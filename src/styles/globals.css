@@ -10,3 +10,16 @@ body {
   color: #ecedee;
 }
 
+:root {
+  --bg-dark: #050505;
+  --bg-card: #111113;
+  --bg-elevated: #18181b;
+  --border-subtle: #2a2a2f;
+  --text-primary: #f0f0f0;
+  --text-secondary: #a1a1aa;
+  --accent-purple: #a855f7;
+  --accent-purple-dark: #9333ea;
+  --success-green: #22c55e;
+  --warning-amber: #f59e0b;
+  --danger-red: #ef4444;
+}
