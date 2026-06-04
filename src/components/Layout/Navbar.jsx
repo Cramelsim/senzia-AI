@@ -14,4 +14,21 @@ const Navbar = () => {
           </h1>
         </Link>
 
-        
+        {/* Desktop Menu */}
+        <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '2rem' }}>
+            <Link to="/" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>Home</Link>
+            <Link to="/dashboard" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>Dashboard</Link>
+            <Link to="/pricing" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>Pricing</Link>
+          </div>
+          <Link to="/demo">
+            <button style={{ background: 'var(--accent-purple)', border: 'none', padding: '0.5rem 1.5rem', borderRadius: '40px', color: 'white', fontWeight: 600, cursor: 'pointer' }}>
+              Book Demo
+            </button>
+          </Link>
+        </div>
+      </div>
+    </nav>
+  );
+};
+
