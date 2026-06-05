@@ -6,16 +6,3 @@ import Capabilities from '../components/Landing/Capabilities';
 import Pricing from '../components/Landing/Pricing';
 import Testimonials from '../components/Landing/Testimonials';
 
-const Home = () => {
-  return (
-    <Layout>
-      <Hero />
-      <Features />
-      <Capabilities />
-      <Pricing />
-      <Testimonials />
-    </Layout>
-  );
-};
-
-export default Home;
