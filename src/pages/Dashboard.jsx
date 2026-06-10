@@ -19,4 +19,10 @@ const Dashboard = () => {
     { title: 'Inventory variance detected', time: 'May 31, 2025 - 8:06 AM', type: 'warning' }
   ];
 
+  const handleAskAI = () => {
+    if (aiQuery.trim()) {
+      setAiResponse(`Based on your data, ${aiQuery}. Your revenue is up 18.6% MTD, and we recommend optimizing supplier payments to reduce expenses further.`);
+    }
+  };
+
   
