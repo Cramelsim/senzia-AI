@@ -13,4 +13,10 @@ const Dashboard = () => {
     { label: 'Operating Expenses', value: 'KES 710,000', change: '-6.4%', trend: 'down', vs: 'vs Apr' }
   ];
 
+  const alerts = [
+    { title: 'High supplier payment detected', time: 'May 31, 2025 - 10:32 AM', type: 'warning' },
+    { title: 'Unusual discount given', time: 'May 31, 2025 - 9:15 AM', type: 'danger' },
+    { title: 'Inventory variance detected', time: 'May 31, 2025 - 8:06 AM', type: 'warning' }
+  ];
+
   
