@@ -34,3 +34,4 @@ const Features = () => {
   );
 };
 
+export default Capabilities;
