@@ -1,11 +1,14 @@
 import React from 'react';
+import Navbar from '../components/Layout/Navbar';
+import Hero from '../components/Landing/Hero';
+import Features from '../components/Landing/Features';
 
 const Home = () => {
   return (
     <div>
-      <h1 style={{ color: 'white', textAlign: 'center', padding: '2rem' }}>
-        SENZIA AI - Testing
-      </h1>
+      <Navbar />
+      <Hero />
+      <Features />
     </div>
   );
 };
