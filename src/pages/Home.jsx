@@ -1,20 +1,12 @@
 import React from 'react';
-import Layout from '../components/Layout/Layout';
-import Hero from '../components/Landing/Hero';
-import Features from '../components/Landing/Features';
-import Capabilities from '../components/Landing/Capabilities';
-import Pricing from '../components/Landing/Pricing';
-import Testimonials from '../components/Landing/Testimonials';
 
 const Home = () => {
   return (
-    <Layout>
-      <Hero />
-      <Features />
-      <Capabilities />
-      <Pricing />
-      <Testimonials />
-    </Layout>
+    <div>
+      <h1 style={{ color: 'white', textAlign: 'center', padding: '2rem' }}>
+        SENZIA AI - Testing
+      </h1>
+    </div>
   );
 };
 
