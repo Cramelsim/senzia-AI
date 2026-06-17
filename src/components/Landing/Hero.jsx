@@ -1,39 +1,75 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Brain, Shield, Zap } from 'lucide-react';
 
 const Hero = () => {
+  const companies = ['Safaricom', 'EQUITY', 'KCB', 'NCBA', 'absa'];
+
   return (
-    <section style={{ padding: '4rem 0', textAlign: 'center' }}>
+    <section style={{ 
+      padding: '5rem 0 4rem',
+      background: 'linear-gradient(135deg, #faf5ff 0%, #ffffff 50%, #f3f4f6 100%)'
+    }}>
       <div className="container">
-        <h1 style={{ fontSize: '3.5rem', fontWeight: 800, marginBottom: '1rem', background: 'linear-gradient(135deg, #fff, #c084fc)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-          Intelligence that <br />understands your business.
-        </h1>
-        <p style={{ fontSize: '1.2rem', color: 'var(--text-secondary)', maxWidth: '600px', margin: '0 auto 2rem' }}>
-          SENZIA AI analyzes your data, detects what matters, and gives you clear recommendations so you can make better decisions, faster.
-        </p>
-        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginBottom: '3rem' }}>
-          <Link to="/demo">
-            <button className="btn-primary">Book a Demo</button>
-          </Link>
-          <Link to="/dashboard">
-            <button style={{ background: 'transparent', border: '1px solid var(--accent-purple)', padding: '0.75rem 1.5rem', borderRadius: '40px', color: 'white', cursor: 'pointer' }}>
-              Explore Features
+        <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
+          <h1 style={{ 
+            fontSize: '3.5rem', 
+            fontWeight: 800, 
+            marginBottom: '1.5rem',
+            lineHeight: '1.1',
+            letterSpacing: '-0.02em',
+            color: '#1a1a1a'
+          }}>
+            Intelligence. <br />Automation. Growth.
+          </h1>
+          
+          <p style={{ 
+            fontSize: '1.25rem', 
+            color: 'var(--text-secondary)',
+            maxWidth: '700px',
+            margin: '0 auto 2.5rem',
+            lineHeight: '1.6'
+          }}>
+            Senzia is an AI-powered Business Intelligence platform that combines real-time data, 
+            advanced analytics, and financial expertise to help businesses increase profitability, 
+            detect risks, automate operations, and uncover new growth opportunities.
+          </p>
+
+          <Link to="/get-started">
+            <button className="btn-primary" style={{ fontSize: '1.1rem', padding: '0.875rem 2.5rem' }}>
+              Get Started →
             </button>
           </Link>
-        </div>
-        <div style={{ display: 'flex', gap: '2rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-          {[
-            { icon: Brain, text: 'Advanced AI Models', sub: 'Trained on real business data' },
-            { icon: Shield, text: 'Secure & Private', sub: 'Bank-grade security' },
-            { icon: Zap, text: 'Real-Time Intelligence', sub: 'Instant alerts & insights' }
-          ].map((feature, i) => (
-            <div key={i} style={{ textAlign: 'center', padding: '1rem' }}>
-              <feature.icon size={40} color="var(--accent-purple)" style={{ marginBottom: '0.5rem' }} />
-              <h3>{feature.text}</h3>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>{feature.sub}</p>
-            </div>
-          ))}
+
+          <p style={{ 
+            marginTop: '2rem', 
+            color: 'var(--text-muted)',
+            fontSize: '0.95rem'
+          }}>
+            Trusted by 15,000+ businesses to drive performance and grow.
+          </p>
+
+          {/* Company Logos */}
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            gap: '3rem', 
+            marginTop: '3rem',
+            flexWrap: 'wrap',
+            alignItems: 'center'
+          }}>
+            {companies.map((company, index) => (
+              <div key={index} style={{ 
+                fontSize: '1.1rem', 
+                fontWeight: 600,
+                color: 'var(--text-secondary)',
+                letterSpacing: '0.05em',
+                textTransform: 'uppercase',
+                opacity: 0.7
+              }}>
+                {company}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
