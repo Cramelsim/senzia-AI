@@ -1,29 +1,59 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <nav style={{ borderBottom: '1px solid var(--border-subtle)', background: 'rgba(5,5,5,0.95)', backdropFilter: 'blur(10px)', position: 'sticky', top: 0, zIndex: 50 }}>
-      <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 2rem' }}>
-        <Link to="/" style={{ textDecoration: 'none' }}>
-          <h1 style={{ fontSize: '1.8rem', fontWeight: 800, background: 'linear-gradient(135deg, #fff, #a855f7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-            SENZIA <span style={{ fontWeight: 400, color: '#a1a1aa' }}>AI</span>
-          </h1>
+    <nav style={{ 
+      background: 'white', 
+      borderBottom: '1px solid #e5e7eb',
+      padding: '0.75rem 0',
+      position: 'sticky',
+      top: 0,
+      zIndex: 50
+    }}>
+      <div className="container" style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center' 
+      }}>
+        {/* Logo */}
+        <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <div style={{ 
+            width: '40px', 
+            height: '40px', 
+            background: 'var(--accent-purple)', 
+            borderRadius: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontWeight: 'bold',
+            fontSize: '1.2rem',
+            color: 'white'
+          }}>
+            S
+          </div>
+          <span style={{ 
+            fontSize: '1.5rem', 
+            fontWeight: 700, 
+            color: '#1a1a1a',
+            letterSpacing: '-0.02em'
+          }}>
+            SENZIA
+          </span>
         </Link>
 
-        {/* Desktop Menu */}
+        {/* Desktop Navigation */}
         <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
-          <div style={{ display: 'flex', gap: '2rem' }}>
-            <Link to="/" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>Home</Link>
-            <Link to="/dashboard" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>Dashboard</Link>
-            <Link to="/pricing" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>Pricing</Link>
-          </div>
+          <Link to="/product" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.95rem', fontWeight: 500 }}>Product</Link>
+          <Link to="/ai-consulting" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.95rem', fontWeight: 500 }}>AI Consulting & Training</Link>
+          <Link to="/about" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.95rem', fontWeight: 500 }}>About Us</Link>
+          <Link to="/pricing" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.95rem', fontWeight: 500 }}>Pricing</Link>
+          <Link to="/contact" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.95rem', fontWeight: 500 }}>Contact</Link>
           <Link to="/demo">
-            <button style={{ background: 'var(--accent-purple)', border: 'none', padding: '0.5rem 1.5rem', borderRadius: '40px', color: 'white', fontWeight: 600, cursor: 'pointer' }}>
-              Book Demo
+            <button className="btn-primary" style={{ padding: '0.5rem 1.5rem', fontSize: '0.95rem' }}>
+              Book a Demo
             </button>
           </Link>
         </div>
