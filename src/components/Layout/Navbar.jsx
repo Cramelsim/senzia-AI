@@ -1,6 +1,15 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
+const LogoMark = () => (
+  <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+    <path
+      d="M9 9 L27 9 L27 16 L13 16 L13 20 L27 20 L27 27 L9 27 L9 20 L23 20 L23 16 L9 16 Z"
+      fill="var(--accent-gold)"
+    />
+  </svg>
+);
+
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
