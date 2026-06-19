@@ -92,4 +92,88 @@ const Product = () => {
     },
   ];
 
-  
+  const pillars = [
+    { icon: Brain, title: 'Intelligence', desc: 'Turning data into actionable insights for smarter decisions.' },
+    { icon: LineChart, title: 'Automation', desc: 'Streamlining operations and reducing manual work.' },
+    { icon: Target, title: 'Growth', desc: 'Identifying opportunities and driving sustainable growth.' },
+    { icon: ShieldCheck, title: 'Integrity', desc: 'Building trust through security, transparency and reliability.' },
+  ];
+
+  return (
+    <div style={{ background: 'var(--bg-dark)' }}>
+      {/* Hero */}
+      <section
+        style={{
+          position: 'relative',
+          padding: '5rem 0 4rem',
+          background: 'radial-gradient(circle at 75% 20%, #14213d 0%, #05070d 55%, #05070d 100%)',
+        }}
+      >
+        <div className="container">
+          <p style={{ color: 'var(--accent-gold)', fontWeight: 700, letterSpacing: '0.1em', fontSize: '0.85rem', marginBottom: '1rem' }}>
+            PRODUCT
+          </p>
+          <h1
+            style={{
+              fontSize: '3rem',
+              fontWeight: 800,
+              maxWidth: '700px',
+              lineHeight: '1.15',
+              letterSpacing: '-0.02em',
+              color: 'var(--text-primary)',
+              marginBottom: '1.5rem',
+            }}
+          >
+            One platform. Every part of your business intelligence.
+          </h1>
+          <p style={{ fontSize: '1.15rem', color: 'var(--text-secondary)', maxWidth: '640px', lineHeight: '1.6', marginBottom: '2rem' }}>
+            Senzia brings financial intelligence, fraud detection, forecasting, opportunity discovery
+            and an AI assistant into a single dashboard — so you stop switching tools and start making
+            faster decisions.
+          </p>
+          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+            <Link to="/get-started">
+              <button className="btn-primary" style={{ fontSize: '1.05rem', padding: '0.875rem 2.25rem' }}>
+                Get Started →
+              </button>
+            </Link>
+            <Link to="/demo">
+              <button className="btn-outline" style={{ fontSize: '1.05rem', padding: '0.85rem 2rem' }}>
+                Book a Demo
+              </button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Four pillars strip */}
+      <section style={{ padding: '0 0 4rem' }}>
+        <div className="container">
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+              gap: '2rem',
+              background: 'var(--bg-dark-card)',
+              border: '1px solid var(--border-subtle)',
+              borderRadius: '12px',
+              padding: '2.5rem',
+            }}
+          >
+            {pillars.map((p, i) => {
+              const Icon = p.icon;
+              return (
+                <div key={i}>
+                  <Icon size={28} color="var(--accent-gold)" style={{ marginBottom: '0.75rem' }} strokeWidth={1.8} />
+                  <h3 style={{ fontSize: '1.05rem', fontWeight: 700, marginBottom: '0.4rem', color: 'var(--text-primary)' }}>
+                    {p.title}
+                  </h3>
+                  <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', lineHeight: '1.5' }}>{p.desc}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+     
