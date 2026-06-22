@@ -4,6 +4,7 @@ import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import Pricing from './pages/Pricing';
 import Demo from './pages/Demo';
+import About from './pages/About';
 
 function App() {
   return (
