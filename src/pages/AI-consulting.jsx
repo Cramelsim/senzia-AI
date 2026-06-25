@@ -638,3 +638,4 @@ const AIConsulting = () => {
   );
 };
 
+export default AIConsulting;
