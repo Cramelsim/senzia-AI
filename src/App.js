@@ -22,6 +22,7 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/ai-consulting" element={<AIConsulting />} />
         <Route path="/contact" element={<Contact />} />
+                <Route path="/resources" element={<Resources />} />
       </Routes>
     </Router>
   );
