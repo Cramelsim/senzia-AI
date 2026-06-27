@@ -8,6 +8,7 @@ import Product from './pages/Product';
 import About from './pages/About';
 import AIConsulting from './pages/AI-consulting';
 import Contact from './pages/Contact.jsx';
+import Resources from './pages/Resources';
 
 function App() {
   return (
