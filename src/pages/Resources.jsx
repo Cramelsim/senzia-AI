@@ -492,15 +492,7 @@ const Resources = () => {
             </button>
           </Link>
 
-          <Link to="/resources" style={{ 
-  color: isActive('/resources') ? '#7c3aed' : 'var(--text-secondary)', 
-  textDecoration: 'none', 
-  fontSize: '0.95rem', 
-  fontWeight: 500,
-  transition: 'color 0.2s ease'
-}}>
-  Resources
-</Link>
+          
         </div>
       </section>
     </div>
