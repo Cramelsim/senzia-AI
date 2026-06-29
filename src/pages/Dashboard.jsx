@@ -1,32 +1,17 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  BarChart3,
   TrendingUp,
   TrendingDown,
-  Wallet,
-  Users,
-  ShoppingBag,
-  AlertCircle,
   Bell,
-  Search,
-  Filter,
-  Download,
+  MessageCircle,
   Calendar,
   ChevronDown,
-  MoreVertical,
-  ArrowUpRight,
-  ArrowDownRight,
-  Eye,
-  MessageCircle,
-  Settings,
-  HelpCircle,
-  Menu,
-  X
+  Filter,
+  Download
 } from 'lucide-react';
 
 const Dashboard = () => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState('This Week');
 
   // Metrics data
@@ -458,7 +443,7 @@ const Dashboard = () => {
               marginBottom: '1.5rem'
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                <h3 style={{ fontSize: '1.1rem, fontWeight: 700, color: '#1a1a1a' }}>AI Insights</h3>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#1a1a1a' }}>AI Insights</h3>
                 <Link to="/insights" style={{ color: '#7c3aed', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600 }}>View All →</Link>
               </div>
               {aiInsights.map((insight, index) => (
