@@ -11,7 +11,7 @@ import {
   Download
 } from 'lucide-react';
 
-const Dashboard = () => {
+const Dashboard = ({ user, onLogout }) => {
   const [selectedPeriod, setSelectedPeriod] = useState('This Week');
 
   // Metrics data
@@ -186,39 +186,91 @@ const Dashboard = () => {
             </Link>
             
             <div style={{ display: 'flex', gap: '1.5rem', marginLeft: '1rem' }}>
-              <Link to="/dashboard" style={{ color: '#7c3aed', textDecoration: 'none', fontWeight: 600, fontSize: '0.9rem' }}>Dashboard</Link>
-              <Link to="/data-sources" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.9rem' }}>Data Sources</Link>
-              <Link to="/reports" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.9rem' }}>Reports</Link>
-              <Link to="/ai-assistant" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.9rem' }}>AI Assistant</Link>
-              <Link to="/insights" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.9rem' }}>Insights</Link>
-              <Link to="/settings" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.9rem' }}>Settings</Link>
-            </div>
-          </div>
+  <Link to="/dashboard" style={{ color: '#7c3aed', textDecoration: 'none', fontWeight: 600, fontSize: '0.9rem' }}>Dashboard</Link>
+  <Link to="/data-sources" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.9rem' }}>Data Sources</Link>
+  <Link to="/reports" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.9rem' }}>Reports</Link>
+  <Link to="/ai-assistant" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.9rem' }}>AI Assistant</Link>
+  <Link to="/insights" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.9rem' }}>Insights</Link>
+  <Link to="/settings" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.9rem' }}>Settings</Link>
+</div>
+  <button
+    style={{
+      background: 'transparent',
+      border: 'none',
+      cursor: 'pointer',
+      padding: '0.25rem'
+    }}
+  >
+    <Bell size={20} color="#4a4a4a" />
+  </button>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <button style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '0.25rem' }}>
-              <Bell size={20} color="#4a4a4a" />
-            </button>
-            <button style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '0.25rem' }}>
-              <MessageCircle size={20} color="#4a4a4a" />
-            </button>
-            <div style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '50%',
-              background: 'linear-gradient(135deg, #7c3aed, #6d28d9)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'white',
-              fontWeight: 600,
-              fontSize: '0.8rem'
-            }}>
-              JM
-            </div>
-          </div>
-        </div>
-      </nav>
+  <button
+    style={{
+      background: 'transparent',
+      border: 'none',
+      cursor: 'pointer',
+      padding: '0.25rem'
+    }}
+  >
+    <MessageCircle size={20} color="#4a4a4a" />
+  </button>
+
+  <div
+    style={{
+      width: '32px',
+      height: '32px',
+      borderRadius: '50%',
+      background: 'linear-gradient(135deg, #7c3aed, #6d28d9)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      color: 'white',
+      fontWeight: 600,
+      fontSize: '0.8rem'
+    }}
+  >
+    {user?.name
+      ? user.name
+          .split(' ')
+          .map((n) => n[0])
+          .join('')
+          .toUpperCase()
+      : 'JM'}
+  </div>
+
+  <button
+    onClick={onLogout}
+    style={{
+      padding: '0.5rem 1rem',
+      border: '1px solid #e5e7eb',
+      borderRadius: '8px',
+      background: 'white',
+      cursor: 'pointer'
+    }}
+  >
+    Logout
+  </button>
+</div>
+
+
+</div>
+</nav>
+
+<div className="container" style={{ padding: '1.5rem 2rem' }}>
+
+  <button
+    onClick={onLogout}
+    style={{
+      padding: '0.5rem 1rem',
+      border: '1px solid #e5e7eb',
+      borderRadius: '8px',
+      background: 'white',
+      cursor: 'pointer'
+    }}
+  >
+    Logout
+  </button>
+</div>
 
       <div className="container" style={{ padding: '1.5rem 2rem' }}>
         {/* Header with Welcome and Filters */}
@@ -232,11 +284,12 @@ const Dashboard = () => {
         }}>
           <div>
             <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#1a1a1a' }}>
-              Welcome back, John! 🎉
-            </h1>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-              Here's what's happening with Senzia Limited today.
-            </p>
+  Welcome back, {user?.name || 'John'}! 🎉
+</h1>
+
+<p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+  Here's what's happening with {user?.businessName || 'Senzia Limited'} today.
+</p>
           </div>
           <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
             <button style={{
