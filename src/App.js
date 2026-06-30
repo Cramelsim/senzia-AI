@@ -10,6 +10,7 @@ import AIConsulting from './pages/AI-consulting';
 import Contact from './pages/Contact';
 import Resources from './pages/Resources';
 import Onboarding from './pages/Onboarding';
+import DataSources from './pages/DataSources';
 import SetupComplete from './pages/SetupComplete';
 
 function App() {
