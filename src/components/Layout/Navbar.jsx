@@ -144,11 +144,11 @@ const Navbar = () => {
                 {link.label}
               </Link>
             ))}
-            <Link to="/demo" onClick={() => setIsOpen(false)}>
-              <button className="btn-outline" style={{ width: '100%', padding: '0.75rem', marginTop: '0.5rem' }}>
-                Book a Demo
-              </button>
-            </Link>
+            <Link to="/demo">
+  <button className="btn-outline" style={{ padding: '0.5rem 1.5rem', fontSize: '0.95rem' }}>
+    Book a Demo
+  </button>
+</Link>
           </div>
         </div>
       )}
