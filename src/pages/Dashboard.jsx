@@ -192,6 +192,20 @@ const Dashboard = ({ user, onLogout }) => {
   <Link to="/ai-assistant" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.9rem' }}>AI Assistant</Link>
   <Link to="/insights" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.9rem' }}>Insights</Link>
   <Link to="/settings" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.9rem' }}>Settings</Link>
+ 
+<Link to="/demo">
+  <button style={{
+    padding: '0.5rem 1.5rem',
+    border: '1px solid #7c3aed',
+    borderRadius: '8px',
+    background: 'transparent',
+    color: '#7c3aed',
+    fontWeight: 600,
+    cursor: 'pointer'
+  }}>
+    Book a Demo
+  </button>
+</Link>
 </div>
   <button
     style={{
