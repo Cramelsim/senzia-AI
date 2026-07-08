@@ -6,7 +6,7 @@ import Pricing from './pages/Pricing';
 import Demo from './pages/Demo';
 import Product from './pages/Product';
 import About from './pages/About';
-import AIConsulting from './pages/AI-consulting';
+import AIConsulting from './pages/AIConsulting';
 import Contact from './pages/Contact';
 import Resources from './pages/Resources';
 import DataSources from './pages/DataSources';
@@ -82,7 +82,7 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/resources" element={<Resources />} />
         
-        {/* Demo Route */}
+        {/* Demo Route - Make sure this is correct */}
         <Route path="/demo" element={<Demo onLogin={handleLogin} />} />
         
         {/* Protected Routes */}
@@ -142,7 +142,7 @@ function App() {
           } 
         />
         
-        {/* Catch all */}
+        {/* Catch all - redirect to home */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
