@@ -6,7 +6,7 @@ import Pricing from './pages/Pricing';
 import Demo from './pages/Demo';
 import Product from './pages/Product';
 import About from './pages/About';
-import AIConsulting from './pages/AI-consulting';
+import AIConsulting from './pages/AIConsulting';
 import Contact from './pages/Contact';
 import Resources from './pages/Resources';
 import DataSources from './pages/DataSources';
@@ -14,9 +14,9 @@ import Reports from './pages/Reports';
 import AIAssistant from './pages/AIAssistant';
 import Insights from './pages/Insights';
 import Settings from './pages/Settings';
+import Onboarding from './pages/Onboarding';
 
 function App() {
-  // Auth state
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
   const [onboardingComplete, setOnboardingComplete] = useState(false);
@@ -30,24 +30,31 @@ function App() {
       setUser(JSON.parse(savedUser));
       setIsAuthenticated(true);
       setOnboardingComplete(savedOnboarding === 'true');
+      console.log('✅ User authenticated:', JSON.parse(savedUser));
+    } else {
+      console.log('❌ No user found in localStorage');
     }
     setLoading(false);
   }, []);
 
   const handleLogin = (userData) => {
+    console.log('🔐 handleLogin called with:', userData);
     setUser(userData);
     setIsAuthenticated(true);
     setOnboardingComplete(false);
     localStorage.setItem('senzia_user', JSON.stringify(userData));
     localStorage.setItem('senzia_onboarding_complete', 'false');
+    console.log('✅ User logged in, redirecting to onboarding');
   };
 
   const completeOnboarding = () => {
+    console.log('✅ Onboarding completed');
     setOnboardingComplete(true);
     localStorage.setItem('senzia_onboarding_complete', 'true');
   };
 
   const handleLogout = () => {
+    console.log('👋 User logged out');
     setUser(null);
     setIsAuthenticated(false);
     setOnboardingComplete(false);
@@ -70,6 +77,8 @@ function App() {
     );
   }
 
+  console.log('🔍 App state:', { isAuthenticated, onboardingComplete, user });
+
   return (
     <Router>
       <Routes>
@@ -82,10 +91,20 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/resources" element={<Resources />} />
         
-        {/* Demo Route - Make sure this is correct */}
+        {/* Demo Route */}
         <Route path="/demo" element={<Demo onLogin={handleLogin} />} />
         
-        {/* Protected Routes */}
+        {/* Onboarding Route */}
+        <Route 
+          path="/onboarding" 
+          element={
+            isAuthenticated ? 
+              <Onboarding user={user} onComplete={completeOnboarding} /> : 
+              <Navigate to="/demo" replace />
+          } 
+        />
+        
+        {/* Protected Routes - Dashboard and others */}
         <Route 
           path="/dashboard" 
           element={
