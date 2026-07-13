@@ -6,7 +6,7 @@ import Pricing from './pages/Pricing';
 import Demo from './pages/Demo';
 import Product from './pages/Product';
 import About from './pages/About';
-import AIConsulting from './pages/AIConsulting';
+import AIConsulting from './pages/AI-cnsulting';
 import Contact from './pages/Contact';
 import Resources from './pages/Resources';
 import DataSources from './pages/DataSources';
