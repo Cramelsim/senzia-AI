@@ -119,14 +119,7 @@ const AIAssistant = () => {
     }, 1500);
   };
 
-  const handleSuggestionClick = (suggestion) => {
-    setInputMessage(suggestion);
-    // Auto-send after setting the message
-    setTimeout(() => {
-      handleSendMessage();
-    }, 100);
-  };
-
+  
   const handleKeyPress = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
