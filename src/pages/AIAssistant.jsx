@@ -127,7 +127,12 @@ const AIAssistant = () => {
     }, 100);
   };
 
-  
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
 
   return (
     <div style={{ background: '#f8f9fa', minHeight: '100vh' }}>
