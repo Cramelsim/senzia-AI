@@ -80,7 +80,17 @@ const Insights = () => {
   ];
 
   // Critical insights
-  
+  const criticalInsights = [
+    {
+      type: 'critical',
+      title: 'Expense Spike Detected',
+      description: 'Office Supplies expenses are 32% higher than usual.',
+      action: 'Investigate',
+      link: '/reports',
+      icon: AlertCircle,
+      color: '#ef4444',
+      bgColor: '#fee2e2'
+    },
     {
       type: 'opportunity',
       title: 'Revenue Up 18.6%',
@@ -676,4 +686,3 @@ const Insights = () => {
   );
 };
 
-export default Insights;
