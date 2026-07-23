@@ -42,7 +42,7 @@ const Insights = () => {
       value: 'KES 248,420',
       change: '+18.6%',
       trend: 'up',
-      vs: 'vs last week',
+      // vs: 'vs last week'
       icon: TrendingUp,
       color: '#22c55e',
       bgColor: '#dcfce7'
