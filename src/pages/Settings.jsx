@@ -58,4 +58,34 @@ const Settings = () => {
     confirmPassword: ''
   });
 
-  
+  const [activityLog, setActivityLog] = useState([
+    { action: 'User permissions updated', user: 'Alice Nijuguna', time: 'Today, 09:15 AM' },
+    { action: 'New user invited', user: 'Brian Otieno', time: 'Yesterday, 04:45 PM' },
+    { action: 'User deactivated', user: 'Cynthia Wanjiku', time: 'May 11, 2025, 02:30 PM' },
+    { action: 'System settings updated', user: 'John M.', time: 'May 10, 2025, 11:20 AM' },
+    { action: 'Data export requested', user: 'Sarah K.', time: 'May 9, 2025, 09:45 AM' }
+  ]);
+
+  const tabs = [
+    { id: 'general', label: 'General', icon: SettingsIcon },
+    { id: 'security', label: 'Security', icon: Shield },
+    { id: 'notifications', label: 'Notifications', icon: Bell },
+    { id: 'users', label: 'Users', icon: Users },
+    { id: 'data', label: 'Data Settings', icon: Database },
+    { id: 'system', label: 'System', icon: Monitor }
+  ];
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
+  const handleSave = () => {
+    setIsEditing(false);
+    // In a real app, save to backend
+    console.log('Settings saved:', formData);
+  };
+
