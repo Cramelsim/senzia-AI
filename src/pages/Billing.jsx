@@ -98,7 +98,7 @@ const Billing = () => {
   const addons = [
     { name: 'Additional Users', used: 12, total: 20, price: 'KES 5,000', icon: Users },
     { name: 'Extra Data Sources', used: 15, total: 25, price: 'KES 3,000', icon: Database },
-    { name: 'Additional AI Requests', used: 2,450, total: 5,000, price: 'KES 2,500', icon: Zap }
+    { name: 'Additional AI Requests', used: 2,450, total: 5000, price: 'KES 2,500', icon: Zap }
   ];
 
   // Payment method
