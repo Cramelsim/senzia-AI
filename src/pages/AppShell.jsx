@@ -159,6 +159,7 @@ const AppShell = ({
                   onClick={() => onTabChange && onTabChange(tab.id)}
                 >
                   {tab.label}
+                  {tab.caret && <ChevronDown size={13} style={{ marginLeft: '0.3rem', verticalAlign: '-2px' }} />}
                 </button>
               ))}
             </div>
