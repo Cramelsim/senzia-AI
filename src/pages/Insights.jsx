@@ -1,627 +1,362 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  TrendingUp, 
-  TrendingDown,
+import {
+  Sparkles,
   AlertCircle,
-  Zap,
-  Lightbulb,
+  TrendingUp,
+  TrendingDown,
   Target,
-  BarChart3,
-  PieChart,
-  Clock,
-  ChevronRight,
-  Eye,
-  CheckCircle,
+  AlertTriangle,
   DollarSign,
-  ShoppingBag,
-  Users,
-  Activity,
-  Filter,
+  PieChart,
+  BarChart3,
+  ChevronRight,
   Calendar,
-  Download,
+  MoreHorizontal,
+  Brain,
+  ShoppingBag,
   ArrowUpRight,
   ArrowDownRight,
-  Bell,
-  MessageCircle,
-  Settings,
-  HelpCircle,
-  Menu,
-  X,
-  Search
 } from 'lucide-react';
+import AppShell from './AppShell';
+import './Insights.css';
+
+const TABS = [
+  { id: 'overview', label: 'Overview' },
+  { id: 'trends', label: 'Trends', caret: true },
+  { id: 'anomalies', label: 'Anomalies' },
+  { id: 'opportunities', label: 'Opportunities', caret: true },
+  { id: 'benchmarks', label: 'Benchmarks', caret: true },
+  { id: 'alerts', label: 'Smart Alerts' },
+];
+
+const insightCards = [
+  {
+    tone: 'critical',
+    tag: 'Critical Insight',
+    title: 'Expense Spike Detected',
+    desc: 'Office Supplies expenses are 32% higher than usual.',
+    action: 'Investigate',
+    link: '/reports',
+    icon: AlertCircle,
+    spark: 'down',
+  },
+  {
+    tone: 'growth',
+    tag: 'Growth Insight',
+    title: 'Revenue Up 18.6%',
+    desc: 'Your revenue this week is higher compared to last week.',
+    action: 'View Details',
+    link: '/reports',
+    icon: TrendingUp,
+    spark: 'up',
+  },
+  {
+    tone: 'efficiency',
+    tag: 'Efficiency Insight',
+    title: 'Profit Margin Improved',
+    desc: 'Gross profit margin improved by 4.7% this week.',
+    action: 'View Analysis',
+    link: '/reports',
+    icon: Target,
+    spark: 'up',
+  },
+  {
+    tone: 'warning',
+    tag: 'Warning Insight',
+    title: 'Low Stock Alert',
+    desc: '5 products are running low on inventory.',
+    action: 'Check Inventory',
+    link: '/data-sources',
+    icon: AlertTriangle,
+    spark: 'bars',
+  },
+];
+
+const keyMetrics = [
+  { label: 'Total Revenue', value: 'KES 248,420', change: '+18.6%', up: true, icon: DollarSign, tone: 'good' },
+  { label: 'Gross Profit', value: 'KES 98,540', change: '+14.3%', up: true, icon: PieChart, tone: 'accent' },
+  { label: 'Net Profit', value: 'KES 36,190', change: '+27.4%', up: true, icon: BarChart3, tone: 'info' },
+  { label: 'Total Expenses', value: 'KES 62,350', change: '-7.8%', up: false, icon: TrendingDown, tone: 'warning' },
+];
+
+/* ---- Trend chart data (Apr 15 – May 12) ---- */
+const trendSeries = [
+  { key: 'revenue', label: 'Revenue', value: 'KES 248,420', change: '+18.6%', color: '#34c98e', data: [118000, 132000, 127000, 148000, 162000, 178000, 205000, 222000, 248420] },
+  { key: 'grossProfit', label: 'Gross Profit', value: 'KES 98,540', change: '+14.3%', color: '#a855f7', data: [58000, 63000, 60000, 70000, 76000, 84000, 90000, 95000, 98540] },
+  { key: 'netProfit', label: 'Net Profit', value: 'KES 36,190', change: '+27.4%', color: '#4f8bf0', data: [16000, 18000, 15500, 20000, 23000, 27000, 30000, 33000, 36190] },
+  { key: 'expenses', label: 'Expenses', value: 'KES 62,350', change: '-7.8%', color: '#f0a828', data: [68000, 66000, 70000, 64000, 67000, 63000, 65000, 60000, 62350] },
+];
+
+const xLabels = { 0: 'Apr 15', 2: 'Apr 22', 4: 'Apr 29', 6: 'May 6', 8: 'May 12' };
+
+const TrendChart = () => {
+  const width = 680;
+  const height = 260;
+  const padL = 46;
+  const padR = 14;
+  const padT = 10;
+  const padB = 28;
+  const plotW = width - padL - padR;
+  const plotH = height - padT - padB;
+  const yMax = 300000;
+  const n = trendSeries[0].data.length;
+
+  const sx = (i) => padL + (i * plotW) / (n - 1);
+  const sy = (v) => padT + plotH - (v / yMax) * plotH;
+
+  const yTicks = [0, 50000, 100000, 150000, 200000, 250000, 300000];
+
+  return (
+    <svg viewBox={`0 0 ${width} ${height}`} width="100%" style={{ display: 'block', minWidth: 520 }}>
+      {yTicks.map((t) => (
+        <g key={t}>
+          <line x1={padL} x2={width - padR} y1={sy(t)} y2={sy(t)} stroke="var(--border-soft)" strokeWidth="1" />
+          <text x={padL - 8} y={sy(t) + 3} textAnchor="end" fontSize="10" fill="var(--text-tertiary)">
+            {t === 0 ? '0' : `${t / 1000}K`}
+          </text>
+        </g>
+      ))}
+
+      {Object.entries(xLabels).map(([i, label]) => (
+        <text key={i} x={sx(Number(i))} y={height - 6} textAnchor="middle" fontSize="10" fill="var(--text-tertiary)">
+          {label}
+        </text>
+      ))}
+
+      {trendSeries.map((s) => (
+        <g key={s.key}>
+          <polyline
+            fill="none"
+            stroke={s.color}
+            strokeWidth="2.25"
+            strokeLinejoin="round"
+            strokeLinecap="round"
+            points={s.data.map((v, i) => `${sx(i)},${sy(v)}`).join(' ')}
+          />
+          {s.data.map((v, i) => (
+            <circle key={i} cx={sx(i)} cy={sy(v)} r="3" fill={s.color} />
+          ))}
+        </g>
+      ))}
+    </svg>
+  );
+};
+
+/* ---- Mini sparkline for the 4 top insight cards ---- */
+const MiniSpark = ({ type, color }) => {
+  if (type === 'bars') {
+    const bars = [8, 14, 10, 18, 22];
+    return (
+      <svg width="64" height="28" viewBox="0 0 64 28">
+        {bars.map((h, i) => (
+          <rect key={i} x={i * 13} y={28 - h} width="8" height={h} rx="1.5" fill={color} opacity={0.4 + i * 0.12} />
+        ))}
+      </svg>
+    );
+  }
+  const points = type === 'up'
+    ? [22, 18, 20, 12, 14, 6, 2]
+    : [6, 10, 8, 14, 12, 18, 22];
+  const pts = points.map((y, i) => `${i * 10},${y}`).join(' ');
+  return (
+    <svg width="64" height="28" viewBox="0 0 64 28">
+      <polyline fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" points={pts} />
+    </svg>
+  );
+};
+
+/* ---- Donut chart ---- */
+const donutSegments = [
+  { name: 'E-Commerce Sales', pct: 64, color: '#34c98e' },
+  { name: 'New Customers', pct: 18, color: '#a855f7' },
+  { name: 'Product Mix Improvement', pct: 12, color: '#4f8bf0' },
+  { name: 'Marketing Campaigns', pct: 6, color: '#f0a828' },
+];
+
+const Donut = () => {
+  const r = 46;
+  const stroke = 15;
+  const c = 2 * Math.PI * r;
+  let acc = 0;
+  return (
+    <svg width="120" height="120" viewBox="0 0 120 120">
+      <g transform="rotate(-90 60 60)">
+        <circle cx="60" cy="60" r={r} fill="none" stroke="var(--border-soft)" strokeWidth={stroke} />
+        {donutSegments.map((seg) => {
+          const dash = (seg.pct / 100) * c;
+          const offset = -(acc / 100) * c;
+          acc += seg.pct;
+          return (
+            <circle
+              key={seg.name}
+              cx="60"
+              cy="60"
+              r={r}
+              fill="none"
+              stroke={seg.color}
+              strokeWidth={stroke}
+              strokeDasharray={`${dash} ${c - dash}`}
+              strokeDashoffset={offset}
+              strokeLinecap="butt"
+            />
+          );
+        })}
+      </g>
+      <text x="60" y="56" textAnchor="middle" fontSize="19" fontWeight="700" fill="var(--text-primary)">64%</text>
+      <text x="60" y="72" textAnchor="middle" fontSize="9" fill="var(--text-tertiary)">Total Impact</text>
+    </svg>
+  );
+};
+
+const opportunities = [
+  { title: 'Reduce Office Supplies Cost', sub: 'Potential Savings', amount: 'KES 18,500', impact: 'High Impact', icon: DollarSign },
+  { title: 'Optimize Low Performing Products', sub: 'Potential Profit Increase', amount: 'KES 24,000', impact: 'High Impact', icon: ShoppingBag },
+  { title: 'Increase E-Commerce Ad Spend', sub: 'Potential Revenue Increase', amount: 'KES 35,000', impact: 'Medium Impact', icon: ArrowUpRight },
+];
+
+const anomalies = [
+  { title: 'Expense Anomaly', desc: 'Office Supplies expense spiked by 32%', date: 'May 12, 2025', severity: 'High', color: 'var(--danger)', bg: 'var(--danger-soft)', icon: AlertCircle },
+  { title: 'Sales Anomaly', desc: 'Product D sales dropped by 18%', date: 'May 11, 2025', severity: 'Medium', color: 'var(--warning)', bg: 'var(--warning-soft)', icon: TrendingDown },
+  { title: 'Inventory Anomaly', desc: 'Slow moving inventory increased by 23%', date: 'May 10, 2025', severity: 'Medium', color: 'var(--info)', bg: 'rgba(79,139,240,0.12)', icon: ShoppingBag },
+];
+
+const impactPill = (impact) => (impact === 'High Impact' ? 'pill-danger' : 'pill-warning');
+const severityPill = (sev) => (sev === 'High' ? 'pill-danger' : 'pill-warning');
 
 const Insights = () => {
   const [activeTab, setActiveTab] = useState('overview');
-  const [selectedPeriod, setSelectedPeriod] = useState('This Week');
-
-  // Key metrics
-  const metrics = [
-    {
-      title: 'Total Revenue',
-      value: 'KES 248,420',
-      change: '+18.6%',
-      trend: 'up',
-      // vs: 'vs last week'
-      icon: TrendingUp,
-      color: '#22c55e',
-      bgColor: '#dcfce7'
-    },
-    {
-      title: 'Gross Profit',
-      value: 'KES 98,540',
-      change: '+14.3%',
-      trend: 'up',
-      vs: 'vs last week',
-      icon: TrendingUp,
-      color: '#22c55e',
-      bgColor: '#dcfce7'
-    },
-    {
-      title: 'Net Profit',
-      value: 'KES 36,190',
-      change: '+27.4%',
-      trend: 'up',
-      vs: 'vs last week',
-      icon: TrendingUp,
-      color: '#22c55e',
-      bgColor: '#dcfce7'
-    },
-    {
-      title: 'Total Expenses',
-      value: 'KES 62,350',
-      change: '-7.8%',
-      trend: 'down',
-      vs: 'vs last week',
-      icon: TrendingDown,
-      color: '#ef4444',
-      bgColor: '#fee2e2'
-    }
-  ];
-
-  // Critical insights
-  const criticalInsights = [
-    {
-      type: 'critical',
-      title: 'Expense Spike Detected',
-      description: 'Office Supplies expenses are 32% higher than usual.',
-      action: 'Investigate',
-      link: '/reports',
-      icon: AlertCircle,
-      color: '#ef4444',
-      bgColor: '#fee2e2'
-    },
-    {
-      type: 'opportunity',
-      title: 'Revenue Up 18.6%',
-      description: 'Your revenue this week is higher compared to last week.',
-      action: 'View Analysis',
-      link: '/reports',
-      icon: TrendingUp,
-      color: '#22c55e',
-      bgColor: '#dcfce7'
-    },
-    {
-      type: 'efficiency',
-      title: 'Profit Margin Improved',
-      description: 'Gross profit margin improved by 4.7% this week.',
-      action: 'View Analysis',
-      link: '/reports',
-      icon: Target,
-      color: '#8b5cf6',
-      bgColor: '#ede9fe'
-    }
-  ];
-
-  // Top performing areas
-  const topAreas = [
-    { name: 'E-Commerce Sales', percentage: 64, color: '#7c3aed' },
-    { name: 'New Customers', percentage: 18, color: '#8b5cf6' },
-    { name: 'Product Mix Improvement', percentage: 12, color: '#a78bfa' },
-    { name: 'Marketing Campaigns', percentage: 6, color: '#c4b5fd' }
-  ];
-
-  // Opportunities
-  const opportunities = [
-    {
-      title: 'Reduce Office Supplies Cost',
-      potential: 'KES 18,500',
-      impact: 'High Impact',
-      color: '#ef4444'
-    },
-    {
-      title: 'Optimize Low Performing Products',
-      potential: 'KES 24,000',
-      impact: 'High Impact',
-      color: '#f59e0b'
-    },
-    {
-      title: 'Increase E-Commerce Ad Spend',
-      potential: 'KES 35,000',
-      impact: 'Medium Impact',
-      color: '#22c55e'
-    }
-  ];
-
-  // Recent anomalies
-  const anomalies = [
-    {
-      title: 'Expense Anomaly',
-      description: 'Office Supplies expense spiked by 32%',
-      date: 'May 12, 2025',
-      icon: AlertCircle,
-      color: '#ef4444'
-    },
-    {
-      title: 'Sales Anomaly',
-      description: 'Product D sales dropped by 18%',
-      date: 'May 11, 2025',
-      icon: TrendingDown,
-      color: '#f59e0b'
-    },
-    {
-      title: 'Inventory Anomaly',
-      description: 'Slow moving inventory increased by 23%',
-      date: 'May 10, 2025',
-      icon: ShoppingBag,
-      color: '#3b82f6'
-    }
-  ];
-
-  // Business performance trend
-  const trendData = [
-    { label: 'Revenue', value: 'KES 248,420', change: '+18.6%', color: '#7c3aed' },
-    { label: 'Gross Profit', value: 'KES 98,540', change: '+14.3%', color: '#22c55e' },
-    { label: 'Net Profit', value: 'KES 36,190', change: '+27.4%', color: '#8b5cf6' },
-    { label: 'Expenses', value: 'KES 62,350', change: '-7.8%', color: '#ef4444' }
-  ];
-
-  const getImpactColor = (impact) => {
-    switch(impact) {
-      case 'High Impact': return '#ef4444';
-      case 'Medium Impact': return '#f59e0b';
-      default: return '#22c55e';
-    }
-  };
+  const [granularity, setGranularity] = useState('Daily');
 
   return (
-    <div style={{ background: '#f8f9fa', minHeight: '100vh' }}>
-      {/* Navigation */}
-      <nav style={{
-        background: 'white',
-        borderBottom: '1px solid #e5e7eb',
-        padding: '0.75rem 0',
-        position: 'sticky',
-        top: 0,
-        zIndex: 50
-      }}>
-        <div className="container" style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-            <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <div style={{
-                width: '36px',
-                height: '36px',
-                background: 'linear-gradient(135deg, #7c3aed, #6d28d9)',
-                borderRadius: '8px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontWeight: 800,
-                fontSize: '1rem',
-                color: 'white'
-              }}>
-                SZ
-              </div>
-              <span style={{ fontSize: '1.2rem', fontWeight: 700, color: '#1a1a1a' }}>SENZIA</span>
-            </Link>
-            
-            <div style={{ display: 'flex', gap: '1.5rem', marginLeft: '1rem' }}>
-              <Link to="/dashboard" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.9rem' }}>Dashboard</Link>
-              <Link to="/data-sources" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.9rem' }}>Data Sources</Link>
-              <Link to="/reports" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.9rem' }}>Reports</Link>
-              <Link to="/ai-assistant" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.9rem' }}>AI Assistant</Link>
-              <Link to="/insights" style={{ color: '#7c3aed', textDecoration: 'none', fontWeight: 600, fontSize: '0.9rem' }}>Insights</Link>
-              <Link to="/settings" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.9rem' }}>Settings</Link>
-            </div>
-          </div>
+    <AppShell
+      active="Insights"
+      pageIcon={Sparkles}
+      title="Insights Hub"
+      subtitle="Discover what's happening in your business. Powered by AI."
+      tabs={TABS}
+      activeTab={activeTab}
+      onTabChange={setActiveTab}
+      headerActions={
+        <>
+          <button className="btn btn-ghost"><Calendar size={16} /> May 6 – May 12, 2025</button>
+        </>
+      }
+    >
+      <div className="insights-layout">
+        <div className="content-stack">
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <div style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '50%',
-              background: 'linear-gradient(135deg, #7c3aed, #6d28d9)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'white',
-              fontWeight: 600,
-              fontSize: '0.8rem'
-            }}>
-              JM
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      <div className="container" style={{ padding: '2rem' }}>
-        {/* Header */}
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center',
-          marginBottom: '2rem',
-          flexWrap: 'wrap',
-          gap: '1rem'
-        }}>
-          <div>
-            <h1 style={{ fontSize: '1.8rem', fontWeight: 700, color: '#1a1a1a' }}>Insights Hub</h1>
-            <p style={{ color: 'var(--text-secondary)' }}>
-              Discover what's happening in your business. Powered by AI.
-            </p>
-          </div>
-          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
-            <button style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              padding: '0.5rem 1rem',
-              background: 'white',
-              border: '1px solid #e5e7eb',
-              borderRadius: '8px',
-              fontSize: '0.9rem',
-              color: '#1a1a1a',
-              cursor: 'pointer'
-            }}>
-              <Calendar size={16} />
-              May 12 – May 19, 2025
-            </button>
-            <button style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              padding: '0.5rem 1rem',
-              background: 'white',
-              border: '1px solid #e5e7eb',
-              borderRadius: '8px',
-              fontSize: '0.9rem',
-              color: '#1a1a1a',
-              cursor: 'pointer'
-            }}>
-              <Filter size={16} />
-              Filter
-            </button>
-            <button style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              padding: '0.5rem 1rem',
-              background: '#7c3aed',
-              border: 'none',
-              borderRadius: '8px',
-              fontSize: '0.9rem',
-              color: 'white',
-              cursor: 'pointer'
-            }}>
-              <Download size={16} />
-              Export Insights
-            </button>
-          </div>
-        </div>
-
-        {/* Tab Navigation */}
-        <div style={{
-          display: 'flex',
-          gap: '1rem',
-          borderBottom: '1px solid #e5e7eb',
-          paddingBottom: '0.5rem',
-          marginBottom: '2rem'
-        }}>
-          {['Overview', 'Critical', 'Opportunities', 'Benchmarks', 'Alerts'].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab.toLowerCase())}
-              style={{
-                padding: '0.5rem 1.5rem',
-                border: 'none',
-                borderBottom: activeTab === tab.toLowerCase() ? '2px solid #7c3aed' : '2px solid transparent',
-                background: 'transparent',
-                color: activeTab === tab.toLowerCase() ? '#7c3aed' : 'var(--text-secondary)',
-                fontWeight: activeTab === tab.toLowerCase() ? 600 : 400,
-                cursor: 'pointer',
-                transition: 'all 0.2s ease'
-              }}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
-
-        {/* Metrics Grid */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-          gap: '1.5rem',
-          marginBottom: '2rem'
-        }}>
-          {metrics.map((metric, index) => {
-            const Icon = metric.icon;
-            return (
-              <div key={index} style={{
-                background: 'white',
-                padding: '1.25rem',
-                borderRadius: '12px',
-                border: '1px solid #f0f0f0',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.04)'
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
-                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', fontWeight: 500 }}>{metric.title}</p>
-                  <div style={{
-                    padding: '0.25rem 0.5rem',
-                    background: metric.bgColor,
-                    borderRadius: '6px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.25rem'
-                  }}>
-                    <Icon size={14} color={metric.color} />
-                    <span style={{ color: metric.color, fontSize: '0.8rem', fontWeight: 600 }}>{metric.change}</span>
+          {/* ---- Critical insight cards ---- */}
+          <div className="insight-cards-row">
+            {insightCards.map(({ tone, tag, title, desc, action, link, icon: Icon, spark }) => (
+              <div className={`insight-card tone-${tone}`} key={title}>
+                <div className="insight-card-top">
+                  <div className="insight-card-icon"><Icon size={18} /></div>
+                  <div>
+                    <p className="insight-card-tag">{tag}</p>
                   </div>
                 </div>
-                <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#1a1a1a', marginBottom: '0.25rem' }}>
-                  {metric.value}
-                </h2>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>{metric.vs}</p>
+                <h4>{title}</h4>
+                <p className="desc">{desc}</p>
+                <MiniSpark type={spark} color={
+                  tone === 'critical' ? 'var(--danger)' :
+                  tone === 'growth' ? 'var(--success)' :
+                  tone === 'efficiency' ? 'var(--info)' : 'var(--warning)'
+                } />
+                <Link to={link} className="insight-card-action">
+                  {action} <ChevronRight size={14} />
+                </Link>
               </div>
-            );
-          })}
-        </div>
-
-        {/* Critical Insights */}
-        <div style={{ marginBottom: '2rem' }}>
-          <h2 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#1a1a1a', marginBottom: '1rem' }}>
-            Critical Insights
-          </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
-            {criticalInsights.map((insight, index) => {
-              const Icon = insight.icon;
-              return (
-                <div key={index} style={{
-                  padding: '1.5rem',
-                  background: 'white',
-                  borderRadius: '12px',
-                  border: `1px solid ${insight.color}25`,
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.04)'
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
-                    <div style={{
-                      width: '40px',
-                      height: '40px',
-                      borderRadius: '8px',
-                      background: insight.bgColor,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0
-                    }}>
-                      <Icon size={20} color={insight.color} />
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-                        <h4 style={{ fontWeight: 600, color: '#1a1a1a' }}>{insight.title}</h4>
-                        <span style={{
-                          background: insight.type === 'critical' ? '#fee2e2' : insight.type === 'opportunity' ? '#dcfce7' : '#ede9fe',
-                          color: insight.color,
-                          padding: '0.1rem 0.5rem',
-                          borderRadius: '12px',
-                          fontSize: '0.65rem',
-                          fontWeight: 600,
-                          textTransform: 'uppercase'
-                        }}>
-                          {insight.type}
-                        </span>
-                      </div>
-                      <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>{insight.description}</p>
-                      <Link to={insight.link} style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '0.25rem',
-                        marginTop: '0.75rem',
-                        color: insight.color,
-                        textDecoration: 'none',
-                        fontWeight: 600,
-                        fontSize: '0.85rem'
-                      }}>
-                        {insight.action} <ChevronRight size={16} />
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+            ))}
           </div>
-        </div>
 
-        {/* Two Column Layout */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '2fr 1fr',
-          gap: '2rem',
-          marginBottom: '2rem'
-        }}>
-          {/* Left Column */}
-          <div>
-            {/* Business Performance Trend */}
-            <div style={{
-              background: 'white',
-              padding: '1.5rem',
-              borderRadius: '12px',
-              border: '1px solid #f0f0f0',
-              marginBottom: '1.5rem'
-            }}>
-              <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#1a1a1a', marginBottom: '1rem' }}>
-                Business Performance Trend
-              </h3>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                {trendData.map((item, index) => (
-                  <div key={index} style={{
-                    padding: '0.75rem',
-                    background: '#fafafa',
-                    borderRadius: '8px',
-                    border: '1px solid #f0f0f0'
-                  }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{item.label}</span>
-                      <span style={{
-                        color: item.change.startsWith('+') ? '#22c55e' : '#ef4444',
-                        fontWeight: 600,
-                        fontSize: '0.8rem'
-                      }}>
-                        {item.change}
+          {/* ---- Business performance trend ---- */}
+          <div className="panel">
+            <div className="trend-panel-top">
+              <div>
+                <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: '0 0 0.2rem' }}>Business Performance Trend</h3>
+                <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: 0 }}>Key metrics trend over the selected period</p>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <div className="segmented-control">
+                  {['Daily', 'Weekly', 'Monthly'].map((g) => (
+                    <button key={g} className={granularity === g ? 'active' : ''} onClick={() => setGranularity(g)}>{g}</button>
+                  ))}
+                </div>
+                <button className="icon-btn" aria-label="More options"><MoreHorizontal size={18} /></button>
+              </div>
+            </div>
+
+            <div className="trend-body">
+              <div className="trend-legend">
+                {trendSeries.map((s) => (
+                  <div className="trend-legend-item" key={s.key}>
+                    <div className="trend-legend-dot-row">
+                      <span className="trend-legend-dot" style={{ background: s.color }} />
+                      <span className="trend-legend-label">{s.label}</span>
+                    </div>
+                    <div>
+                      <span className="trend-legend-value">{s.value}</span>
+                      <span className="trend-legend-change" style={{ color: s.change.startsWith('+') ? 'var(--success)' : 'var(--danger)' }}>
+                        {s.change.startsWith('+') ? '↑' : '↓'} {s.change.replace(/[+-]/, '')}
                       </span>
                     </div>
-                    <p style={{ fontSize: '1.1rem', fontWeight: 700, color: '#1a1a1a' }}>{item.value}</p>
                   </div>
                 ))}
               </div>
-            </div>
-
-            {/* Recent Anomalies */}
-            <div style={{
-              background: 'white',
-              padding: '1.5rem',
-              borderRadius: '12px',
-              border: '1px solid #f0f0f0'
-            }}>
-              <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#1a1a1a', marginBottom: '1rem' }}>
-                Recent Anomalies
-              </h3>
-              {anomalies.map((anomaly, index) => {
-                const Icon = anomaly.icon;
-                return (
-                  <div key={index} style={{
-                    display: 'flex',
-                    gap: '0.75rem',
-                    padding: '0.75rem 0',
-                    borderBottom: index < anomalies.length - 1 ? '1px solid #f5f5f5' : 'none'
-                  }}>
-                    <div style={{
-                      width: '32px',
-                      height: '32px',
-                      borderRadius: '50%',
-                      background: `${anomaly.color}15`,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0
-                    }}>
-                      <Icon size={16} color={anomaly.color} />
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <p style={{ fontWeight: 600, color: '#1a1a1a', fontSize: '0.9rem' }}>{anomaly.title}</p>
-                        <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>{anomaly.date}</span>
-                      </div>
-                      <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{anomaly.description}</p>
-                    </div>
-                  </div>
-                );
-              })}
+              <div className="trend-chart-wrap">
+                <TrendChart />
+              </div>
             </div>
           </div>
 
-          {/* Right Column */}
-          <div>
-            {/* Top Performing Areas */}
-            <div style={{
-              background: 'white',
-              padding: '1.5rem',
-              borderRadius: '12px',
-              border: '1px solid #f0f0f0',
-              marginBottom: '1.5rem'
-            }}>
-              <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#1a1a1a', marginBottom: '1rem' }}>
-                Top Performing Areas
-              </h3>
-              <div style={{ marginBottom: '0.5rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
-                  <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#1a1a1a' }}>Total Impact</span>
-                  <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#1a1a1a' }}>100%</span>
+          {/* ---- Top performing areas + Opportunity spotlight ---- */}
+          <div className="two-col">
+            <div className="panel">
+              <div className="panel-head">
+                <div>
+                  <h3>Top Performing Areas</h3>
+                  <p>Areas contributing most to your growth</p>
                 </div>
-                <div style={{ height: '8px', background: '#f3f4f6', borderRadius: '4px', overflow: 'hidden', marginBottom: '1rem' }}>
-                  <div style={{
-                    width: '100%',
-                    height: '100%',
-                    background: 'linear-gradient(90deg, #7c3aed, #8b5cf6, #a78bfa, #c4b5fd)',
-                    borderRadius: '4px'
-                  }} />
+                <Link to="/reports" className="link-accent">View All</Link>
+              </div>
+              <div className="donut-legend-wrap">
+                <Donut />
+                <div className="donut-legend">
+                  {donutSegments.map((seg) => (
+                    <div className="donut-legend-row" key={seg.name}>
+                      <div className="donut-legend-row-left">
+                        <span className="donut-legend-swatch" style={{ background: seg.color }} />
+                        {seg.name}
+                      </div>
+                      <span className="donut-legend-pct">{seg.pct}%</span>
+                    </div>
+                  ))}
                 </div>
               </div>
-              {topAreas.map((area, index) => (
-                <div key={index} style={{ marginBottom: index < topAreas.length - 1 ? '0.75rem' : 0 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
-                    <span style={{ fontSize: '0.85rem', color: '#1a1a1a' }}>{area.name}</span>
-                    <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#1a1a1a' }}>{area.percentage}%</span>
-                  </div>
-                  <div style={{ height: '6px', background: '#f3f4f6', borderRadius: '4px', overflow: 'hidden' }}>
-                    <div style={{
-                      width: `${area.percentage}%`,
-                      height: '100%',
-                      background: area.color,
-                      borderRadius: '4px'
-                    }} />
-                  </div>
-                </div>
-              ))}
             </div>
 
-            {/* Opportunities Spotlight */}
-            <div style={{
-              background: 'white',
-              padding: '1.5rem',
-              borderRadius: '12px',
-              border: '1px solid #f0f0f0'
-            }}>
-              <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#1a1a1a', marginBottom: '1rem' }}>
-                Opportunities Spotlight
-              </h3>
-              {opportunities.map((opp, index) => (
-                <div key={index} style={{
-                  padding: '0.75rem',
-                  marginBottom: index < opportunities.length - 1 ? '0.75rem' : 0,
-                  background: '#fafafa',
-                  borderRadius: '8px',
-                  border: '1px solid #f0f0f0'
-                }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <p style={{ fontWeight: 600, color: '#1a1a1a', fontSize: '0.9rem' }}>{opp.title}</p>
-                    <span style={{
-                      background: getImpactColor(opp.impact) === '#ef4444' ? '#fee2e2' : getImpactColor(opp.impact) === '#f59e0b' ? '#fef3c7' : '#dcfce7',
-                      color: getImpactColor(opp.impact),
-                      padding: '0.1rem 0.5rem',
-                      borderRadius: '12px',
-                      fontSize: '0.65rem',
-                      fontWeight: 600
-                    }}>
-                      {opp.impact}
-                    </span>
+            <div className="panel">
+              <div className="panel-head">
+                <div>
+                  <h3>Opportunity Spotlight</h3>
+                  <p>High impact opportunities for your business</p>
+                </div>
+                <Link to="/reports" className="link-accent">View All</Link>
+              </div>
+              {opportunities.map(({ title, sub, amount, impact, icon: Icon }) => (
+                <div className="opportunity-row" key={title}>
+                  <div className="opportunity-left">
+                    <div className="opportunity-icon"><Icon size={16} /></div>
+                    <div>
+                      <p>{title}</p>
+                      <p>{sub}</p>
+                    </div>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.25rem' }}>
-                    <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Potential: {opp.potential}</span>
-                    <button style={{
-                      background: 'transparent',
-                      border: 'none',
-                      color: '#7c3aed',
-                      fontWeight: 500,
-                      fontSize: '0.8rem',
-                      cursor: 'pointer'
-                    }}>
-                      View Details →
-                    </button>
+                  <div className="opportunity-right">
+                    <p>&nbsp;</p>
+                    <p className="opportunity-amount">{amount}</p>
+                    <span className={`pill ${impactPill(impact)}`}>{impact}</span>
                   </div>
                 </div>
               ))}
@@ -629,60 +364,94 @@ const Insights = () => {
           </div>
         </div>
 
-        {/* Pro Tip from Senzia AI */}
-        <div style={{
-          background: 'white',
-          padding: '1.5rem',
-          borderRadius: '12px',
-          border: '1px solid #f0f0f0',
-          marginBottom: '2rem'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <div style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '50%',
-              background: 'linear-gradient(135deg, #7c3aed, #6d28d9)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'white',
-              fontSize: '1.2rem'
-            }}>
-              💡
+        {/* ============ RIGHT RAIL ============ */}
+        <div className="rail-stack">
+          <div className="rail-card">
+            <h4>Key Metrics Snapshot</h4>
+            {keyMetrics.map(({ label, value, change, up, icon: Icon, tone }) => (
+              <div className="rail-row" key={label} style={{ alignItems: 'flex-start' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                  <div style={{
+                    width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: tone === 'good' ? 'var(--success-soft)' : tone === 'accent' ? 'rgba(168,85,247,0.14)' : tone === 'info' ? 'rgba(79,139,240,0.14)' : 'var(--warning-soft)',
+                    color: tone === 'good' ? 'var(--success)' : tone === 'accent' ? '#a855f7' : tone === 'info' ? 'var(--info)' : 'var(--warning)',
+                  }}>
+                    <Icon size={15} />
+                  </div>
+                  <div>
+                    <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', margin: 0 }}>{label}</p>
+                    <p style={{ fontSize: '0.9rem', fontWeight: 700, margin: '0.1rem 0 0' }}>{value}</p>
+                  </div>
+                </div>
+                <span style={{ fontSize: '0.75rem', fontWeight: 600, color: up ? 'var(--success)' : 'var(--danger)', whiteSpace: 'nowrap' }}>
+                  {up ? '↑' : '↓'} {change.replace(/[+-]/, '')}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <div className="rail-card ai-summary-card">
+            <div className="ai-summary-top">
+              <div className="ai-summary-icon"><Brain size={17} color="white" /></div>
+              <h4 style={{ margin: 0 }}>AI Insight Summary</h4>
             </div>
-            <div style={{ flex: 1 }}>
-              <p style={{ fontWeight: 600, color: '#1a1a1a' }}>Pro Tip from Senzia AI</p>
-              <p style={{ color: 'var(--text-secondary)' }}>
-                Consider negotiating with your Office Supplies vendor. Similar businesses are paying 15-20% less.
-              </p>
+            <p className="lead-text">
+              Your business is performing well this week with strong revenue growth and improved profitability.
+            </p>
+            <div className="ai-summary-list">
+              <div className="ai-summary-list-item"><ArrowUpRight size={14} color="var(--success)" /> Revenue is above target by 12%</div>
+              <div className="ai-summary-list-item"><ArrowUpRight size={14} color="var(--success)" /> Marketing spend is delivering good ROI</div>
+              <div className="ai-summary-list-item"><ArrowUpRight size={14} color="var(--success)" /> 2 cost saving opportunities identified</div>
+              <div className="ai-summary-list-item"><ArrowUpRight size={14} color="var(--success)" /> Inventory turnover rate is healthy</div>
             </div>
-            <Link to="/ai-assistant" style={{
-              color: '#7c3aed',
-              textDecoration: 'none',
-              fontWeight: 600,
-              fontSize: '0.85rem'
-            }}>
-              Learn More →
+            <Link to="/ai-assistant">
+              <button className="btn btn-ai btn-block">View Full AI Analysis <ChevronRight size={14} /></button>
             </Link>
           </div>
-        </div>
 
-        {/* View All Analysis Link */}
-        <div style={{ textAlign: 'center' }}>
-          <Link to="/reports" style={{
-            color: '#7c3aed',
-            textDecoration: 'none',
-            fontWeight: 600,
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '0.25rem'
-          }}>
-            View All Analysis <ChevronRight size={18} />
-          </Link>
+          <div className="rail-card">
+            <div className="panel-head" style={{ marginBottom: '0.6rem' }}>
+              <h4 style={{ margin: 0 }}>Recent Anomalies</h4>
+              <Link to="/reports" className="link-accent">View All</Link>
+            </div>
+            {anomalies.map(({ title, desc, date, severity, color, bg, icon: Icon }) => (
+              <div className="anomaly-row" key={title}>
+                <div className="anomaly-left">
+                  <div className="anomaly-icon" style={{ background: bg }}>
+                    <Icon size={15} color={color} />
+                  </div>
+                  <div>
+                    <p>{title}</p>
+                    <p>{desc}</p>
+                  </div>
+                </div>
+                <div className="anomaly-right">
+                  <span className={`pill ${severityPill(severity)}`}>{severity}</span>
+                  <p className="anomaly-date">{date}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
-    </div>
+
+      {/* ---- Pro tip ---- */}
+      <div className="panel pro-tip-banner">
+        <div className="pro-tip-icon">💡</div>
+        <div className="pro-tip-text">
+          <p>Pro Tip from Senzia AI</p>
+          <p>Consider negotiating with your Office Supplies vendor. Similar businesses are paying 15-20% less.</p>
+        </div>
+        <Link to="/ai-assistant" className="link-accent">Learn More <ChevronRight size={14} /></Link>
+      </div>
+
+      <div style={{ textAlign: 'center' }}>
+        <Link to="/reports" className="link-accent" style={{ justifyContent: 'center' }}>
+          View All Analysis <ChevronRight size={16} />
+        </Link>
+      </div>
+    </AppShell>
   );
 };
 
