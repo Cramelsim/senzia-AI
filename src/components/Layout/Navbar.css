@@ -1,0 +1,105 @@
+.site-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(5, 7, 13, 0.75);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-subtle, rgba(255,255,255,0.08));
+}
+
+.site-navbar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.1rem 0;
+}
+
+.site-navbar-brand {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.site-navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 2.1rem;
+}
+
+.site-navbar-link {
+  position: relative;
+  color: var(--text-secondary, #c7cad1);
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: color 0.15s ease;
+  padding-bottom: 0.3rem;
+}
+
+.site-navbar-link:hover { color: var(--text-primary, #f5f5f7); }
+
+.site-navbar-link.active { color: var(--accent-gold, #f0c987); }
+
+.site-navbar-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--accent-gold, #f0c987);
+  border-radius: 2px;
+}
+
+.btn-outline-gold {
+  padding: 0.55rem 1.4rem;
+  border: 1px solid var(--accent-gold, #f0c987);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--accent-gold, #f0c987);
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.btn-outline-gold:hover {
+  background: var(--accent-gold, #f0c987);
+  color: #1a1408;
+}
+
+.site-navbar-mobile-toggle {
+  display: none;
+  background: transparent;
+  border: none;
+  color: var(--text-primary, #f5f5f7);
+  cursor: pointer;
+}
+
+.site-navbar-mobile-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0.5rem 1.5rem 1.5rem;
+  border-top: 1px solid var(--border-subtle, rgba(255,255,255,0.08));
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.site-navbar-mobile-link {
+  display: block;
+  padding: 0.85rem 0;
+  color: var(--text-secondary, #c7cad1);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+  border-bottom: 1px solid var(--border-subtle, rgba(255,255,255,0.08));
+}
+
+.site-navbar-mobile-link.active { color: var(--accent-gold, #f0c987); }
+
+@media (max-width: 900px) {
+  .site-navbar-links,
+  .site-navbar-actions { display: none; }
+  .site-navbar-mobile-toggle { display: block; }
+}
