@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import './Hero.css';
 
 const Hero = () => {
   const companies = ['Safaricom', 'EQUITY', 'KCB', 'NCBA', 'absa'];
@@ -12,108 +13,56 @@ const Hero = () => {
   ];
 
   return (
-    <section
-      style={{
-        position: 'relative',
-        padding: '4rem 0 0',
-        background: 'radial-gradient(circle at 75% 30%, #14213d 0%, #05070d 55%, #05070d 100%)',
-        overflow: 'hidden',
-        minHeight: '100vh',
-      }}
-    >
-      <div className="container" style={{ position: 'relative', zIndex: 2 }}>
-        <div style={{ maxWidth: '640px', paddingTop: '2rem' }}>
-          <h1
-            style={{
-              fontSize: '3.25rem',
-              fontWeight: 800,
-              marginBottom: '1.5rem',
-              lineHeight: '1.15',
-              letterSpacing: '-0.02em',
-              color: 'var(--text-primary)',
-            }}
-          >
+    <section className="hero-section">
+      {/* decorative concentric ring backdrop */}
+      <svg className="hero-rings" viewBox="0 0 1440 1000" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        {[90, 170, 250, 330, 410, 490, 570, 650].map((r) => (
+          <circle key={r} cx="1060" cy="300" r={r} fill="none" stroke="rgba(150, 180, 230, 0.14)" strokeWidth="1" />
+        ))}
+      </svg>
+
+      <div className="container hero-content">
+        <div className="hero-copy">
+          <h1 className="hero-heading">
             Intelligence.<br />
             Automation.<br />
-            Growth.
+            <span className="hero-heading-accent">Growth.</span>
           </h1>
 
-          <p
-            style={{
-              fontSize: '1.125rem',
-              color: 'var(--text-secondary)',
-              maxWidth: '540px',
-              marginBottom: '2rem',
-              lineHeight: '1.6',
-            }}
-          >
+          <p className="hero-lead">
             Senzia is an AI-powered Business Intelligence platform that combines real-time data,
             advanced analytics, and financial expertise to help businesses increase profitability,
             detect risks, automate operations, and uncover new growth opportunities.
           </p>
 
           <Link to="/get-started">
-            <button className="btn-primary" style={{ fontSize: '1.05rem', padding: '0.875rem 2.25rem' }}>
-              Get Started →
+            <button className="btn-primary hero-cta">
+              Get Started <span aria-hidden="true">→</span>
             </button>
           </Link>
         </div>
 
         {/* Trust strip */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '3rem',
-            flexWrap: 'wrap',
-            marginTop: '5rem',
-            paddingBottom: '2.5rem',
-            borderBottom: '1px solid var(--border-subtle)',
-          }}
-        >
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', maxWidth: '160px', lineHeight: '1.4' }}>
+        <div className="hero-trust-strip">
+          <p className="hero-trust-copy">
             Trusted by 15,000+ businesses to drive performance and grow.
           </p>
-          {companies.map((company, index) => (
-            <div
-              key={index}
-              style={{
-                fontSize: '1.1rem',
-                fontWeight: 600,
-                color: 'var(--text-muted)',
-                letterSpacing: '0.03em',
-                opacity: 0.8,
-              }}
-            >
+          {companies.map((company) => (
+            <div className="hero-trust-logo" key={company}>
               {company}
             </div>
           ))}
         </div>
 
         {/* Feature pillars card */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: '2rem',
-            background: 'var(--bg-dark-card)',
-            border: '1px solid var(--border-subtle)',
-            borderRadius: '12px',
-            padding: '2.5rem',
-            margin: '2.5rem 0',
-          }}
-        >
-          {features.map((f, i) => (
-            <div key={i}>
-              <div style={{ marginBottom: '0.75rem' }}>
+        <div className="hero-features-card">
+          {features.map((f) => (
+            <div className="hero-feature" key={f.title}>
+              <div className="hero-feature-icon-box">
                 <FeatureIcon type={f.icon} />
               </div>
-              <h3 style={{ fontSize: '1.05rem', fontWeight: 700, marginBottom: '0.4rem', color: 'var(--text-primary)' }}>
-                {f.title}
-              </h3>
-              <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', lineHeight: '1.5' }}>
-                {f.desc}
-              </p>
+              <h3 className="hero-feature-title">{f.title}</h3>
+              <p className="hero-feature-desc">{f.desc}</p>
             </div>
           ))}
         </div>
@@ -123,7 +72,7 @@ const Hero = () => {
 };
 
 const FeatureIcon = ({ type }) => {
-  const common = { width: 28, height: 28, stroke: 'var(--accent-gold)', strokeWidth: 1.8, fill: 'none' };
+  const common = { width: 22, height: 22, stroke: 'var(--accent-gold, #f0c987)', strokeWidth: 1.8, fill: 'none' };
   switch (type) {
     case 'brain':
       return (

@@ -1,8 +1,14 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
-import { LogoMark, Wordmark } from './Logo';
 import './Navbar.css';
+
+const LogoMark = () => (
+  <svg width="32" height="32" viewBox="0 0 36 36" fill="none">
+    <rect width="36" height="36" rx="8" fill="var(--accent-gold, #f0c987)" />
+    <text x="18" y="26" fontFamily="Arial, sans-serif" fontSize="20" fontWeight="800" fill="#1a1408" textAnchor="middle">S</text>
+  </svg>
+);
 
 const NAV_LINKS = [
   { to: '/product', label: 'Product' },
@@ -22,8 +28,8 @@ const Navbar = () => {
     <nav className="site-navbar">
       <div className="container site-navbar-inner">
         <Link to="/" className="site-navbar-brand">
-          <LogoMark size={32} />
-          <Wordmark size="1.4rem" />
+          <LogoMark />
+          <span className="site-navbar-wordmark">SENZIA</span>
         </Link>
 
         {/* Desktop nav */}
