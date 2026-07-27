@@ -15,6 +15,7 @@ import AIAssistant from './pages/AIAssistant';
 import Insights from './pages/Insights';
 import Settings from './pages/Settings';
 import Onboarding from './pages/Onboarding';
+import Integrations from './pages/Integrations';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
