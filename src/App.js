@@ -152,6 +152,15 @@ function App() {
               <Navigate to="/demo" replace />
           } 
         />
+
+        <Route 
+  path="/integrations" 
+  element={
+    isAuthenticated && onboardingComplete ? 
+      <Integrations /> : 
+      <Navigate to="/demo" replace />
+  } 
+/>
         
         <Route 
           path="/settings" 
