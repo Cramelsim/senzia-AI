@@ -555,7 +555,7 @@ const Alerts = () => {
             justifyContent: 'space-between',
             alignItems: 'center'
           }}>
-            <span style={{ fontSize: '0.85rem", color: 'var(--text-secondary)' }}>
+            <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
               Showing 1 to {filteredAlerts.length} of {recentAlerts.length} alerts
             </span>
             <div style={{ display: 'flex', gap: '0.5rem' }}>
