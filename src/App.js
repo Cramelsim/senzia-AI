@@ -171,6 +171,15 @@ function App() {
               <Navigate to="/demo" replace />
           } 
         />
+
+        <Route 
+  path="/alerts" 
+  element={
+    isAuthenticated && onboardingComplete ? 
+      <Alerts /> : 
+      <Navigate to="/demo" replace />
+  } 
+/>
         
         {/* Catch all - redirect to home */}
         <Route path="*" element={<Navigate to="/" replace />} />
