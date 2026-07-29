@@ -174,6 +174,15 @@ function App() {
         />
 
         <Route 
+          path="/billing" 
+          element={
+            isAuthenticated && onboardingComplete ? 
+              <Billing /> : 
+              <Navigate to="/demo" replace />
+          } 
+        />
+
+        <Route 
   path="/alerts" 
   element={
     isAuthenticated && onboardingComplete ? 
