@@ -16,6 +16,7 @@ import {
   Search,
   HelpCircle,
   Gauge,
+  LogOut,
 } from 'lucide-react';
 import './tokens.css';
 
@@ -57,8 +58,17 @@ const AppShell = ({
   tabs,
   activeTab,
   onTabChange,
+  userName = 'John M.',
+  businessName = 'Senzia Limited',
+  onLogout,
   children,
 }) => {
+  const initials = userName
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .toUpperCase();
+
   return (
     <div className="senzia-app">
       {/* ============ SIDEBAR ============ */}
@@ -128,13 +138,18 @@ const AppShell = ({
               <HelpCircle size={19} />
             </button>
             <div className="user-chip">
-              <div className="avatar">JM</div>
+              <div className="avatar">{initials}</div>
               <div className="user-chip-text">
-                <p>John M.</p>
-                <p>Senzia Limited</p>
+                <p>{userName}</p>
+                <p>{businessName}</p>
               </div>
               <ChevronDown size={15} color="var(--text-tertiary)" />
             </div>
+            {onLogout && (
+              <button className="btn btn-ghost btn-sm" onClick={onLogout}>
+                <LogOut size={14} /> Logout
+              </button>
+            )}
           </div>
         </header>
 
