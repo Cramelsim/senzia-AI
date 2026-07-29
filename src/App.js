@@ -19,6 +19,7 @@ import Integrations from './pages/Integrations';
 import Alerts from './pages/Alerts';
 import Billing from './pages/Billing';
 import Forecasting from './pages/Forecasting';
+import Users from './pages/Users';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -187,6 +188,15 @@ function App() {
           element={
             isAuthenticated && onboardingComplete ? 
               <Forecasting /> : 
+              <Navigate to="/demo" replace />
+          } 
+        />
+
+        <Route 
+          path="/users" 
+          element={
+            isAuthenticated && onboardingComplete ? 
+              <Users /> : 
               <Navigate to="/demo" replace />
           } 
         />
