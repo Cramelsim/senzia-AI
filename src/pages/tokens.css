@@ -26,6 +26,11 @@
   --warning-soft: rgba(240, 168, 40, 0.1);
   --info: #4f8bf0;
 
+  --violet: #8b5cf6;
+  --violet-hover: #a78bfa;
+  --violet-soft: rgba(139, 92, 246, 0.14);
+  --violet-soft-border: rgba(139, 92, 246, 0.32);
+
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 14px;
@@ -332,6 +337,9 @@
 .btn-outline-danger { background: transparent; border-color: rgba(239, 90, 90, 0.35); color: var(--danger); }
 .btn-outline-danger:hover { background: var(--danger-soft); }
 
+.btn-violet { background: linear-gradient(135deg, var(--violet), #7c3aed); color: white; }
+.btn-violet:hover { background: linear-gradient(135deg, var(--violet-hover), var(--violet)); }
+
 .btn-icon-only { padding: 0.55rem; }
 
 .btn-sm { padding: 0.45rem 0.85rem; font-size: 0.78rem; }
@@ -343,6 +351,7 @@
 .pill-success { background: var(--success-soft); color: var(--success); }
 .pill-warning { background: var(--warning-soft); color: var(--warning); }
 .pill-danger { background: var(--danger-soft); color: var(--danger); }
+.pill-info { background: rgba(79, 139, 240, 0.12); color: var(--info); }
 
 /* ===================== PANELS / RAIL CARDS ===================== */
 .panel {
@@ -367,6 +376,18 @@
   white-space: nowrap;
 }
 .link-accent:hover { color: var(--accent-hover); }
+
+.link-violet {
+  color: var(--violet);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  white-space: nowrap;
+}
+.link-violet:hover { color: var(--violet-hover); }
 
 .rail-card {
   background: var(--surface);
@@ -475,6 +496,15 @@
 }
 
 .segmented-control button.active { background: var(--accent); color: #17130a; }
+
+/* ===================== VIOLET (AI) CARD ===================== */
+.violet-card {
+  background: linear-gradient(165deg, rgba(139,92,246,0.16), rgba(79,139,240,0.05));
+  border: 1px solid var(--violet-soft-border);
+}
+
+.violet-card-title-row { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.9rem; }
+.violet-card-title-row h4 { margin: 0; }
 
 /* ===================== RESPONSIVE ===================== */
 @media (max-width: 1180px) {
