@@ -1,0 +1,103 @@
+@import './tokens.css';
+
+.forecasting-layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.content-stack { display: grid; gap: 1.5rem; min-width: 0; }
+
+/* ---- Metric cards ---- */
+.forecast-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.1rem;
+}
+
+.forecast-metric-card {
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  padding: 1.1rem;
+}
+
+.forecast-metric-top { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.75rem; }
+.forecast-metric-icon {
+  width: 32px; height: 32px; border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.forecast-metric-top span { font-size: 0.83rem; color: var(--text-secondary); font-weight: 500; }
+.forecast-metric-value { font-size: 1.35rem; font-weight: 700; margin: 0 0 0.35rem; }
+
+.forecast-metric-foot { display: flex; justify-content: space-between; align-items: center; }
+.forecast-metric-change { font-size: 0.82rem; font-weight: 600; }
+.confidence-chip {
+  font-size: 0.68rem;
+  color: var(--text-secondary);
+  background: var(--surface-raised);
+  border: 1px solid var(--border-soft);
+  padding: 0.12rem 0.5rem;
+  border-radius: 999px;
+}
+.forecast-metric-period { font-size: 0.74rem; color: var(--text-tertiary); margin: 0.4rem 0 0; }
+
+/* ---- Period selector ---- */
+.period-selector { display: flex; gap: 0.6rem; }
+
+/* ---- Chart panel ---- */
+.chart-panel-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.chart-panel-top p { font-size: 0.83rem; color: var(--text-secondary); margin: 0.2rem 0 0; }
+
+.forecast-note { margin-top: 0.5rem; text-align: right; font-size: 0.74rem; color: var(--text-tertiary); }
+
+/* ---- Inventory table ---- */
+.status-chip-sm {
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 0.12rem 0.55rem;
+  border-radius: 999px;
+  display: inline-block;
+}
+
+/* ---- Demand forecast bars ---- */
+.demand-row { margin-bottom: 1rem; }
+.demand-row:last-child { margin-bottom: 0; }
+.demand-row-top { display: flex; justify-content: space-between; margin-bottom: 0.3rem; font-size: 0.85rem; }
+.demand-bars { display: flex; gap: 0.5rem; }
+.demand-bar-track { flex: 1; height: 6px; background: var(--border-soft); border-radius: 4px; overflow: hidden; }
+.demand-bar-fill { height: 100%; border-radius: 4px; }
+.demand-row-labels { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-tertiary); margin-top: 0.2rem; }
+
+/* ---- AI insights ---- */
+.forecast-insight-card {
+  padding: 0.95rem;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+}
+.forecast-insight-card.positive { background: var(--success-soft); }
+.forecast-insight-card.opportunity { background: var(--warning-soft); }
+.forecast-insight-card p:first-child { font-weight: 600; font-size: 0.88rem; margin: 0; color: var(--text-primary); }
+.forecast-insight-card p:last-child { font-size: 0.82rem; color: var(--text-secondary); margin: 0.15rem 0 0; }
+
+.insight-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; }
+
+/* ---- Responsive ---- */
+@media (max-width: 1280px) {
+  .forecast-metric-grid { grid-template-columns: repeat(2, 1fr); }
+  .forecasting-layout { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+  .forecast-metric-grid { grid-template-columns: 1fr; }
+}
