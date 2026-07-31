@@ -1,0 +1,89 @@
+@import './tokens.css';
+
+.users-layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.content-stack { display: grid; gap: 1.5rem; min-width: 0; }
+
+/* ---- Stat cards ---- */
+.user-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.1rem;
+}
+
+.user-stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  padding: 1.1rem;
+}
+
+.user-stat-top { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.75rem; }
+.user-stat-icon {
+  width: 32px; height: 32px; border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.user-stat-top span { font-size: 0.85rem; color: var(--text-secondary); font-weight: 500; }
+.user-stat-value { font-size: 1.6rem; font-weight: 700; margin: 0 0 0.3rem; }
+.user-stat-sub { font-size: 0.78rem; font-weight: 600; margin: 0; }
+
+/* ---- Table extras ---- */
+.user-cell { display: flex; align-items: center; gap: 0.65rem; }
+.user-avatar-tile {
+  width: 34px; height: 34px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 0.78rem; flex-shrink: 0;
+}
+.user-cell p:first-child { font-weight: 500; margin: 0; }
+.user-cell p:last-child { font-size: 0.78rem; color: var(--text-tertiary); margin: 0; }
+
+.role-pill {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  display: inline-block;
+}
+
+.row-actions { display: flex; align-items: center; justify-content: center; gap: 0.35rem; }
+
+/* ---- Role distribution donut ---- */
+.role-donut-wrap { display: flex; align-items: center; gap: 1.25rem; }
+
+/* ---- Role permissions list ---- */
+.perm-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--border-soft);
+  font-size: 0.83rem;
+}
+.perm-row:last-of-type { border-bottom: none; }
+.perm-row-role { font-weight: 600; color: var(--text-primary); white-space: nowrap; }
+.perm-row-desc { color: var(--text-secondary); text-align: right; }
+
+/* ---- Recent activity ---- */
+.user-activity-row {
+  padding: 0.65rem 0;
+  border-bottom: 1px solid var(--border-soft);
+}
+.user-activity-row:last-of-type { border-bottom: none; }
+.user-activity-row p:first-child { font-size: 0.86rem; font-weight: 600; margin: 0; }
+.user-activity-meta { display: flex; justify-content: space-between; margin-top: 0.15rem; }
+.user-activity-meta span { font-size: 0.76rem; color: var(--text-tertiary); }
+
+/* ---- Responsive ---- */
+@media (max-width: 1280px) {
+  .user-stat-grid { grid-template-columns: repeat(2, 1fr); }
+  .users-layout { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+  .user-stat-grid { grid-template-columns: 1fr; }
+}
