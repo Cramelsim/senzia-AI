@@ -1,390 +1,244 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { 
-  Database, 
-  Plus, 
-  Search, 
-  Filter, 
-  CheckCircle, 
-  AlertCircle, 
+import React, { useState, useMemo } from 'react';
+import {
+  Database,
+  Plus,
+  Search,
+  CheckCircle,
   Clock,
-  ArrowRight,
-  Download,
   RefreshCw,
-  Zap,
-  Shield,
-  TrendingUp
+  ArrowRight,
+  Lightbulb,
+  MoreVertical,
 } from 'lucide-react';
+import AppShell from './AppShell';
+import './DataSources.css';
+
+/* Kept from your real source — not swapped for the different fictional list shown
+   in the reference screenshot (Salesforce/Snowflake/etc.), since that data doesn't
+   exist in your app. "connection" is inferred per source type; add a real field
+   if you track it. */
+const dataSources = [
+  { id: 1, name: 'POS System', type: 'Point of Sale', connection: 'API', status: 'connected', lastSync: 'Today, 08:45 AM', records: '45,230', icon: '💳', color: '#8b5cf6' },
+  { id: 2, name: 'M-Pesa Business', type: 'Mobile Money', connection: 'API', status: 'connected', lastSync: 'Today, 08:30 AM', records: '12,540', icon: '📱', color: '#22c55e' },
+  { id: 3, name: 'Shopify', type: 'E-Commerce', connection: 'OAuth 2.0', status: 'connected', lastSync: 'Today, 08:15 AM', records: '8,920', icon: '🛍️', color: '#f59e0b' },
+  { id: 4, name: 'Google Analytics 4', type: 'Analytics', connection: 'OAuth 2.0', status: 'connected', lastSync: 'Today, 07:50 AM', records: '156,780', icon: '📊', color: '#3b82f6' },
+  { id: 5, name: 'Xero Accounting', type: 'Accounting', connection: 'OAuth 2.0', status: 'warning', lastSync: 'Yesterday, 11:20 PM', records: '23,450', icon: '📒', color: '#ec4899' },
+  { id: 6, name: 'Stripe', type: 'Payments', connection: 'API', status: 'connected', lastSync: 'Today, 08:40 AM', records: '5,670', icon: '💳', color: '#6366f1' },
+  { id: 7, name: 'Mailchimp', type: 'Marketing', connection: 'API', status: 'warning', lastSync: 'Yesterday, 09:10 PM', records: '34,890', icon: '✉️', color: '#f43f5e' },
+  { id: 8, name: 'Google Sheets', type: 'Spreadsheet', connection: 'OAuth 2.0', status: 'connected', lastSync: 'Today, 08:05 AM', records: '2,340', icon: '📋', color: '#8b5cf6' },
+];
+
+const availableIntegrations = [
+  { name: 'Slack', icon: '💬', description: 'Streamline team communication.' },
+  { name: 'SharePoint', icon: '📁', description: 'Collaborate and share documents.' },
+  { name: 'Zendesk', icon: '🎫', description: 'Sync support tickets and customer data.' },
+  { name: 'HubSpot', icon: '📈', description: 'Manage CRM and marketing automation.' },
+  { name: 'WooCommerce', icon: '🛒', description: 'Sync orders, customers and products.' },
+];
+
+const statusPill = { connected: 'pill-success', warning: 'pill-warning', error: 'pill-danger' };
+const statusLabel = { connected: 'Active', warning: 'Warning', error: 'Error' };
 
 const DataSources = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
-  const dataSources = [
-    {
-      id: 1,
-      name: 'POS System',
-      type: 'Point of Sale',
-      status: 'connected',
-      lastSync: 'Today, 08:45 AM',
-      records: '45,230',
-      icon: '💳',
-      color: '#7c3aed'
-    },
-    {
-      id: 2,
-      name: 'M-Pesa Business',
-      type: 'Mobile Money',
-      status: 'connected',
-      lastSync: 'Today, 08:30 AM',
-      records: '12,540',
-      icon: '📱',
-      color: '#22c55e'
-    },
-    {
-      id: 3,
-      name: 'Shopify',
-      type: 'E-Commerce',
-      status: 'connected',
-      lastSync: 'Today, 08:15 AM',
-      records: '8,920',
-      icon: '🛍️',
-      color: '#f59e0b'
-    },
-    {
-      id: 4,
-      name: 'Google Analytics 4',
-      type: 'Analytics',
-      status: 'connected',
-      lastSync: 'Today, 07:50 AM',
-      records: '156,780',
-      icon: '📊',
-      color: '#3b82f6'
-    },
-    {
-      id: 5,
-      name: 'Xero Accounting',
-      type: 'Accounting',
-      status: 'warning',
-      lastSync: 'Yesterday, 11:20 PM',
-      records: '23,450',
-      icon: '📒',
-      color: '#ec4899'
-    },
-    {
-      id: 6,
-      name: 'Stripe',
-      type: 'Payments',
-      status: 'connected',
-      lastSync: 'Today, 08:40 AM',
-      records: '5,670',
-      icon: '💳',
-      color: '#6366f1'
-    },
-    {
-      id: 7,
-      name: 'Mailchimp',
-      type: 'Marketing',
-      status: 'warning',
-      lastSync: 'Yesterday, 09:10 PM',
-      records: '34,890',
-      icon: '✉️',
-      color: '#f43f5e'
-    },
-    {
-      id: 8,
-      name: 'Google Sheets',
-      type: 'Spreadsheet',
-      status: 'connected',
-      lastSync: 'Today, 08:05 AM',
-      records: '2,340',
-      icon: '📋',
-      color: '#8b5cf6'
-    }
-  ];
+  const filteredSources = dataSources.filter(
+    (s) => s.name.toLowerCase().includes(searchTerm.toLowerCase()) || s.type.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-  const availableIntegrations = [
-    { name: 'Slack', icon: '💬', description: 'Streamline team communication.' },
-    { name: 'SharePoint', icon: '📁', description: 'Collaborate and share documents.' },
-    { name: 'Zendesk', icon: '🎫', description: 'Sync support tickets and customer data.' },
-    { name: 'HubSpot', icon: '📈', description: 'Manage CRM and marketing automation.' },
-    { name: 'WooCommerce', icon: '🛒', description: 'Sync orders, customers and products.' }
+  /* Stats derived live from the actual dataset, instead of the hardcoded
+     "16 total / 14 active" your source had (which didn't match its own 8-item array). */
+  const { total, active, warning } = useMemo(() => {
+    const active = dataSources.filter((s) => s.status === 'connected').length;
+    const warning = dataSources.filter((s) => s.status === 'warning').length;
+    return { total: dataSources.length, active, warning };
+  }, []);
+
+  const typeBreakdown = useMemo(() => {
+    const map = {};
+    dataSources.forEach((s) => { map[s.type] = (map[s.type] || 0) + 1; });
+    return Object.entries(map).sort((a, b) => b[1] - a[1]);
+  }, []);
+
+  const donutSegments = [
+    { label: 'Active', count: active, pct: Math.round((active / total) * 100), color: 'var(--success)' },
+    { label: 'Warning', count: warning, pct: Math.round((warning / total) * 100), color: 'var(--warning)' },
   ];
 
   const stats = [
-    { label: 'Total Integrations', value: '16', change: '+33%', icon: Database },
-    { label: 'Active Connections', value: '14', change: '88% healthy', icon: CheckCircle },
-    { label: 'Data Sync Status', value: '98.7%', change: 'Success Rate', icon: RefreshCw },
-    { label: 'Time Saved', value: '125 hrs', change: '+18% this month', icon: Clock }
+    { label: 'Total Data Sources', value: String(total), sub: 'Connected and active', icon: Database, color: 'var(--accent)', bg: 'var(--accent-soft)' },
+    { label: 'Active Sources', value: String(active), sub: `${Math.round((active / total) * 100)}% of total sources`, icon: CheckCircle, color: 'var(--success)', bg: 'var(--success-soft)' },
+    { label: 'Data Sync Status', value: '98.7%', sub: 'Success Rate', icon: RefreshCw, color: 'var(--info)', bg: 'rgba(79,139,240,0.12)' },
+    { label: 'Time Saved', value: '125 hrs', sub: '+18% this month', icon: Clock, color: 'var(--warning)', bg: 'var(--warning-soft)' },
   ];
 
-  const getStatusBadge = (status) => {
-    switch(status) {
-      case 'connected':
-        return { color: '#22c55e', bg: '#dcfce7', label: 'Connected' };
-      case 'warning':
-        return { color: '#f59e0b', bg: '#fef3c7', label: 'Warning' };
-      case 'error':
-        return { color: '#ef4444', bg: '#fee2e2', label: 'Error' };
-      default:
-        return { color: '#6b7280', bg: '#f3f4f6', label: 'Disconnected' };
-    }
-  };
-
-  const filteredSources = dataSources.filter(source =>
-    source.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    source.type.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
   return (
-    <div style={{ background: '#f8f9fa', minHeight: '100vh' }}>
-      {/* Navigation */}
-      <nav style={{
-        background: 'white',
-        borderBottom: '1px solid #e5e7eb',
-        padding: '0.75rem 0',
-        position: 'sticky',
-        top: 0,
-        zIndex: 50
-      }}>
-        <div className="container" style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-            <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <div style={{
-                width: '36px',
-                height: '36px',
-                background: 'linear-gradient(135deg, #7c3aed, #6d28d9)',
-                borderRadius: '8px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontWeight: 800,
-                fontSize: '1rem',
-                color: 'white'
-              }}>
-                SZ
+    <AppShell
+      active="Data Sources"
+      pageIcon={Database}
+      title="Data Sources"
+      subtitle="Manage and monitor all your connected data sources."
+      headerActions={
+        <>
+          <button className="btn btn-ghost"><RefreshCw size={16} /> Refresh All</button>
+          <button className="btn btn-violet"><Plus size={16} /> Add Data Source</button>
+        </>
+      }
+    >
+      <div className="datasources-layout">
+        <div className="content-stack">
+
+          {/* ---- Stat cards ---- */}
+          <div className="ds-stat-grid">
+            {stats.map(({ label, value, sub, icon: Icon, color, bg }) => (
+              <div className="ds-stat-card" key={label}>
+                <div className="ds-stat-top">
+                  <div className="ds-stat-icon" style={{ background: bg, color }}><Icon size={16} /></div>
+                  <span>{label}</span>
+                </div>
+                <p className="ds-stat-value">{value}</p>
+                <p className="ds-stat-trend" style={{ color }}>{sub}</p>
               </div>
-              <span style={{ fontSize: '1.2rem', fontWeight: 700, color: '#1a1a1a' }}>SENZIA</span>
-            </Link>
-            
-            <div style={{ display: 'flex', gap: '1.5rem', marginLeft: '1rem' }}>
-              <Link to="/dashboard" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.9rem' }}>Dashboard</Link>
-              <Link to="/data-sources" style={{ color: '#7c3aed', textDecoration: 'none', fontWeight: 600, fontSize: '0.9rem' }}>Data Sources</Link>
-              <Link to="/reports" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.9rem' }}>Reports</Link>
-              <Link to="/ai-assistant" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.9rem' }}>AI Assistant</Link>
-              <Link to="/insights" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.9rem' }}>Insights</Link>
-              <Link to="/settings" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.9rem' }}>Settings</Link>
+            ))}
+          </div>
+
+          {/* ---- Search + table ---- */}
+          <div className="panel">
+            <div className="panel-head">
+              <h3>Connected Sources</h3>
+              <div className="search-bar" style={{ maxWidth: 260, padding: '0.4rem 0.7rem' }}>
+                <Search size={14} />
+                <input
+                  placeholder="Search data sources..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+            </div>
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Data Source</th>
+                  <th>Type</th>
+                  <th>Connection</th>
+                  <th>Last Sync</th>
+                  <th className="num">Records</th>
+                  <th className="center">Status</th>
+                  <th className="center">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredSources.map((s) => (
+                  <tr key={s.id}>
+                    <td>
+                      <div className="ds-name-cell">
+                        <div className="ds-icon-badge" style={{ background: `${s.color}26` }}>{s.icon}</div>
+                        <div>
+                          <p>{s.name}</p>
+                          <p>{s.type}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td style={{ color: 'var(--text-secondary)' }}>{s.type}</td>
+                    <td style={{ color: 'var(--text-secondary)' }}>{s.connection}</td>
+                    <td style={{ color: 'var(--text-tertiary)', whiteSpace: 'nowrap' }}>{s.lastSync}</td>
+                    <td className="num">{s.records}</td>
+                    <td className="center"><span className={`pill ${statusPill[s.status]}`}>{statusLabel[s.status]}</span></td>
+                    <td className="center">
+                      <div style={{ display: 'flex', gap: '0.3rem', justifyContent: 'center' }}>
+                        <button className="btn btn-ghost btn-sm">{s.status === 'connected' ? 'Manage' : 'Fix'}</button>
+                        <button className="icon-btn" aria-label="More"><MoreVertical size={14} /></button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+                {filteredSources.length === 0 && (
+                  <tr><td colSpan={7} style={{ textAlign: 'center', color: 'var(--text-tertiary)', padding: '1.5rem' }}>No data sources match your search.</td></tr>
+                )}
+              </tbody>
+            </table>
+            <div className="table-footer">
+              <span>Showing 1 to {filteredSources.length} of {dataSources.length} results</span>
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <div style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '50%',
-              background: 'linear-gradient(135deg, #7c3aed, #6d28d9)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'white',
-              fontWeight: 600,
-              fontSize: '0.8rem'
-            }}>
-              JM
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      <div className="container" style={{ padding: '2rem' }}>
-        {/* Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+          {/* ---- Available integrations ---- */}
           <div>
-            <h1 style={{ fontSize: '1.8rem', fontWeight: 700, color: '#1a1a1a' }}>Data Sources</h1>
-            <p style={{ color: 'var(--text-secondary)' }}>Connect your favorite tools and platforms with SENZIA.</p>
-          </div>
-          <button style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-            padding: '0.75rem 1.5rem',
-            background: 'linear-gradient(135deg, #7c3aed, #6d28d9)',
-            border: 'none',
-            borderRadius: '8px',
-            color: 'white',
-            fontWeight: 600,
-            cursor: 'pointer'
-          }}>
-            <Plus size={18} />
-            Add Integration
-          </button>
-        </div>
-
-        {/* Stats */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
-          {stats.map((stat, index) => {
-            const Icon = stat.icon;
-            return (
-              <div key={index} style={{ background: 'white', padding: '1.25rem', borderRadius: '12px', border: '1px solid #f0f0f0' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
-                  <Icon size={20} color="#7c3aed" />
-                  <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{stat.label}</span>
-                </div>
-                <p style={{ fontSize: '1.8rem', fontWeight: 700, color: '#1a1a1a' }}>{stat.value}</p>
-                <p style={{ fontSize: '0.85rem', color: '#22c55e' }}>{stat.change}</p>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Search and Filter */}
-        <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
-          <div style={{ flex: 1, position: 'relative' }}>
-            <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af' }} />
-            <input
-              type="text"
-              placeholder="Search integrations..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '0.75rem 0.75rem 0.75rem 2.5rem',
-                border: '1px solid #e5e7eb',
-                borderRadius: '8px',
-                fontSize: '1rem',
-                outline: 'none'
-              }}
-            />
-          </div>
-          <button style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-            padding: '0.75rem 1.5rem',
-            border: '1px solid #e5e7eb',
-            borderRadius: '8px',
-            background: 'white',
-            cursor: 'pointer'
-          }}>
-            <Filter size={18} />
-            Filter
-          </button>
-        </div>
-
-        {/* Data Sources Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem', marginBottom: '3rem' }}>
-          {filteredSources.map((source) => {
-            const status = getStatusBadge(source.status);
-            return (
-              <div key={source.id} style={{
-                background: 'white',
-                padding: '1.5rem',
-                borderRadius: '12px',
-                border: '1px solid #f0f0f0',
-                transition: 'all 0.3s ease'
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    <div style={{
-                      width: '40px',
-                      height: '40px',
-                      borderRadius: '8px',
-                      background: `${source.color}15`,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '1.2rem'
-                    }}>
-                      {source.icon}
-                    </div>
-                    <div>
-                      <h4 style={{ fontWeight: 600, color: '#1a1a1a' }}>{source.name}</h4>
-                      <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{source.type}</p>
-                    </div>
+            <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: '0 0 1rem' }}>Available Integrations</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
+              {availableIntegrations.map((i) => (
+                <div className="available-ds-row" key={i.name}>
+                  <span style={{ fontSize: '1.6rem' }}>{i.icon}</span>
+                  <div style={{ flex: 1 }}>
+                    <p>{i.name}</p>
+                    <p>{i.description}</p>
                   </div>
-                  <span style={{
-                    background: status.bg,
-                    color: status.color,
-                    padding: '0.2rem 0.75rem',
-                    borderRadius: '12px',
-                    fontSize: '0.75rem',
-                    fontWeight: 600
-                  }}>
-                    {status.label}
-                  </span>
+                  <ArrowRight size={16} color="var(--accent)" />
                 </div>
-
-                <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '1rem' }}>
-                  <div>
-                    <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Last Sync</p>
-                    <p style={{ fontSize: '0.85rem', fontWeight: 500, color: '#1a1a1a' }}>{source.lastSync}</p>
-                  </div>
-                  <div>
-                    <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Records</p>
-                    <p style={{ fontSize: '0.85rem', fontWeight: 500, color: '#1a1a1a' }}>{source.records}</p>
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', gap: '0.75rem' }}>
-                  <button style={{
-                    flex: 1,
-                    padding: '0.5rem',
-                    background: source.status === 'connected' ? 'transparent' : '#7c3aed',
-                    border: source.status === 'connected' ? '1px solid #7c3aed' : 'none',
-                    borderRadius: '6px',
-                    color: source.status === 'connected' ? '#7c3aed' : 'white',
-                    fontWeight: 600,
-                    fontSize: '0.85rem',
-                    cursor: 'pointer'
-                  }}>
-                    {source.status === 'connected' ? 'Manage' : 'Connect'}
-                  </button>
-                  <button style={{
-                    padding: '0.5rem 1rem',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '6px',
-                    background: 'transparent',
-                    cursor: 'pointer'
-                  }}>
-                    ⋮
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Available Integrations */}
-        <h2 style={{ fontSize: '1.3rem', fontWeight: 700, color: '#1a1a1a', marginBottom: '1rem' }}>
-          Available Integrations
-        </h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem' }}>
-          {availableIntegrations.map((integration, index) => (
-            <div key={index} style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '1rem',
-              padding: '1rem',
-              background: 'white',
-              borderRadius: '8px',
-              border: '1px solid #f0f0f0',
-              transition: 'all 0.3s ease',
-              cursor: 'pointer'
-            }}>
-              <span style={{ fontSize: '2rem' }}>{integration.icon}</span>
-              <div style={{ flex: 1 }}>
-                <p style={{ fontWeight: 600, color: '#1a1a1a' }}>{integration.name}</p>
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{integration.description}</p>
-              </div>
-              <ArrowRight size={18} color="#7c3aed" />
+              ))}
             </div>
-          ))}
+          </div>
+        </div>
+
+        {/* ============ RIGHT RAIL ============ */}
+        <div className="rail-stack">
+          <div className="rail-card">
+            <h4>Data Sources Overview</h4>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+              <svg width="120" height="120" viewBox="0 0 120 120">
+                <g transform="rotate(-90 60 60)">
+                  <circle cx="60" cy="60" r="46" fill="none" stroke="var(--border-soft)" strokeWidth="14" />
+                  {(() => {
+                    const r = 46, c = 2 * Math.PI * r;
+                    let acc = 0;
+                    return donutSegments.map((seg) => {
+                      const dash = (seg.pct / 100) * c;
+                      const offset = -(acc / 100) * c;
+                      acc += seg.pct;
+                      return <circle key={seg.label} cx="60" cy="60" r={r} fill="none" stroke={seg.color} strokeWidth="14" strokeDasharray={`${dash} ${c - dash}`} strokeDashoffset={offset} />;
+                    });
+                  })()}
+                </g>
+                <text x="60" y="56" textAnchor="middle" fontSize="22" fontWeight="700" fill="var(--text-primary)">{total}</text>
+                <text x="60" y="73" textAnchor="middle" fontSize="9" fill="var(--text-tertiary)">Total</text>
+              </svg>
+              <div style={{ display: 'grid', gap: '0.5rem', flex: 1 }}>
+                {donutSegments.map((seg) => (
+                  <div key={seg.label} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.83rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <span style={{ width: 9, height: 9, borderRadius: '50%', background: seg.color, display: 'inline-block' }} /> {seg.label}
+                    </div>
+                    <span>{seg.count} ({seg.pct}%)</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="rail-card">
+            <h4>Data Sources by Type</h4>
+            {typeBreakdown.map(([type, count]) => (
+              <div className="type-row" key={type}>
+                <span>{type}</span>
+                <span className="type-row-value">{count}</span>
+              </div>
+            ))}
+          </div>
+
+          <div className="rail-card">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.6rem' }}>
+              <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--accent-soft)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Lightbulb size={15} color="var(--accent)" />
+              </div>
+              <h4 style={{ margin: 0 }}>Quick Tips</h4>
+            </div>
+            <p style={{ fontSize: '0.83rem', color: 'var(--text-secondary)', lineHeight: 1.4, margin: 0 }}>
+              Keep your data fresh — ensure all your data sources are syncing regularly for accurate insights.
+            </p>
+          </div>
         </div>
       </div>
-    </div>
+    </AppShell>
   );
 };
 
