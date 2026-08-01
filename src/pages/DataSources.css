@@ -1,0 +1,78 @@
+@import './tokens.css';
+
+.datasources-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.content-stack { display: grid; gap: 1.5rem; min-width: 0; }
+
+/* ---- Stat cards ---- */
+.ds-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.1rem;
+}
+
+.ds-stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  padding: 1.1rem;
+}
+
+.ds-stat-top { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.75rem; }
+.ds-stat-icon {
+  width: 32px; height: 32px; border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.ds-stat-top span { font-size: 0.83rem; color: var(--text-secondary); font-weight: 500; }
+.ds-stat-value { font-size: 1.5rem; font-weight: 700; margin: 0 0 0.3rem; }
+.ds-stat-trend { font-size: 0.78rem; font-weight: 600; margin: 0; }
+
+/* ---- Table extras ---- */
+.ds-name-cell { display: flex; align-items: center; gap: 0.65rem; }
+.ds-icon-badge {
+  width: 34px; height: 34px; border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.05rem; flex-shrink: 0;
+}
+.ds-name-cell p:first-child { font-weight: 500; margin: 0; }
+.ds-name-cell p:last-child { font-size: 0.76rem; color: var(--text-tertiary); margin: 0; }
+
+/* ---- Available integrations ---- */
+.available-ds-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.9rem;
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+.available-ds-row p:first-child { font-weight: 600; margin: 0; font-size: 0.9rem; }
+.available-ds-row p:last-child { font-size: 0.78rem; color: var(--text-tertiary); margin: 0.1rem 0 0; }
+
+/* ---- Right rail: type breakdown ---- */
+.type-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border-soft);
+  font-size: 0.85rem;
+}
+.type-row:last-of-type { border-bottom: none; }
+.type-row-value { font-weight: 700; }
+
+/* ---- Responsive ---- */
+@media (max-width: 1280px) {
+  .ds-stat-grid { grid-template-columns: repeat(2, 1fr); }
+  .datasources-layout { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .ds-stat-grid { grid-template-columns: 1fr; }
+}
