@@ -1,690 +1,243 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  MapPin, 
-  Mail, 
-  Phone, 
-  Clock, 
+import {
+  MapPin,
+  Mail,
+  Phone,
   MessageSquare,
   Send,
   CheckCircle,
   ChevronRight,
-  ExternalLink
+  User,
+  Briefcase,
+  Building2,
+  HelpCircle,
+  Edit3,
+  Clock,
+  ArrowRight,
 } from 'lucide-react';
 import Navbar from '../components/Layout/Navbar';
+import './Contact.css';
+
+const contactInfo = [
+  { icon: Phone, title: 'Call Us', lines: ['+254 700 123 456', 'Mon – Fri, 8:00 AM – 6:00 PM EAT'] },
+  { icon: Mail, title: 'Email Us', lines: ['hello@senzia.ai', 'We aim to respond within 24 hours'] },
+  { icon: MapPin, title: 'Visit Us', lines: ['WestPark Towers, 7th Floor', 'Waiyaki Way, Nairobi, Kenya', 'By appointment only'] },
+  { icon: MessageSquare, title: 'Live Chat', lines: ['Chat with our team in real-time'], link: 'https://wa.me/254700123456', linkText: 'Start Chat' },
+];
+
+const supportOptions = [
+  { icon: MessageSquare, title: 'Chat on WhatsApp', description: 'Get instant support on WhatsApp', link: 'https://wa.me/254700123456', color: '#25D366', bg: 'rgba(37,211,102,0.12)' },
+  { icon: Mail, title: 'Email Support', description: "Email us and we'll respond within 24 hours", link: 'mailto:support@senzia.ai', color: 'var(--accent-gold, #f0c987)', bg: 'rgba(240,201,135,0.12)' },
+  { icon: Phone, title: 'Phone Support', description: 'Call us for immediate assistance', link: 'tel:+254700123456', color: '#4f8bf0', bg: 'rgba(79,139,240,0.12)' },
+];
+
+const faqs = [
+  { question: 'What is the response time for support queries?', answer: 'We typically respond to all support queries within 24 hours. For urgent issues, we provide immediate assistance through our WhatsApp support.' },
+  { question: 'Do you offer on-site training and consulting?', answer: 'Yes, we provide on-site training and consulting services for businesses in Kenya and across East Africa. Contact us to schedule a consultation.' },
+  { question: 'Can I book a free consultation?', answer: 'Absolutely! We offer free consultations for businesses interested in learning more about SENZIA. Book a demo through our website.' },
+  { question: 'What industries do you serve?', answer: 'We serve restaurants, clubs, supermarkets, hotels, fuel stations, logistics, manufacturing, retail, healthcare, and more.' },
+];
+
+const industries = ['Restaurant', 'Retail', 'Hospitality', 'Manufacturing', 'Healthcare', 'Logistics', 'Other'];
+const helpOptions = ['General Inquiry', 'Product Demo', 'Consulting Services', 'Training Programs', 'Support', 'Partnership', 'Other'];
 
 const Contact = () => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    company: '',
-    phone: '',
-    subject: '',
-    message: ''
+    firstName: '', lastName: '', businessEmail: '', companyName: '',
+    phoneNumber: '', industry: '', helpType: '', message: '', agreeToTerms: false,
   });
-
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
-    // Simulate API call
     setTimeout(() => {
       setIsSubmitting(false);
       setIsSubmitted(true);
-      setFormData({
-        name: '',
-        email: '',
-        company: '',
-        phone: '',
-        subject: '',
-        message: ''
-      });
+      setFormData({ firstName: '', lastName: '', businessEmail: '', companyName: '', phoneNumber: '', industry: '', helpType: '', message: '', agreeToTerms: false });
     }, 1500);
   };
-
-  const contactInfo = [
-    {
-      icon: MapPin,
-      title: 'Visit Us',
-      details: ['Senzia Limited', 'Nairobi, Kenya', 'PO Box 12345'],
-      link: 'https://maps.google.com',
-      linkText: 'Get Directions'
-    },
-    {
-      icon: Mail,
-      title: 'Email Us',
-      details: ['info@senzia.com', 'support@senzia.com'],
-      link: 'mailto:info@senzia.com',
-      linkText: 'Send Email'
-    },
-    {
-      icon: Phone,
-      title: 'Call Us',
-      details: ['+254 700 123 456', '+254 700 123 457'],
-      link: 'tel:+254700123456',
-      linkText: 'Call Now'
-    },
-    {
-      icon: Clock,
-      title: 'Working Hours',
-      details: ['Monday - Friday: 8:00 AM - 6:00 PM', 'Saturday: 9:00 AM - 1:00 PM', 'Sunday: Closed'],
-      link: null,
-      linkText: null
-    }
-  ];
-
-  const supportOptions = [
-    {
-      icon: MessageSquare,
-      title: 'Chat on WhatsApp',
-      description: 'Get instant support on WhatsApp',
-      action: 'Chat Now',
-      link: 'https://wa.me/254700123456',
-      color: '#25D366'
-    },
-    {
-      icon: Mail,
-      title: 'Email Support',
-      description: 'Email us and we\'ll respond within 24 hours',
-      action: 'Send Email',
-      link: 'mailto:support@senzia.com',
-      color: '#7c3aed'
-    },
-    {
-      icon: Phone,
-      title: 'Phone Support',
-      description: 'Call us for immediate assistance',
-      action: 'Call Now',
-      link: 'tel:+254700123456',
-      color: '#3b82f6'
-    }
-  ];
-
-  const faqs = [
-    {
-      question: 'What is the response time for support queries?',
-      answer: 'We typically respond to all support queries within 24 hours. For urgent issues, we provide immediate assistance through our WhatsApp support.'
-    },
-    {
-      question: 'Do you offer on-site training and consulting?',
-      answer: 'Yes, we provide on-site training and consulting services for businesses in Kenya and across East Africa. Contact us to schedule a consultation.'
-    },
-    {
-      question: 'Can I book a free consultation?',
-      answer: 'Absolutely! We offer free consultations for businesses interested in learning more about SENZIA. Book a demo through our website.'
-    },
-    {
-      question: 'What industries do you serve?',
-      answer: 'We serve restaurants, clubs, supermarkets, hotels, fuel stations, logistics, manufacturing, retail, healthcare, and more.'
-    }
-  ];
 
   return (
     <div>
       <Navbar />
-      
-      {/* Hero Section */}
-      <section style={{ 
-        padding: '5rem 0 4rem',
-        background: 'linear-gradient(135deg, #faf5ff 0%, #ffffff 50%, #f3f4f6 100%)'
-      }}>
-        <div className="container">
-          <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
-            <h1 style={{ 
-              fontSize: '3.5rem', 
-              fontWeight: 800, 
-              marginBottom: '1.5rem',
-              lineHeight: '1.1',
-              color: '#1a1a1a'
-            }}>
-              Get in Touch
+
+      {/* ---- Hero: intro + info + form ---- */}
+      <section className="contact-hero">
+        <div className="container contact-hero-grid">
+          <div>
+            <p className="contact-eyebrow">CONTACT US</p>
+            <h1 className="contact-heading">
+              Let's build smarter<br />
+              businesses <span className="contact-heading-accent">together.</span>
             </h1>
-            
-            <p style={{ 
-              fontSize: '1.25rem', 
-              color: 'var(--text-secondary)',
-              maxWidth: '650px',
-              margin: '0 auto',
-              lineHeight: '1.6'
-            }}>
-              Have questions about SENZIA? We're here to help. Reach out to us and 
-              let's start a conversation about your business needs.
+            <p className="contact-lead">
+              Have a question, want a demo, or ready to get started? We'd love to hear from you.
             </p>
-          </div>
-        </div>
-      </section>
 
-      {/* Contact Info Cards */}
-      <section style={{ padding: '2rem 0', background: 'white' }}>
-        <div className="container">
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', 
-            gap: '1.5rem'
-          }}>
-            {contactInfo.map((info, index) => {
-              const Icon = info.icon;
-              return (
-                <div key={index} style={{ 
-                  padding: '1.5rem',
-                  background: '#fafafa',
-                  borderRadius: '16px',
-                  border: '1px solid #f0f0f0',
-                  transition: 'all 0.3s ease'
-                }}>
-                  <div style={{ 
-                    width: '48px',
-                    height: '48px',
-                    borderRadius: '12px',
-                    background: '#f3e8ff',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginBottom: '1rem'
-                  }}>
-                    <Icon size={24} color="#7c3aed" />
+            <div className="contact-info-list">
+              {contactInfo.map(({ icon: Icon, title, lines, link, linkText }) => (
+                <div className="contact-info-row" key={title}>
+                  <div className="contact-info-icon"><Icon size={19} /></div>
+                  <div>
+                    <h4>{title}</h4>
+                    {lines.map((l) => <p key={l}>{l}</p>)}
+                    {link && (
+                      <a href={link} target="_blank" rel="noopener noreferrer" className="contact-info-link">
+                        {linkText} <ArrowRight size={14} />
+                      </a>
+                    )}
                   </div>
-                  
-                  <h3 style={{ 
-                    fontSize: '1.1rem', 
-                    fontWeight: 700,
-                    marginBottom: '0.5rem',
-                    color: '#1a1a1a'
-                  }}>
-                    {info.title}
-                  </h3>
-                  
-                  {info.details.map((detail, idx) => (
-                    <p key={idx} style={{ 
-                      color: 'var(--text-secondary)',
-                      lineHeight: '1.6',
-                      fontSize: '0.95rem',
-                      margin: '0.15rem 0'
-                    }}>
-                      {detail}
-                    </p>
-                  ))}
-
-                  {info.link && (
-                    <a href={info.link} target="_blank" rel="noopener noreferrer" style={{ 
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '0.25rem',
-                      marginTop: '0.75rem',
-                      color: '#7c3aed',
-                      textDecoration: 'none',
-                      fontWeight: 600,
-                      fontSize: '0.9rem'
-                    }}>
-                      {info.linkText} <ExternalLink size={14} />
-                    </a>
-                  )}
                 </div>
-              );
-            })}
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
 
-      {/* Contact Form Section */}
-      <section style={{ padding: '4rem 0', background: '#fafafa' }}>
-        <div className="container">
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: '1fr 1fr', 
-            gap: '4rem',
-            '@media (max-width: 768px)': { gridTemplateColumns: '1fr' }
-          }}>
-            {/* Form */}
-            <div>
-              <h2 style={{ 
-                fontSize: '2rem', 
-                fontWeight: 700, 
-                marginBottom: '0.5rem',
-                color: '#1a1a1a'
-              }}>
-                Send Us a Message
-              </h2>
-              <p style={{ 
-                color: 'var(--text-secondary)',
-                marginBottom: '2rem',
-                fontSize: '1rem'
-              }}>
-                Fill in the form below and we'll get back to you within 24 hours.
-              </p>
-
-              {isSubmitted ? (
-                <div style={{ 
-                  padding: '2rem',
-                  background: 'white',
-                  borderRadius: '16px',
-                  border: '1px solid #d1fae5',
-                  textAlign: 'center'
-                }}>
-                  <div style={{ 
-                    width: '64px',
-                    height: '64px',
-                    borderRadius: '50%',
-                    background: '#d1fae5',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    margin: '0 auto 1rem'
-                  }}>
-                    <CheckCircle size={32} color="#22c55e" />
-                  </div>
-                  <h3 style={{ 
-                    fontSize: '1.25rem', 
-                    fontWeight: 700,
-                    color: '#1a1a1a',
-                    marginBottom: '0.5rem'
-                  }}>
-                    Message Sent!
-                  </h3>
-                  <p style={{ color: 'var(--text-secondary)' }}>
-                    Thank you for reaching out. We'll get back to you within 24 hours.
-                  </p>
-                  <button
-                    onClick={() => setIsSubmitted(false)}
-                    style={{
-                      marginTop: '1.5rem',
-                      background: 'transparent',
-                      border: '1px solid #7c3aed',
-                      padding: '0.5rem 2rem',
-                      borderRadius: '8px',
-                      color: '#7c3aed',
-                      fontWeight: 600,
-                      cursor: 'pointer'
-                    }}
-                  >
-                    Send Another Message
-                  </button>
-                </div>
-              ) : (
+          <div className="contact-form-panel">
+            {isSubmitted ? (
+              <div className="contact-success">
+                <div className="contact-success-icon"><CheckCircle size={28} color="var(--success, #34c98e)" /></div>
+                <h3>Message Sent!</h3>
+                <p>Thank you for reaching out. We'll get back to you within 24 hours.</p>
+                <button
+                  onClick={() => setIsSubmitted(false)}
+                  className="btn-outline-gold"
+                  style={{ marginTop: '1.4rem' }}
+                >
+                  Send Another Message
+                </button>
+              </div>
+            ) : (
+              <>
+                <h2>Send us a message</h2>
+                <p>Fill out the form and our team will get back to you shortly.</p>
                 <form onSubmit={handleSubmit}>
-                  <div style={{ marginBottom: '1.5rem' }}>
-                    <label style={{ 
-                      display: 'block',
-                      fontWeight: 600,
-                      marginBottom: '0.5rem',
-                      color: '#1a1a1a',
-                      fontSize: '0.95rem'
-                    }}>
-                      Full Name *
-                    </label>
-                    <input
-                      type="text"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      required
-                      placeholder="Enter your full name"
-                      style={{
-                        width: '100%',
-                        padding: '0.75rem',
-                        border: '1px solid #e5e7eb',
-                        borderRadius: '8px',
-                        fontSize: '1rem',
-                        outline: 'none',
-                        transition: 'border-color 0.2s ease',
-                        background: 'white'
-                      }}
-                    />
+                  <div className="contact-field-grid">
+                    <div className="contact-field">
+                      <User size={16} className="contact-field-icon" />
+                      <input name="firstName" value={formData.firstName} onChange={handleChange} placeholder="First Name" required />
+                    </div>
+                    <div className="contact-field">
+                      <User size={16} className="contact-field-icon" />
+                      <input name="lastName" value={formData.lastName} onChange={handleChange} placeholder="Last Name" required />
+                    </div>
                   </div>
 
-                  <div style={{ marginBottom: '1.5rem' }}>
-                    <label style={{ 
-                      display: 'block',
-                      fontWeight: 600,
-                      marginBottom: '0.5rem',
-                      color: '#1a1a1a',
-                      fontSize: '0.95rem'
-                    }}>
-                      Email Address *
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
-                      placeholder="Enter your email address"
-                      style={{
-                        width: '100%',
-                        padding: '0.75rem',
-                        border: '1px solid #e5e7eb',
-                        borderRadius: '8px',
-                        fontSize: '1rem',
-                        outline: 'none',
-                        transition: 'border-color 0.2s ease',
-                        background: 'white'
-                      }}
-                    />
+                  <div className="contact-field" style={{ marginBottom: '1rem' }}>
+                    <Mail size={16} className="contact-field-icon" />
+                    <input type="email" name="businessEmail" value={formData.businessEmail} onChange={handleChange} placeholder="Business Email" required />
                   </div>
 
-                  <div style={{ marginBottom: '1.5rem' }}>
-                    <label style={{ 
-                      display: 'block',
-                      fontWeight: 600,
-                      marginBottom: '0.5rem',
-                      color: '#1a1a1a',
-                      fontSize: '0.95rem'
-                    }}>
-                      Company Name
-                    </label>
-                    <input
-                      type="text"
-                      name="company"
-                      value={formData.company}
-                      onChange={handleChange}
-                      placeholder="Enter your company name"
-                      style={{
-                        width: '100%',
-                        padding: '0.75rem',
-                        border: '1px solid #e5e7eb',
-                        borderRadius: '8px',
-                        fontSize: '1rem',
-                        outline: 'none',
-                        transition: 'border-color 0.2s ease',
-                        background: 'white'
-                      }}
-                    />
+                  <div className="contact-field" style={{ marginBottom: '1rem' }}>
+                    <Building2 size={16} className="contact-field-icon" />
+                    <input name="companyName" value={formData.companyName} onChange={handleChange} placeholder="Company Name" />
                   </div>
 
-                  <div style={{ marginBottom: '1.5rem' }}>
-                    <label style={{ 
-                      display: 'block',
-                      fontWeight: 600,
-                      marginBottom: '0.5rem',
-                      color: '#1a1a1a',
-                      fontSize: '0.95rem'
-                    }}>
-                      Phone Number
-                    </label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      placeholder="Enter your phone number"
-                      style={{
-                        width: '100%',
-                        padding: '0.75rem',
-                        border: '1px solid #e5e7eb',
-                        borderRadius: '8px',
-                        fontSize: '1rem',
-                        outline: 'none',
-                        transition: 'border-color 0.2s ease',
-                        background: 'white'
-                      }}
-                    />
+                  <div className="contact-field-grid">
+                    <div className="contact-field">
+                      <Phone size={16} className="contact-field-icon" />
+                      <input type="tel" name="phoneNumber" value={formData.phoneNumber} onChange={handleChange} placeholder="Phone Number" />
+                    </div>
+                    <div className="contact-field">
+                      <Briefcase size={16} className="contact-field-icon" />
+                      <select name="industry" value={formData.industry} onChange={handleChange}>
+                        <option value="">Industry</option>
+                        {industries.map((i) => <option key={i} value={i}>{i}</option>)}
+                      </select>
+                    </div>
                   </div>
 
-                  <div style={{ marginBottom: '1.5rem' }}>
-                    <label style={{ 
-                      display: 'block',
-                      fontWeight: 600,
-                      marginBottom: '0.5rem',
-                      color: '#1a1a1a',
-                      fontSize: '0.95rem'
-                    }}>
-                      Subject *
-                    </label>
-                    <select
-                      name="subject"
-                      value={formData.subject}
-                      onChange={handleChange}
-                      required
-                      style={{
-                        width: '100%',
-                        padding: '0.75rem',
-                        border: '1px solid #e5e7eb',
-                        borderRadius: '8px',
-                        fontSize: '1rem',
-                        outline: 'none',
-                        background: 'white',
-                        color: '#1a1a1a'
-                      }}
-                    >
-                      <option value="">Select a subject</option>
-                      <option value="General Inquiry">General Inquiry</option>
-                      <option value="Product Demo">Product Demo</option>
-                      <option value="Consulting Services">Consulting Services</option>
-                      <option value="Training Programs">Training Programs</option>
-                      <option value="Support">Support</option>
-                      <option value="Partnership">Partnership</option>
-                      <option value="Other">Other</option>
+                  <div className="contact-field" style={{ marginBottom: '1rem' }}>
+                    <HelpCircle size={16} className="contact-field-icon" />
+                    <select name="helpType" value={formData.helpType} onChange={handleChange} required>
+                      <option value="">How can we help you?</option>
+                      {helpOptions.map((h) => <option key={h} value={h}>{h}</option>)}
                     </select>
                   </div>
 
-                  <div style={{ marginBottom: '2rem' }}>
-                    <label style={{ 
-                      display: 'block',
-                      fontWeight: 600,
-                      marginBottom: '0.5rem',
-                      color: '#1a1a1a',
-                      fontSize: '0.95rem'
-                    }}>
-                      Message *
-                    </label>
-                    <textarea
-                      name="message"
-                      value={formData.message}
-                      onChange={handleChange}
-                      required
-                      placeholder="Tell us how we can help you"
-                      rows="5"
-                      style={{
-                        width: '100%',
-                        padding: '0.75rem',
-                        border: '1px solid #e5e7eb',
-                        borderRadius: '8px',
-                        fontSize: '1rem',
-                        outline: 'none',
-                        transition: 'border-color 0.2s ease',
-                        background: 'white',
-                        resize: 'vertical',
-                        fontFamily: 'inherit'
-                      }}
-                    />
+                  <div className="contact-field" style={{ marginBottom: '1rem' }}>
+                    <Edit3 size={16} className="contact-field-icon" />
+                    <textarea name="message" value={formData.message} onChange={handleChange} placeholder="Tell us more about your needs..." required />
                   </div>
 
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    style={{
-                      width: '100%',
-                      background: 'linear-gradient(135deg, #7c3aed, #6d28d9)',
-                      border: 'none',
-                      padding: '0.875rem',
-                      borderRadius: '8px',
-                      color: 'white',
-                      fontWeight: 700,
-                      fontSize: '1rem',
-                      cursor: isSubmitting ? 'not-allowed' : 'pointer',
-                      opacity: isSubmitting ? 0.7 : 1,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '0.5rem',
-                      transition: 'all 0.2s ease'
-                    }}
-                  >
-                    {isSubmitting ? 'Sending...' : 'Send Message'}
-                    {!isSubmitting && <Send size={18} />}
-                  </button>
+                  <label className="contact-terms-row">
+                    <input type="checkbox" name="agreeToTerms" checked={formData.agreeToTerms} onChange={handleChange} required />
+                    <span>I agree to the <a href="/privacy">Privacy Policy</a> and <a href="/terms">Terms of Service</a>.</span>
+                  </label>
+
+                  <div className="contact-submit-row">
+                    <button type="submit" className="btn-primary" disabled={isSubmitting} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+                      {isSubmitting ? 'Sending...' : 'Send Message'}
+                      {!isSubmitting && <Send size={17} />}
+                    </button>
+                    <span className="contact-reply-note"><Clock size={14} /> We typically reply within 24 hours</span>
+                  </div>
                 </form>
-              )}
-            </div>
+              </>
+            )}
+          </div>
+        </div>
+      </section>
 
-            {/* Right Column - Support Options & FAQ */}
-            <div>
-              <h2 style={{ 
-                fontSize: '2rem', 
-                fontWeight: 700, 
-                marginBottom: '0.5rem',
-                color: '#1a1a1a'
-              }}>
-                Get Support
-              </h2>
-              <p style={{ 
-                color: 'var(--text-secondary)',
-                marginBottom: '2rem',
-                fontSize: '1rem'
-              }}>
-                Our support team is available 24/7 to help you.
-              </p>
+      {/* ---- Support options + FAQ ---- */}
+      <section className="contact-secondary">
+        <div className="container contact-secondary-grid">
+          <div>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary, #f5f5f7)', margin: '0 0 1.2rem' }}>Get Support</h2>
+            {supportOptions.map(({ icon: Icon, title, description, link, color, bg }) => (
+              <a href={link} target="_blank" rel="noopener noreferrer" className="support-option-row" key={title}>
+                <div className="support-option-icon" style={{ background: bg, color }}><Icon size={19} /></div>
+                <div style={{ flex: 1 }}>
+                  <h4>{title}</h4>
+                  <p>{description}</p>
+                </div>
+                <ChevronRight size={18} color="var(--accent-gold, #f0c987)" />
+              </a>
+            ))}
+          </div>
 
-              {/* Support Options */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
-                {supportOptions.map((option, index) => {
-                  const Icon = option.icon;
-                  return (
-                    <a
-                      key={index}
-                      href={option.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        padding: '1.25rem',
-                        background: 'white',
-                        borderRadius: '12px',
-                        border: '1px solid #f0f0f0',
-                        textDecoration: 'none',
-                        transition: 'all 0.2s ease',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      <div style={{ 
-                        width: '44px',
-                        height: '44px',
-                        borderRadius: '10px',
-                        background: `${option.color}15`,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        marginRight: '1rem',
-                        flexShrink: 0
-                      }}>
-                        <Icon size={20} color={option.color} />
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <h4 style={{ 
-                          fontSize: '1rem', 
-                          fontWeight: 700,
-                          color: '#1a1a1a',
-                          marginBottom: '0.2rem'
-                        }}>
-                          {option.title}
-                        </h4>
-                        <p style={{ 
-                          fontSize: '0.9rem',
-                          color: 'var(--text-secondary)'
-                        }}>
-                          {option.description}
-                        </p>
-                      </div>
-                      <ChevronRight size={20} color="#7c3aed" />
-                    </a>
-                  );
-                })}
-              </div>
-
-              {/* FAQ Section */}
-              <div style={{
-                background: 'white',
-                padding: '1.5rem',
-                borderRadius: '12px',
-                border: '1px solid #f0f0f0'
-              }}>
-                <h3 style={{ 
-                  fontSize: '1.1rem', 
-                  fontWeight: 700,
-                  color: '#1a1a1a',
-                  marginBottom: '1rem'
-                }}>
-                  Frequently Asked Questions
-                </h3>
-                {faqs.map((faq, index) => (
-                  <div key={index} style={{
-                    padding: '0.75rem 0',
-                    borderBottom: index < faqs.length - 1 ? '1px solid #f0f0f0' : 'none'
-                  }}>
-                    <h4 style={{
-                      fontSize: '0.95rem',
-                      fontWeight: 600,
-                      color: '#1a1a1a',
-                      marginBottom: '0.25rem'
-                    }}>
-                      {faq.question}
-                    </h4>
-                    <p style={{
-                      fontSize: '0.9rem',
-                      color: 'var(--text-secondary)',
-                      lineHeight: '1.5'
-                    }}>
-                      {faq.answer}
-                    </p>
-                  </div>
-                ))}
-              </div>
+          <div>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary, #f5f5f7)', margin: '0 0 1.2rem' }}>FAQs</h2>
+            <div className="faq-panel">
+              {faqs.map((faq) => (
+                <div className="faq-item" key={faq.question}>
+                  <h4>{faq.question}</h4>
+                  <p>{faq.answer}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section style={{ 
-        padding: '4rem 0',
-        background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
-        textAlign: 'center'
-      }}>
+      {/* ---- Bottom CTA banner ---- */}
+      <section className="contact-cta-section">
         <div className="container">
-          <h2 style={{ 
-            fontSize: '2.5rem', 
-            fontWeight: 700,
-            color: 'white',
-            marginBottom: '1rem'
-          }}>
-            Ready to Transform Your Business?
-          </h2>
-          <p style={{ 
-            fontSize: '1.1rem',
-            color: 'rgba(255,255,255,0.9)',
-            maxWidth: '600px',
-            margin: '0 auto 2rem',
-            lineHeight: '1.6'
-          }}>
-            Join 15,000+ businesses already using SENZIA to drive performance and grow.
-          </p>
-          <Link to="/demo">
-            <button style={{ 
-              background: 'white',
-              border: 'none',
-              padding: '1rem 2.5rem',
-              borderRadius: '8px',
-              color: '#7c3aed',
-              fontWeight: 700,
-              fontSize: '1.1rem',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease'
-            }}>
-              Book a Demo →
-            </button>
-          </Link>
+          <div className="contact-cta-banner">
+            <div className="contact-cta-text">
+              <h2>Ready to see Senzia in action?</h2>
+              <p>Book a personalized demo and discover how Senzia can help you automate, analyze, and grow with confidence.</p>
+              <div className="contact-cta-actions">
+                <Link to="/dashboard"><button className="btn-primary">Book a Demo <ArrowRight size={16} /></button></Link>
+                <Link to="/product"><button className="btn-outline-gold">Explore Our Platform</button></Link>
+              </div>
+            </div>
+            <div className="contact-cta-art">
+              <svg width="70%" height="70%" viewBox="0 0 200 100" fill="none">
+                <polyline points="10,80 40,60 70,68 100,40 130,50 160,20 190,30" stroke="#f0c987" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" opacity="0.85" />
+                {[10, 40, 70, 100, 130, 160, 190].map((x, i) => (
+                  <circle key={x} cx={x} cy={[80, 60, 68, 40, 50, 20, 30][i]} r="2.5" fill="#f0c987" />
+                ))}
+              </svg>
+            </div>
+          </div>
         </div>
       </section>
     </div>
