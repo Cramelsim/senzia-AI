@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Check, ChevronDown, ChevronUp } from 'lucide-react';
 import Navbar from '../components/Layout/Navbar';
+import './Pricing.css';
 
 const Pricing = () => {
   const [billingCycle, setBillingCycle] = useState('monthly');
@@ -128,10 +129,10 @@ const Pricing = () => {
   ];
 
   const usageStats = {
-    users: { used: 12, total: 20, percentage: 60 },
-    dataSources: { used: 15, total: 25, percentage: 60 },
-    reports: { used: 8, total: 15, percentage: 53 },
-    aiRequests: { used: 2450, total: 5000, percentage: 49 }
+    users: { used: 12, total: 20, percentage: 60, color: 'indigo' },
+    dataSources: { used: 15, total: 25, percentage: 60, color: 'green' },
+    reports: { used: 8, total: 15, percentage: 53, color: 'gold' },
+    aiRequests: { used: 2450, total: 5000, percentage: 49, color: 'red' }
   };
 
   const getPrice = (plan) => {
@@ -150,257 +151,105 @@ const Pricing = () => {
   };
 
   return (
-    <div>
+    <div className="pricing-page">
       <Navbar />
-      
+
       {/* Current Plan Banner */}
-      <section style={{ 
-        padding: '2rem 0',
-        background: 'linear-gradient(135deg, #faf5ff 0%, #ffffff 50%)',
-        borderBottom: '1px solid #e5e7eb'
-      }}>
-        <div className="container">
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: '1rem'
-          }}>
-            <div>
-              <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#1a1a1a' }}>
-                {currentPlan.name}
-              </h2>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '0.25rem' }}>
-                <span style={{
-                  background: '#d1fae5',
-                  color: '#065f46',
-                  padding: '0.25rem 0.75rem',
-                  borderRadius: '20px',
-                  fontSize: '0.85rem',
-                  fontWeight: 600
-                }}>
-                  {currentPlan.status}
-                </span>
-                <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-                  Renews on {currentPlan.renews}
-                </span>
-              </div>
+      <section className="current-plan-banner">
+        <div className="container current-plan-row">
+          <div>
+            <h2 className="current-plan-name">{currentPlan.name}</h2>
+            <div className="current-plan-meta">
+              <span className="status-badge">{currentPlan.status}</span>
+              <span className="current-plan-renews">Renews on {currentPlan.renews}</span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-              <div style={{ textAlign: 'right' }}>
-                <p style={{ fontSize: '1.5rem', fontWeight: 700, color: '#1a1a1a' }}>
-                  {currentPlan.price}
-                  <span style={{ fontSize: '1rem', fontWeight: 400, color: 'var(--text-secondary)' }}>
-                    {currentPlan.period}
-                  </span>
-                </p>
-              </div>
-              <button style={{
-                background: 'transparent',
-                border: '1px solid #7c3aed',
-                padding: '0.5rem 1.5rem',
-                borderRadius: '8px',
-                color: '#7c3aed',
-                fontWeight: 600,
-                cursor: 'pointer',
-                transition: 'all 0.2s ease'
-              }}>
-                Manage Plan
-              </button>
-            </div>
+          </div>
+          <div className="current-plan-actions">
+            <p className="current-plan-price">
+              {currentPlan.price}
+              <span className="current-plan-period">{currentPlan.period}</span>
+            </p>
+            <button className="btn-outline">Manage Plan</button>
           </div>
         </div>
       </section>
 
-      {/* Billing Toggle */}
-      <section style={{ padding: '2rem 0', background: 'white' }}>
+      {/* Pricing Cards */}
+      <section className="pricing-hero">
         <div className="container">
-          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-            <h1 style={{ 
-              fontSize: '2.5rem', 
-              fontWeight: 800, 
-              color: '#1a1a1a',
-              marginBottom: '0.5rem'
-            }}>
-              Simple, Transparent Pricing
-            </h1>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem' }}>
-              Choose the plan that fits your business needs.
-            </p>
+          <div className="pricing-heading">
+            <span className="eyebrow">Pricing</span>
+            <h1 className="pricing-title">Simple, Transparent Pricing</h1>
+            <p className="pricing-subtitle">Choose the plan that fits your business needs.</p>
           </div>
 
-          {/* Billing Toggle */}
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginBottom: '3rem' }}>
+          <div className="billing-toggle">
             <button
+              className={`toggle-btn${billingCycle === 'monthly' ? ' active' : ''}`}
               onClick={() => setBillingCycle('monthly')}
-              style={{
-                padding: '0.5rem 2rem',
-                borderRadius: '8px',
-                border: billingCycle === 'monthly' ? '2px solid #7c3aed' : '1px solid #e5e7eb',
-                background: billingCycle === 'monthly' ? '#faf5ff' : 'white',
-                color: billingCycle === 'monthly' ? '#7c3aed' : 'var(--text-secondary)',
-                fontWeight: 600,
-                cursor: 'pointer'
-              }}
             >
               Monthly
             </button>
             <button
+              className={`toggle-btn${billingCycle === 'yearly' ? ' active' : ''}`}
               onClick={() => setBillingCycle('yearly')}
-              style={{
-                padding: '0.5rem 2rem',
-                borderRadius: '8px',
-                border: billingCycle === 'yearly' ? '2px solid #7c3aed' : '1px solid #e5e7eb',
-                background: billingCycle === 'yearly' ? '#faf5ff' : 'white',
-                color: billingCycle === 'yearly' ? '#7c3aed' : 'var(--text-secondary)',
-                fontWeight: 600,
-                cursor: 'pointer',
-                position: 'relative'
-              }}
             >
               Yearly
-              <span style={{
-                position: 'absolute',
-                top: '-8px',
-                right: '-8px',
-                background: '#22c55e',
-                color: 'white',
-                padding: '0.15rem 0.5rem',
-                borderRadius: '12px',
-                fontSize: '0.65rem',
-                fontWeight: 700
-              }}>
-                Save 16%
-              </span>
+              <span className="save-badge">Save 16%</span>
             </button>
           </div>
 
-          {/* Pricing Cards */}
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', 
-            gap: '2rem',
-            marginBottom: '3rem'
-          }}>
+          <div className="plans-grid">
             {plans.map((plan) => {
               const price = getPrice(plan);
               const period = getPeriod(plan);
               const isExpanded = expandedPlan === plan.id;
 
               return (
-                <div key={plan.id} style={{
-                  background: 'white',
-                  borderRadius: '16px',
-                  border: plan.popular ? '2px solid #7c3aed' : '1px solid #e5e7eb',
-                  padding: '2rem',
-                  position: 'relative',
-                  transition: 'all 0.3s ease',
-                  boxShadow: plan.popular ? '0 4px 20px rgba(124, 58, 237, 0.12)' : 'none'
-                }}>
-                  {plan.popular && (
-                    <span style={{
-                      position: 'absolute',
-                      top: '-12px',
-                      right: '20px',
-                      background: 'linear-gradient(135deg, #7c3aed, #6d28d9)',
-                      color: 'white',
-                      padding: '0.25rem 1rem',
-                      borderRadius: '20px',
-                      fontSize: '0.8rem',
-                      fontWeight: 600
-                    }}>
-                      Most Popular
-                    </span>
-                  )}
-                  
-                  {plan.isEnterprise && (
-                    <span style={{
-                      position: 'absolute',
-                      top: '-12px',
-                      right: '20px',
-                      background: '#1a1a1a',
-                      color: 'white',
-                      padding: '0.25rem 1rem',
-                      borderRadius: '20px',
-                      fontSize: '0.8rem',
-                      fontWeight: 600
-                    }}>
-                      Enterprise
-                    </span>
-                  )}
+                <div
+                  key={plan.id}
+                  className={`plan-card${plan.popular ? ' popular' : ''}${plan.isEnterprise ? ' enterprise' : ''}`}
+                >
+                  {plan.popular && <span className="plan-tag popular-tag">Most Popular</span>}
+                  {plan.isEnterprise && <span className="plan-tag enterprise-tag">Enterprise</span>}
 
-                  <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#1a1a1a', marginBottom: '0.5rem' }}>
-                    {plan.name}
-                  </h3>
-                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', marginBottom: '1.5rem' }}>
-                    {plan.description}
-                  </p>
+                  <h3 className="plan-name">{plan.name}</h3>
+                  <p className="plan-description">{plan.description}</p>
 
-                  <div style={{ marginBottom: '1.5rem' }}>
+                  <div className="plan-price-block">
                     {plan.isEnterprise ? (
-                      <p style={{ fontSize: '2rem', fontWeight: 800, color: '#1a1a1a' }}>
-                        Custom
-                      </p>
+                      <p className="plan-price">Custom</p>
                     ) : (
                       <>
-                        <p style={{ fontSize: '2.5rem', fontWeight: 800, color: '#1a1a1a' }}>
+                        <p className="plan-price">
                           {formatPrice(price)}
-                          <span style={{ fontSize: '1rem', fontWeight: 400, color: 'var(--text-secondary)' }}>
-                            {period}
-                          </span>
+                          <span className="plan-period">{period}</span>
                         </p>
-                        {billingCycle === 'yearly' && !plan.isEnterprise && (
-                          <p style={{ color: '#22c55e', fontSize: '0.9rem', fontWeight: 600 }}>
-                            Save {plan.savings} vs monthly
-                          </p>
+                        {billingCycle === 'yearly' && (
+                          <p className="plan-savings">Save {plan.savings} vs monthly</p>
                         )}
                       </>
                     )}
                   </div>
 
                   <Link to={plan.isEnterprise ? '/contact' : '/demo'}>
-                    <button style={{
-                      width: '100%',
-                      background: plan.popular ? 'linear-gradient(135deg, #7c3aed, #6d28d9)' : 'transparent',
-                      border: plan.popular ? 'none' : '1px solid #7c3aed',
-                      padding: '0.75rem',
-                      borderRadius: '8px',
-                      color: plan.popular ? 'white' : '#7c3aed',
-                      fontWeight: 600,
-                      fontSize: '1rem',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease',
-                      marginBottom: '1.5rem'
-                    }}>
+                    <button className={`plan-btn${plan.popular ? ' filled' : ''}`}>
                       {plan.buttonText}
                     </button>
                   </Link>
 
-                  <div style={{ borderTop: '1px solid #f0f0f0', paddingTop: '1rem' }}>
-                    <p style={{ fontWeight: 600, marginBottom: '0.75rem', color: '#1a1a1a' }}>
-                      Features included:
-                    </p>
+                  <div className="plan-features">
+                    <p className="plan-features-label">Features included:</p>
                     {plan.features.slice(0, isExpanded ? plan.features.length : 5).map((feature, index) => (
-                      <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                        <Check size={16} color="#22c55e" />
-                        <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>{feature}</span>
+                      <div className="plan-feature" key={index}>
+                        <Check size={16} className="feature-check" />
+                        <span>{feature}</span>
                       </div>
                     ))}
                     {plan.features.length > 5 && (
                       <button
+                        className="show-more-btn"
                         onClick={() => setExpandedPlan(isExpanded ? null : plan.id)}
-                        style={{
-                          background: 'transparent',
-                          border: 'none',
-                          color: '#7c3aed',
-                          fontWeight: 600,
-                          cursor: 'pointer',
-                          marginTop: '0.5rem',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '0.25rem'
-                        }}
                       >
                         {isExpanded ? 'Show less' : `Show ${plan.features.length - 5} more features`}
                         {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
@@ -415,242 +264,122 @@ const Pricing = () => {
       </section>
 
       {/* Billing Center Section */}
-      <section style={{ padding: '4rem 0', background: '#fafafa' }}>
+      <section className="billing-center">
         <div className="container">
-          <h2 style={{ 
-            fontSize: '2rem', 
-            fontWeight: 700, 
-            color: '#1a1a1a',
-            marginBottom: '2rem'
-          }}>
-            Billing Center
-          </h2>
+          <h2 className="section-title left">Billing Center</h2>
 
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
-            gap: '1.5rem',
-            marginBottom: '2rem'
-          }}>
-            <div style={{
-              background: 'white',
-              padding: '1.5rem',
-              borderRadius: '12px',
-              border: '1px solid #e5e7eb'
-            }}>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Current Plan</p>
-              <p style={{ fontSize: '1.25rem', fontWeight: 700, color: '#1a1a1a' }}>
-                KES 24,999 / month
-              </p>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-                Renews on June 12, 2025
-              </p>
-              <button style={{
-                marginTop: '1rem',
-                background: 'transparent',
-                border: '1px solid #7c3aed',
-                padding: '0.5rem 1rem',
-                borderRadius: '6px',
-                color: '#7c3aed',
-                fontWeight: 600,
-                cursor: 'pointer',
-                fontSize: '0.9rem'
-              }}>
-                View Subscription
-              </button>
+          <div className="billing-summary-grid">
+            <div className="summary-card">
+              <p className="summary-label">Current Plan</p>
+              <p className="summary-value">KES 24,999 / month</p>
+              <p className="summary-note">Renews on June 12, 2025</p>
+              <button className="btn-outline small">View Subscription</button>
             </div>
 
-            <div style={{
-              background: 'white',
-              padding: '1.5rem',
-              borderRadius: '12px',
-              border: '1px solid #e5e7eb'
-            }}>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Next Billing</p>
-              <p style={{ fontSize: '1.25rem', fontWeight: 700, color: '#1a1a1a' }}>
-                June 12, 2025
-              </p>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-                KES 24,999 · Monthly subscription
-              </p>
+            <div className="summary-card">
+              <p className="summary-label">Next Billing</p>
+              <p className="summary-value">June 12, 2025</p>
+              <p className="summary-note">KES 24,999 · Monthly subscription</p>
             </div>
 
-            <div style={{
-              background: 'white',
-              padding: '1.5rem',
-              borderRadius: '12px',
-              border: '1px solid #e5e7eb'
-            }}>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Amount Due</p>
-              <p style={{ fontSize: '1.25rem', fontWeight: 700, color: '#22c55e' }}>
-                KES 0
-              </p>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-                You're all caught up!
-              </p>
+            <div className="summary-card">
+              <p className="summary-label">Amount Due</p>
+              <p className="summary-value good">KES 0</p>
+              <p className="summary-note">You're all caught up!</p>
             </div>
 
-            <div style={{
-              background: 'white',
-              padding: '1.5rem',
-              borderRadius: '12px',
-              border: '1px solid #e5e7eb'
-            }}>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Total Paid</p>
-              <p style={{ fontSize: '1.25rem', fontWeight: 700, color: '#1a1a1a' }}>
-                KES 149,994
-              </p>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-                This Year · 2025 total payments
-              </p>
+            <div className="summary-card">
+              <p className="summary-label">Total Paid</p>
+              <p className="summary-value">KES 149,994</p>
+              <p className="summary-note">This Year · 2025 total payments</p>
             </div>
           </div>
 
           {/* Usage Stats */}
-          <div style={{
-            background: 'white',
-            padding: '1.5rem',
-            borderRadius: '12px',
-            border: '1px solid #e5e7eb',
-            marginBottom: '2rem'
-          }}>
-            <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#1a1a1a', marginBottom: '1rem' }}>
-              Usage This Month
-            </h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1.5rem' }}>
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
-                  <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Users</span>
-                  <span style={{ fontSize: '0.9rem', fontWeight: 600, color: '#1a1a1a' }}>
-                    {usageStats.users.used}/{usageStats.users.total}
-                  </span>
+          <div className="usage-card">
+            <h3 className="card-heading">Usage This Month</h3>
+            <div className="usage-grid">
+              <div className="usage-item">
+                <div className="usage-row">
+                  <span>Users</span>
+                  <span className="usage-count">{usageStats.users.used}/{usageStats.users.total}</span>
                 </div>
-                <div style={{ height: '6px', background: '#f0f0f0', borderRadius: '4px', overflow: 'hidden' }}>
-                  <div style={{ width: `${usageStats.users.percentage}%`, height: '100%', background: '#7c3aed' }} />
+                <div className="usage-track">
+                  <div className={`usage-fill ${usageStats.users.color}`} style={{ width: `${usageStats.users.percentage}%` }} />
                 </div>
               </div>
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
-                  <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Data Sources</span>
-                  <span style={{ fontSize: '0.9rem', fontWeight: 600, color: '#1a1a1a' }}>
-                    {usageStats.dataSources.used}/{usageStats.dataSources.total}
-                  </span>
+              <div className="usage-item">
+                <div className="usage-row">
+                  <span>Data Sources</span>
+                  <span className="usage-count">{usageStats.dataSources.used}/{usageStats.dataSources.total}</span>
                 </div>
-                <div style={{ height: '6px', background: '#f0f0f0', borderRadius: '4px', overflow: 'hidden' }}>
-                  <div style={{ width: `${usageStats.dataSources.percentage}%`, height: '100%', background: '#22c55e' }} />
+                <div className="usage-track">
+                  <div className={`usage-fill ${usageStats.dataSources.color}`} style={{ width: `${usageStats.dataSources.percentage}%` }} />
                 </div>
               </div>
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
-                  <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Reports</span>
-                  <span style={{ fontSize: '0.9rem', fontWeight: 600, color: '#1a1a1a' }}>
-                    {usageStats.reports.used}/{usageStats.reports.total}
-                  </span>
+              <div className="usage-item">
+                <div className="usage-row">
+                  <span>Reports</span>
+                  <span className="usage-count">{usageStats.reports.used}/{usageStats.reports.total}</span>
                 </div>
-                <div style={{ height: '6px', background: '#f0f0f0', borderRadius: '4px', overflow: 'hidden' }}>
-                  <div style={{ width: `${usageStats.reports.percentage}%`, height: '100%', background: '#f59e0b' }} />
+                <div className="usage-track">
+                  <div className={`usage-fill ${usageStats.reports.color}`} style={{ width: `${usageStats.reports.percentage}%` }} />
                 </div>
               </div>
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
-                  <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>AI Requests</span>
-                  <span style={{ fontSize: '0.9rem', fontWeight: 600, color: '#1a1a1a' }}>
-                    {usageStats.aiRequests.used}/{usageStats.aiRequests.total}
-                  </span>
+              <div className="usage-item">
+                <div className="usage-row">
+                  <span>AI Requests</span>
+                  <span className="usage-count">{usageStats.aiRequests.used}/{usageStats.aiRequests.total}</span>
                 </div>
-                <div style={{ height: '6px', background: '#f0f0f0', borderRadius: '4px', overflow: 'hidden' }}>
-                  <div style={{ width: `${usageStats.aiRequests.percentage}%`, height: '100%', background: '#ef4444' }} />
+                <div className="usage-track">
+                  <div className={`usage-fill ${usageStats.aiRequests.color}`} style={{ width: `${usageStats.aiRequests.percentage}%` }} />
                 </div>
               </div>
             </div>
           </div>
 
           {/* Recent Invoices Table */}
-          <div style={{
-            background: 'white',
-            padding: '1.5rem',
-            borderRadius: '12px',
-            border: '1px solid #e5e7eb',
-            overflowX: 'auto'
-          }}>
-            <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#1a1a1a', marginBottom: '1rem' }}>
-              Recent Invoices
-            </h3>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid #f0f0f0' }}>
-                  <th style={{ textAlign: 'left', padding: '0.75rem', color: 'var(--text-secondary)', fontSize: '0.9rem', fontWeight: 600 }}>Invoice ID</th>
-                  <th style={{ textAlign: 'left', padding: '0.75rem', color: 'var(--text-secondary)', fontSize: '0.9rem', fontWeight: 600 }}>Date</th>
-                  <th style={{ textAlign: 'left', padding: '0.75rem', color: 'var(--text-secondary)', fontSize: '0.9rem', fontWeight: 600 }}>Description</th>
-                  <th style={{ textAlign: 'right', padding: '0.75rem', color: 'var(--text-secondary)', fontSize: '0.9rem', fontWeight: 600 }}>Amount</th>
-                  <th style={{ textAlign: 'center', padding: '0.75rem', color: 'var(--text-secondary)', fontSize: '0.9rem', fontWeight: 600 }}>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recentInvoices.map((invoice) => (
-                  <tr key={invoice.id} style={{ borderBottom: '1px solid #f5f5f5' }}>
-                    <td style={{ padding: '0.75rem', fontSize: '0.9rem', color: '#1a1a1a', fontWeight: 500 }}>{invoice.id}</td>
-                    <td style={{ padding: '0.75rem', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>{invoice.date}</td>
-                    <td style={{ padding: '0.75rem', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>{invoice.description}</td>
-                    <td style={{ padding: '0.75rem', fontSize: '0.9rem', color: '#1a1a1a', fontWeight: 600, textAlign: 'right' }}>{invoice.amount}</td>
-                    <td style={{ padding: '0.75rem', textAlign: 'center' }}>
-                      <span style={{
-                        background: '#d1fae5',
-                        color: '#065f46',
-                        padding: '0.15rem 0.75rem',
-                        borderRadius: '20px',
-                        fontSize: '0.8rem',
-                        fontWeight: 600
-                      }}>
-                        {invoice.status}
-                      </span>
-                    </td>
+          <div className="invoices-card">
+            <h3 className="card-heading">Recent Invoices</h3>
+            <div className="table-scroll">
+              <table className="invoices-table">
+                <thead>
+                  <tr>
+                    <th>Invoice ID</th>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th className="align-right">Amount</th>
+                    <th className="align-center">Status</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {recentInvoices.map((invoice) => (
+                    <tr key={invoice.id}>
+                      <td className="mono">{invoice.id}</td>
+                      <td>{invoice.date}</td>
+                      <td>{invoice.description}</td>
+                      <td className="align-right strong">{invoice.amount}</td>
+                      <td className="align-center">
+                        <span className="status-badge">{invoice.status}</span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section style={{ 
-        padding: '4rem 0',
-        background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
-        textAlign: 'center'
-      }}>
-        <div className="container">
-          <h2 style={{ 
-            fontSize: '2.5rem', 
-            fontWeight: 700,
-            color: 'white',
-            marginBottom: '1rem'
-          }}>
-            Need More Power?
-          </h2>
-          <p style={{ 
-            fontSize: '1.1rem',
-            color: 'rgba(255,255,255,0.9)',
-            maxWidth: '600px',
-            margin: '0 auto 2rem',
-            lineHeight: '1.6'
-          }}>
+      <section className="pricing-cta">
+        <div className="container cta-inner">
+          <h2 className="cta-title">Need More Power?</h2>
+          <p className="cta-subtitle">
             Upgrade your plan for more users, higher limits and advanced features.
           </p>
           <Link to="/demo">
-            <button style={{ 
-              background: 'white',
-              border: 'none',
-              padding: '1rem 2.5rem',
-              borderRadius: '8px',
-              color: '#7c3aed',
-              fontWeight: 700,
-              fontSize: '1.1rem',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease'
-            }}>
-              Upgrade Plan →
-            </button>
+            <button className="cta-button">Upgrade Plan →</button>
           </Link>
         </div>
       </section>
