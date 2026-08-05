@@ -1,0 +1,535 @@
+/* ==========================================================================
+   Senzia — Pricing page
+   Same token system as Product.css so both pages read as one product.
+   ========================================================================== */
+
+.pricing-page {
+  --bg: #0a0d16;
+  --bg-elevated: #0e121c;
+  --surface-solid: #12172a;
+  --border: #232a3d;
+  --border-soft: #1b2131;
+  --text-primary: #f5f6f8;
+  --text-secondary: #9aa3b5;
+  --text-muted: #6b7386;
+  --gold: #f0b23c;
+  --indigo: #818cf8;
+  --violet: #a78bfa;
+  --green: #34d399;
+  --red: #f87171;
+
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.pricing-page .container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.pricing-page .btn-outline {
+  background: transparent;
+  border: 1px solid var(--gold);
+  padding: 0.55rem 1.5rem;
+  border-radius: 8px;
+  color: var(--gold);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  font-size: 0.95rem;
+}
+
+.pricing-page .btn-outline:hover {
+  background: rgba(240, 178, 60, 0.08);
+}
+
+.pricing-page .btn-outline.small {
+  padding: 0.45rem 1rem;
+  font-size: 0.85rem;
+  margin-top: 1rem;
+}
+
+.pricing-page .status-badge {
+  background: rgba(52, 211, 153, 0.14);
+  color: var(--green);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: inline-block;
+}
+
+/* ----------------------------- Current plan banner ------------------------ */
+
+.pricing-page .current-plan-banner {
+  padding: 1.75rem 0;
+  background: radial-gradient(60% 100% at 15% 0%, rgba(129, 140, 248, 0.08), transparent 60%), var(--bg);
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.pricing-page .current-plan-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.pricing-page .current-plan-name {
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.pricing-page .current-plan-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.35rem;
+}
+
+.pricing-page .current-plan-renews {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.pricing-page .current-plan-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.pricing-page .current-plan-price {
+  font-size: 1.4rem;
+  font-weight: 700;
+  text-align: right;
+}
+
+.pricing-page .current-plan-period {
+  font-size: 0.95rem;
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+/* --------------------------------- Hero/plans ------------------------------ */
+
+.pricing-page .pricing-hero {
+  padding: 3.5rem 0 4rem;
+}
+
+.pricing-page .pricing-heading {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.pricing-page .eyebrow {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.75rem;
+}
+
+.pricing-page .pricing-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.pricing-page .pricing-subtitle {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+}
+
+.pricing-page .billing-toggle {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 3rem;
+}
+
+.pricing-page .toggle-btn {
+  padding: 0.5rem 2rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface-solid);
+  color: var(--text-secondary);
+  font-weight: 600;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.pricing-page .toggle-btn.active {
+  border: 1px solid var(--indigo);
+  background: rgba(129, 140, 248, 0.1);
+  color: var(--indigo);
+}
+
+.pricing-page .save-badge {
+  position: absolute;
+  top: -10px;
+  right: -12px;
+  background: var(--green);
+  color: #062b1c;
+  padding: 0.15rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+/* ---------------------------------- Cards ---------------------------------- */
+
+.pricing-page .plans-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.75rem;
+}
+
+.pricing-page .plan-card {
+  background: var(--surface-solid);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  padding: 2rem;
+  position: relative;
+  transition: border-color 0.25s ease, transform 0.25s ease;
+}
+
+.pricing-page .plan-card:hover {
+  transform: translateY(-3px);
+}
+
+.pricing-page .plan-card.popular {
+  border: 1px solid var(--gold);
+  box-shadow: 0 0 0 1px rgba(240, 178, 60, 0.15), 0 20px 40px -20px rgba(240, 178, 60, 0.25);
+}
+
+.pricing-page .plan-tag {
+  position: absolute;
+  top: -13px;
+  right: 20px;
+  padding: 0.3rem 1rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.pricing-page .popular-tag {
+  background: linear-gradient(135deg, var(--gold), #d99a2b);
+  color: #14181f;
+}
+
+.pricing-page .enterprise-tag {
+  background: var(--violet);
+  color: #14181f;
+}
+
+.pricing-page .plan-name {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+
+.pricing-page .plan-description {
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  margin-bottom: 1.5rem;
+  min-height: 2.6em;
+}
+
+.pricing-page .plan-price-block {
+  margin-bottom: 1.5rem;
+  min-height: 3.6rem;
+}
+
+.pricing-page .plan-price {
+  font-size: 2.35rem;
+  font-weight: 800;
+}
+
+.pricing-page .plan-period {
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+.pricing-page .plan-savings {
+  color: var(--green);
+  font-size: 0.88rem;
+  font-weight: 600;
+  margin-top: 0.2rem;
+}
+
+.pricing-page .plan-btn {
+  width: 100%;
+  background: transparent;
+  border: 1px solid var(--gold);
+  padding: 0.75rem;
+  border-radius: 8px;
+  color: var(--gold);
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 1.5rem;
+}
+
+.pricing-page .plan-btn.filled {
+  background: linear-gradient(135deg, var(--gold), #d99a2b);
+  border: none;
+  color: #14181f;
+}
+
+.pricing-page .plan-btn:hover {
+  filter: brightness(1.08);
+}
+
+.pricing-page .plan-features {
+  border-top: 1px solid var(--border-soft);
+  padding-top: 1rem;
+}
+
+.pricing-page .plan-features-label {
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.pricing-page .plan-feature {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.pricing-page .feature-check {
+  color: var(--green);
+  flex-shrink: 0;
+}
+
+.pricing-page .show-more-btn {
+  background: transparent;
+  border: none;
+  color: var(--indigo);
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.9rem;
+  padding: 0;
+}
+
+/* ------------------------------- Billing center ---------------------------- */
+
+.pricing-page .billing-center {
+  padding: 4.5rem 0;
+  background: var(--bg-elevated);
+  border-top: 1px solid var(--border-soft);
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.pricing-page .section-title.left {
+  font-size: 1.85rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+}
+
+.pricing-page .billing-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.pricing-page .summary-card {
+  background: var(--surface-solid);
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.pricing-page .summary-label {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+}
+
+.pricing-page .summary-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.pricing-page .summary-value.good {
+  color: var(--green);
+}
+
+.pricing-page .summary-note {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  margin-top: 0.2rem;
+}
+
+.pricing-page .card-heading {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+/* Usage */
+
+.pricing-page .usage-card {
+  background: var(--surface-solid);
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  margin-bottom: 2rem;
+}
+
+.pricing-page .usage-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1.5rem;
+}
+
+.pricing-page .usage-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.35rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.pricing-page .usage-count {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.pricing-page .usage-track {
+  height: 6px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-soft);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.pricing-page .usage-fill {
+  height: 100%;
+  border-radius: 4px;
+}
+
+.pricing-page .usage-fill.indigo { background: var(--indigo); }
+.pricing-page .usage-fill.green { background: var(--green); }
+.pricing-page .usage-fill.gold { background: var(--gold); }
+.pricing-page .usage-fill.red { background: var(--red); }
+
+/* Invoices */
+
+.pricing-page .invoices-card {
+  background: var(--surface-solid);
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.pricing-page .table-scroll {
+  overflow-x: auto;
+}
+
+.pricing-page .invoices-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.pricing-page .invoices-table th {
+  text-align: left;
+  padding: 0.75rem;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.pricing-page .invoices-table td {
+  padding: 0.75rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.pricing-page .invoices-table .mono {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.pricing-page .invoices-table .strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.pricing-page .invoices-table .align-right { text-align: right; }
+.pricing-page .invoices-table .align-center { text-align: center; }
+
+/* ----------------------------------- CTA ------------------------------------ */
+
+.pricing-page .pricing-cta {
+  padding: 4.5rem 0;
+  background: linear-gradient(135deg, #14182a 0%, #0a0d16 100%);
+  text-align: center;
+}
+
+.pricing-page .cta-inner {
+  max-width: 620px;
+}
+
+.pricing-page .cta-title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.pricing-page .cta-subtitle {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.pricing-page .cta-button {
+  background: var(--gold);
+  border: none;
+  padding: 0.9rem 2.25rem;
+  border-radius: 8px;
+  color: #14181f;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.pricing-page .cta-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px -8px rgba(240, 178, 60, 0.4);
+}
+
+/* -------------------------------- Responsive --------------------------------- */
+
+@media (max-width: 768px) {
+  .pricing-page .current-plan-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .pricing-page .current-plan-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .pricing-page .pricing-title {
+    font-size: 2rem;
+  }
+}
