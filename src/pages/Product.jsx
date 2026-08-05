@@ -1,18 +1,19 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  BarChart3, 
-  Zap, 
-  Brain, 
-  Bell, 
-  Database, 
-  Users, 
-  Shield, 
-  TrendingUp, 
-  Layout, 
-  Headphones 
+import {
+  BarChart3,
+  Zap,
+  Brain,
+  Bell,
+  Database,
+  Users,
+  Shield,
+  TrendingUp,
+  Layout,
+  Headphones
 } from 'lucide-react';
 import Navbar from '../components/Layout/Navbar';
+import './Product.css';
 
 const Product = () => {
   const modules = [
@@ -22,7 +23,7 @@ const Product = () => {
       description: 'Get real-time insights into your business performance.',
       features: ['Interactive Dashboards', 'Custom Reports', 'KPI Tracking', 'Data Visualization'],
       link: '/product/bi',
-      color: '#7c3aed'
+      color: '#60a5fa'
     },
     {
       icon: Zap,
@@ -30,7 +31,7 @@ const Product = () => {
       description: 'Automate repetitive tasks and streamline your operations.',
       features: ['Workflow Automation', 'Scheduled Reports', 'Data Sync & Integration', 'Task Automation'],
       link: '/product/automation',
-      color: '#f59e0b'
+      color: '#34d399'
     },
     {
       icon: Brain,
@@ -38,7 +39,7 @@ const Product = () => {
       description: 'Leverage AI to uncover trends, predict outcomes, and get smarter recommendations.',
       features: ['AI-Powered Analytics', 'Predictive Forecasting', 'Anomaly Detection', 'Smart Recommendations'],
       link: '/product/ai-insights',
-      color: '#8b5cf6'
+      color: '#a78bfa'
     },
     {
       icon: Bell,
@@ -46,7 +47,7 @@ const Product = () => {
       description: 'Stay informed with real-time alerts on what matters.',
       features: ['Threshold Alerts', 'Email Notifications', 'WhatsApp Alerts', 'Custom Notifications'],
       link: '/product/alerts',
-      color: '#ef4444'
+      color: '#fb923c'
     },
     {
       icon: Database,
@@ -54,7 +55,7 @@ const Product = () => {
       description: 'Connect all your data sources in one central platform.',
       features: ['Multiple Data Sources', 'Real-time Sync', 'Data Cleaning', 'Secure Storage'],
       link: '/product/integrations',
-      color: '#22c55e'
+      color: '#22d3ee'
     },
     {
       icon: Users,
@@ -62,7 +63,7 @@ const Product = () => {
       description: 'Upskill your team and implement AI the right way.',
       features: ['AI Strategy Consulting', 'Team Training', 'Workshops', 'Ongoing Support'],
       link: '/product/consulting',
-      color: '#ec4899'
+      color: '#f472b6'
     }
   ];
 
@@ -70,164 +71,150 @@ const Product = () => {
     {
       icon: Shield,
       title: 'Secure & Reliable',
-      description: 'Enterprise-grade security to protect your data.',
-      color: '#3b82f6'
+      description: 'Enterprise-grade security to protect your data.'
     },
     {
       icon: TrendingUp,
       title: 'Scalable',
-      description: 'Built to grow with your business needs.',
-      color: '#22c55e'
+      description: 'Built to grow with your business needs.'
     },
     {
       icon: Layout,
       title: 'User-Friendly',
-      description: 'Easy to use, with a clean and intuitive interface.',
-      color: '#8b5cf6'
+      description: 'Easy to use, with a clean and intuitive interface.'
     },
     {
       icon: Headphones,
       title: 'Expert Support',
-      description: 'We\'re here to help you succeed every step of the way.',
-      color: '#ec4899'
+      description: "We're here to help you succeed every step of the way."
     }
   ];
 
+  const revenuePoints = '0,55 40,48 80,50 120,32 160,38 200,20 240,26 280,6';
+
   return (
-    <div>
+    <div className="product-page">
       <Navbar />
-      
+
       {/* Hero Section */}
-      <section style={{ 
-        padding: '5rem 0 4rem',
-        background: 'linear-gradient(135deg, #faf5ff 0%, #ffffff 50%, #f3f4f6 100%)'
-      }}>
-        <div className="container">
-          <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
-            <h1 style={{ 
-              fontSize: '3.5rem', 
-              fontWeight: 800, 
-              marginBottom: '1.5rem',
-              lineHeight: '1.1',
-              color: '#1a1a1a'
-            }}>
-              Our Product
-            </h1>
-            
-            <p style={{ 
-              fontSize: '1.25rem', 
-              color: 'var(--text-secondary)',
-              maxWidth: '700px',
-              margin: '0 auto',
-              lineHeight: '1.6'
-            }}>
-              Senzia is an all-in-one AI-powered Business Intelligence platform designed to help 
-              businesses transform data into actionable insights, automate operations, and drive 
+      <section className="hero">
+        <div className="container hero-grid">
+          <div className="hero-content">
+            <h1 className="hero-title">Our Product</h1>
+            <p className="hero-subtitle">
+              Senzia is an all-in-one AI-powered Business Intelligence platform designed to help
+              businesses transform data into actionable insights, automate operations, and drive
               sustainable growth.
             </p>
+          </div>
+
+          <div className="hero-visual">
+            <div className="dashboard-glow" aria-hidden="true" />
+            <div className="dashboard-mockup">
+              <div className="dashboard-titlebar">
+                <span className="dashboard-brand">
+                  <span className="dashboard-logo-mark">S</span> SENZIA
+                </span>
+                <span className="dashboard-admin">Admin ▾</span>
+              </div>
+
+              <div className="dashboard-body">
+                <nav className="dashboard-nav">
+                  {['Overview', 'Reports', 'Data Sources', 'Alerts', 'Automation', 'AI Insights', 'Settings'].map(
+                    (item, i) => (
+                      <span key={item} className={`dashboard-nav-item${i === 0 ? ' active' : ''}`}>
+                        {item}
+                      </span>
+                    )
+                  )}
+                </nav>
+
+                <div className="dashboard-main">
+                  <p className="dashboard-section-label">Overview</p>
+
+                  <div className="dashboard-stats">
+                    <div className="dashboard-stat">
+                      <span className="stat-label">Total Revenue</span>
+                      <span className="stat-value">KSh 245.8M</span>
+                      <span className="stat-delta up">▲ 12.9% vs last month</span>
+                    </div>
+                    <div className="dashboard-stat">
+                      <span className="stat-label">Total Profit</span>
+                      <span className="stat-value">KSh 68.4M</span>
+                      <span className="stat-delta up">▲ 15.3% vs last month</span>
+                    </div>
+                    <div className="dashboard-stat">
+                      <span className="stat-label">Total Expenses</span>
+                      <span className="stat-value">KSh 117.3M</span>
+                      <span className="stat-delta down">▼ 4.6% vs last month</span>
+                    </div>
+                    <div className="dashboard-stat">
+                      <span className="stat-label">Active Users</span>
+                      <span className="stat-value">1,842</span>
+                      <span className="stat-delta up">▲ 8.2% vs last month</span>
+                    </div>
+                  </div>
+
+                  <div className="dashboard-charts">
+                    <div className="dashboard-chart-card">
+                      <span className="dashboard-section-label small">Revenue Trend</span>
+                      <svg viewBox="0 0 280 60" className="revenue-line" preserveAspectRatio="none">
+                        <polyline points={revenuePoints} fill="none" stroke="#818cf8" strokeWidth="2" />
+                      </svg>
+                    </div>
+                    <div className="dashboard-chart-card donut-card">
+                      <span className="dashboard-section-label small">Top Performing Areas</span>
+                      <div className="donut-row">
+                        <div className="donut">
+                          <span className="donut-value">45%</span>
+                        </div>
+                        <ul className="donut-legend">
+                          <li><span className="dot" style={{ background: '#818cf8' }} />Sales<em>45%</em></li>
+                          <li><span className="dot" style={{ background: '#34d399' }} />Operations<em>25%</em></li>
+                          <li><span className="dot" style={{ background: '#a78bfa' }} />Marketing<em>20%</em></li>
+                          <li><span className="dot" style={{ background: '#fb923c' }} />Other<em>10%</em></li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Modules Section */}
-      <section style={{ padding: '4rem 0', background: 'white' }}>
+      <section className="modules">
         <div className="container">
-          <h2 style={{ 
-            fontSize: '2.5rem', 
-            fontWeight: 700, 
-            textAlign: 'center',
-            marginBottom: '0.5rem',
-            color: '#1a1a1a'
-          }}>
-            Everything You Need to Run Smarter
-          </h2>
-          <p style={{ 
-            textAlign: 'center', 
-            color: 'var(--text-secondary)',
-            maxWidth: '600px',
-            margin: '0 auto 3rem',
-            fontSize: '1.1rem'
-          }}>
+          <h2 className="section-title">Everything You Need to Run Smarter</h2>
+          <p className="section-subtitle">
             Powerful modules built to give you intelligence, automation, and growth.
           </p>
 
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', 
-            gap: '2rem'
-          }}>
+          <div className="modules-grid">
             {modules.map((module, index) => {
               const Icon = module.icon;
               return (
-                <div key={index} style={{ 
-                  padding: '2rem',
-                  background: '#fafafa',
-                  borderRadius: '16px',
-                  border: '1px solid #f0f0f0',
-                  transition: 'all 0.3s ease',
-                  cursor: 'default'
-                }}>
-                  <div style={{ 
-                    width: '48px',
-                    height: '48px',
-                    borderRadius: '12px',
-                    background: `${module.color}10`,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginBottom: '1rem'
-                  }}>
+                <div className="module-card" key={index} style={{ '--accent': module.color }}>
+                  <div className="module-icon">
                     <Icon size={24} color={module.color} />
                   </div>
-                  
-                  <h3 style={{ 
-                    fontSize: '1.25rem', 
-                    fontWeight: 700,
-                    marginBottom: '0.5rem',
-                    color: '#1a1a1a'
-                  }}>
-                    {module.title}
-                  </h3>
-                  
-                  <p style={{ 
-                    color: 'var(--text-secondary)',
-                    lineHeight: '1.6',
-                    fontSize: '0.95rem',
-                    marginBottom: '1rem'
-                  }}>
-                    {module.description}
-                  </p>
 
-                  <ul style={{ 
-                    listStyle: 'none',
-                    padding: 0,
-                    marginBottom: '1.5rem'
-                  }}>
+                  <h3 className="module-title">{module.title}</h3>
+                  <p className="module-description">{module.description}</p>
+
+                  <ul className="module-features">
                     {module.features.map((feature, idx) => (
-                      <li key={idx} style={{ 
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem',
-                        padding: '0.25rem 0',
-                        color: 'var(--text-secondary)',
-                        fontSize: '0.9rem'
-                      }}>
-                        <span style={{ color: module.color }}>▸</span>
+                      <li key={idx}>
+                        <span className="check">✓</span>
                         {feature}
                       </li>
                     ))}
                   </ul>
 
-                  <Link to={module.link} style={{ 
-                    color: module.color,
-                    textDecoration: 'none',
-                    fontWeight: 600,
-                    fontSize: '0.95rem',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.25rem'
-                  }}>
-                    Learn more →
+                  <Link to={module.link} className="module-link">
+                    Learn more <span aria-hidden="true">→</span>
                   </Link>
                 </div>
               );
@@ -237,109 +224,32 @@ const Product = () => {
       </section>
 
       {/* Benefits Section */}
-      <section style={{ padding: '4rem 0', background: '#fafafa' }}>
-        <div className="container">
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
-            gap: '2rem'
-          }}>
-            {benefits.map((benefit, index) => {
-              const Icon = benefit.icon;
-              return (
-                <div key={index} style={{ 
-                  textAlign: 'center',
-                  padding: '2rem',
-                  background: 'white',
-                  borderRadius: '16px',
-                  border: '1px solid #f0f0f0',
-                  transition: 'all 0.3s ease'
-                }}>
-                  <div style={{ 
-                    width: '56px',
-                    height: '56px',
-                    borderRadius: '50%',
-                    background: `${benefit.color}10`,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    margin: '0 auto 1rem'
-                  }}>
-                    <Icon size={28} color={benefit.color} />
-                  </div>
-                  
-                  <h3 style={{ 
-                    fontSize: '1.1rem', 
-                    fontWeight: 700,
-                    marginBottom: '0.5rem',
-                    color: '#1a1a1a'
-                  }}>
-                    {benefit.title}
-                  </h3>
-                  
-                  <p style={{ 
-                    color: 'var(--text-secondary)',
-                    lineHeight: '1.6',
-                    fontSize: '0.95rem'
-                  }}>
-                    {benefit.description}
-                  </p>
-
-                  <Link to="/product" style={{ 
-                    display: 'inline-block',
-                    marginTop: '1rem',
-                    color: benefit.color,
-                    textDecoration: 'none',
-                    fontWeight: 600,
-                    fontSize: '0.95rem'
-                  }}>
-                    Learn more →
-                  </Link>
+      <section className="benefits">
+        <div className="container benefits-grid">
+          {benefits.map((benefit, index) => {
+            const Icon = benefit.icon;
+            return (
+              <div className="benefit-card" key={index}>
+                <div className="benefit-icon">
+                  <Icon size={28} />
                 </div>
-              );
-            })}
-          </div>
+                <h3 className="benefit-title">{benefit.title}</h3>
+                <p className="benefit-description">{benefit.description}</p>
+              </div>
+            );
+          })}
         </div>
       </section>
 
       {/* CTA Section */}
-      <section style={{ 
-        padding: '4rem 0',
-        background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
-        textAlign: 'center'
-      }}>
-        <div className="container">
-          <h2 style={{ 
-            fontSize: '2.5rem', 
-            fontWeight: 700,
-            color: 'white',
-            marginBottom: '1rem'
-          }}>
-            Ready to Transform Your Business?
-          </h2>
-          <p style={{ 
-            fontSize: '1.1rem',
-            color: 'rgba(255,255,255,0.9)',
-            maxWidth: '600px',
-            margin: '0 auto 2rem',
-            lineHeight: '1.6'
-          }}>
+      <section className="cta">
+        <div className="container cta-inner">
+          <h2 className="cta-title">Ready to Transform Your Business?</h2>
+          <p className="cta-subtitle">
             Join 15,000+ businesses using SENZIA to drive performance and grow.
           </p>
           <Link to="/demo">
-            <button style={{ 
-              background: 'white',
-              border: 'none',
-              padding: '1rem 2.5rem',
-              borderRadius: '8px',
-              color: '#7c3aed',
-              fontWeight: 700,
-              fontSize: '1.1rem',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease'
-            }}>
-              Start Free Trial →
-            </button>
+            <button className="cta-button">Start Free Trial →</button>
           </Link>
         </div>
       </section>
