@@ -1,0 +1,313 @@
+/* ==========================================================================
+   Senzia — About page
+   Same token system as Product.css / Pricing.css for a consistent brand.
+   ========================================================================== */
+
+.about-page {
+  --bg: #0a0d16;
+  --bg-elevated: #0e121c;
+  --surface-solid: #12172a;
+  --border: #232a3d;
+  --border-soft: #1b2131;
+  --text-primary: #f5f6f8;
+  --text-secondary: #9aa3b5;
+  --text-muted: #6b7386;
+  --gold: #f0b23c;
+  --gold-soft: #f8cd7c;
+  --indigo: #818cf8;
+
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+.about-page .container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.about-page .eyebrow {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.9rem;
+}
+
+.about-page .about-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, var(--gold-soft), var(--gold));
+  border: none;
+  padding: 0.8rem 1.75rem;
+  border-radius: 8px;
+  color: #14181f;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.about-page .about-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px -10px rgba(240, 178, 60, 0.45);
+}
+
+/* ----------------------------------- Hero ---------------------------------- */
+
+.about-page .about-hero {
+  padding: 5rem 0 4rem;
+  background: radial-gradient(55% 60% at 10% 20%, rgba(129, 140, 248, 0.08), transparent 65%), var(--bg);
+}
+
+.about-page .about-hero-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.05fr;
+  gap: 3rem;
+  align-items: center;
+}
+
+.about-page .about-hero-title {
+  font-size: 3rem;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  margin-bottom: 1.25rem;
+}
+
+.about-page .about-hero-subtitle {
+  color: var(--text-secondary);
+  font-size: 1.05rem;
+  line-height: 1.75;
+  max-width: 480px;
+  margin-bottom: 2rem;
+}
+
+.about-page .about-hero-visual {
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  box-shadow: 0 30px 60px -25px rgba(0, 0, 0, 0.6);
+}
+
+.about-page .skyline-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* ----------------------------------- Stats ---------------------------------- */
+
+.about-page .about-stats {
+  padding: 0 0 4rem;
+}
+
+.about-page .about-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  background: var(--surface-solid);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem;
+}
+
+.about-page .about-stat {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+}
+
+.about-page .about-stat-icon {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: rgba(240, 178, 60, 0.12);
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.about-page .about-stat-number {
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.about-page .about-stat-label {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-top: 0.1rem;
+}
+
+.about-page .about-stat-note {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 0.15rem;
+}
+
+/* -------------------------------- Mission / Values --------------------------- */
+
+.about-page .about-mission {
+  position: relative;
+  padding: 4rem 0 5rem;
+  overflow: hidden;
+}
+
+.about-page .mission-glow {
+  position: absolute;
+  left: -12%;
+  bottom: -18%;
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 60% 60%, rgba(240, 178, 60, 0.16), transparent 60%),
+    repeating-radial-gradient(circle at 60% 60%, transparent 0, transparent 40px, rgba(240, 178, 60, 0.06) 41px, transparent 42px);
+  pointer-events: none;
+}
+
+.about-page .about-mission-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  gap: 3rem;
+  align-items: start;
+}
+
+.about-page .mission-title {
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: 1.1rem;
+}
+
+.about-page .mission-text {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  line-height: 1.75;
+  max-width: 420px;
+}
+
+.about-page .values-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+}
+
+.about-page .value-card {
+  background: var(--surface-solid);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.5rem 1.25rem;
+  text-align: center;
+  transition: border-color 0.25s ease, transform 0.25s ease;
+}
+
+.about-page .value-card:hover {
+  border-color: var(--gold);
+  transform: translateY(-3px);
+}
+
+.about-page .value-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(240, 178, 60, 0.12);
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+}
+
+.about-page .value-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.about-page .value-description {
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+/* ------------------------------------ CTA bar -------------------------------- */
+
+.about-page .about-cta {
+  padding: 0 0 4rem;
+}
+
+.about-page .cta-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.75rem 2rem;
+}
+
+.about-page .cta-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.about-page .cta-bar-icon {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: rgba(129, 140, 248, 0.14);
+  color: var(--indigo);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.about-page .cta-bar-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.about-page .cta-bar-subtitle {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-top: 0.15rem;
+}
+
+/* -------------------------------- Responsive ---------------------------------- */
+
+@media (max-width: 960px) {
+  .about-page .about-hero-grid,
+  .about-page .about-mission-grid {
+    grid-template-columns: 1fr;
+  }
+  .about-page .mission-text {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .about-page .about-hero-title {
+    font-size: 2.25rem;
+  }
+  .about-page .cta-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
