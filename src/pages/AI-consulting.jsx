@@ -14,7 +14,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import Navbar from '../components/Layout/Navbar';
-import './AIConsulting.css';
+import './AI-consulting.css';
 
 const AIConsulting = () => {
   const services = [
