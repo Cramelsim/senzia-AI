@@ -1,19 +1,20 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  Lightbulb, 
-  Users, 
-  Target, 
-  BookOpen, 
-  TrendingUp, 
-  Shield, 
-  Clock, 
+import {
+  Lightbulb,
+  Users,
+  Target,
+  BookOpen,
+  TrendingUp,
+  Shield,
+  Clock,
   Award,
   ChevronRight,
-  CheckCircle
+  CheckCircle,
+  ArrowRight
 } from 'lucide-react';
 import Navbar from '../components/Layout/Navbar';
+import './AIConsulting.css';
 
 const AIConsulting = () => {
   const services = [
@@ -27,7 +28,7 @@ const AIConsulting = () => {
         'Use case identification',
         'ROI analysis'
       ],
-      color: '#7c3aed'
+      color: '#4f8cff'
     },
     {
       icon: Users,
@@ -39,7 +40,7 @@ const AIConsulting = () => {
         'Practical use cases',
         'Ongoing support'
       ],
-      color: '#8b5cf6'
+      color: '#a855f7'
     },
     {
       icon: Target,
@@ -51,7 +52,7 @@ const AIConsulting = () => {
         'Implementation planning',
         'Best practices sharing'
       ],
-      color: '#f59e0b'
+      color: '#e8a94d'
     },
     {
       icon: BookOpen,
@@ -72,13 +73,13 @@ const AIConsulting = () => {
       icon: TrendingUp,
       title: 'Drive Business Growth',
       description: 'Leverage AI to identify new opportunities and accelerate growth.',
-      color: '#7c3aed'
+      color: '#4f8cff'
     },
     {
       icon: Shield,
       title: 'Reduce Risk',
       description: 'Implement AI with confidence and mitigate potential risks.',
-      color: '#f59e0b'
+      color: '#e8a94d'
     },
     {
       icon: Clock,
@@ -147,157 +148,79 @@ const AIConsulting = () => {
 
   const testimonials = [
     {
-      quote: 'SENZIA\'s AI consulting team transformed our approach to data. We\'re now making decisions faster and with more confidence.',
+      quote: "SENZIA's AI consulting team transformed our approach to data. We're now making decisions faster and with more confidence.",
       author: 'David Kimani',
       role: 'Managing Director, Urban Bites Restaurant',
-      image: '👨‍💼'
+      initials: 'DK'
     },
     {
       quote: 'The training program was exceptional. Our team is now equipped to leverage AI for real business impact.',
       author: 'Jane Mwangi',
       role: 'CTO, TechHub Africa',
-      image: '👩‍💻'
+      initials: 'JM'
     }
   ];
 
   return (
-    <div>
+    <div className="ai-page">
       <Navbar />
-      
-      {/* Hero Section */}
-      <section style={{ 
-        padding: '5rem 0 4rem',
-        background: 'linear-gradient(135deg, #faf5ff 0%, #ffffff 50%, #f3f4f6 100%)'
-      }}>
-        <div className="container">
-          <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
-            <h1 style={{ 
-              fontSize: '3.5rem', 
-              fontWeight: 800, 
-              marginBottom: '1.5rem',
-              lineHeight: '1.1',
-              color: '#1a1a1a'
-            }}>
-              AI Consulting & Training
-            </h1>
-            
-            <p style={{ 
-              fontSize: '1.25rem', 
-              color: 'var(--text-secondary)',
-              maxWidth: '700px',
-              margin: '0 auto 2rem',
-              lineHeight: '1.6'
-            }}>
-              Upskill your team and implement AI the right way with our expert consulting 
-              and training programs designed for African businesses.
-            </p>
 
-            <Link to="/demo">
-              <button className="btn-primary" style={{ fontSize: '1.1rem', padding: '0.875rem 2.5rem' }}>
-                Get Started →
-              </button>
+      {/* Hero Section */}
+      <section className="ai-hero">
+        <div className="container">
+          <div className="ai-hero-inner">
+            <p className="ai-eyebrow">AI CONSULTING & TRAINING</p>
+            <h1 className="ai-hero-title">AI Consulting & Training</h1>
+            <p className="ai-hero-desc">
+              Upskill your team and implement AI the right way with our expert
+              consulting and training programs designed for African businesses.
+            </p>
+            <Link to="/demo" className="ai-btn-primary">
+              Get Started <ArrowRight size={18} />
             </Link>
           </div>
         </div>
       </section>
 
       {/* Services Section */}
-      <section style={{ padding: '4rem 0', background: 'white' }}>
+      <section className="ai-section">
         <div className="container">
-          <h2 style={{ 
-            fontSize: '2.5rem', 
-            fontWeight: 700, 
-            textAlign: 'center',
-            marginBottom: '0.5rem',
-            color: '#1a1a1a'
-          }}>
-            Our Services
-          </h2>
-          <p style={{ 
-            textAlign: 'center', 
-            color: 'var(--text-secondary)',
-            maxWidth: '600px',
-            margin: '0 auto 3rem',
-            fontSize: '1.1rem'
-          }}>
-            Comprehensive AI consulting and training solutions for your business.
-          </p>
+          <div className="ai-section-header">
+            <h2 className="ai-section-title">Our Services</h2>
+            <p className="ai-section-desc">
+              Comprehensive AI consulting and training solutions for your business.
+            </p>
+          </div>
 
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', 
-            gap: '2rem'
-          }}>
+          <div className="ai-services-grid">
             {services.map((service, index) => {
               const Icon = service.icon;
               return (
-                <div key={index} style={{ 
-                  padding: '2rem',
-                  background: '#fafafa',
-                  borderRadius: '16px',
-                  border: '1px solid #f0f0f0',
-                  transition: 'all 0.3s ease'
-                }}>
-                  <div style={{ 
-                    width: '48px',
-                    height: '48px',
-                    borderRadius: '12px',
-                    background: `${service.color}10`,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginBottom: '1rem'
-                  }}>
+                <div key={index} className="ai-service-card">
+                  <div
+                    className="ai-service-icon"
+                    style={{ background: `${service.color}1f` }}
+                  >
                     <Icon size={24} color={service.color} />
                   </div>
-                  
-                  <h3 style={{ 
-                    fontSize: '1.25rem', 
-                    fontWeight: 700,
-                    marginBottom: '0.5rem',
-                    color: '#1a1a1a'
-                  }}>
-                    {service.title}
-                  </h3>
-                  
-                  <p style={{ 
-                    color: 'var(--text-secondary)',
-                    lineHeight: '1.6',
-                    fontSize: '0.95rem',
-                    marginBottom: '1rem'
-                  }}>
-                    {service.description}
-                  </p>
 
-                  <ul style={{ 
-                    listStyle: 'none',
-                    padding: 0,
-                    marginBottom: '1.5rem'
-                  }}>
+                  <h3 className="ai-service-title">{service.title}</h3>
+                  <p className="ai-service-desc">{service.description}</p>
+
+                  <ul className="ai-service-features">
                     {service.features.map((feature, idx) => (
-                      <li key={idx} style={{ 
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem',
-                        padding: '0.25rem 0',
-                        color: 'var(--text-secondary)',
-                        fontSize: '0.9rem'
-                      }}>
+                      <li key={idx}>
                         <span style={{ color: service.color }}>▸</span>
                         {feature}
                       </li>
                     ))}
                   </ul>
 
-                  <Link to="/contact" style={{ 
-                    color: service.color,
-                    textDecoration: 'none',
-                    fontWeight: 600,
-                    fontSize: '0.95rem',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.25rem'
-                  }}>
+                  <Link
+                    to="/contact"
+                    className="ai-service-link"
+                    style={{ color: service.color }}
+                  >
                     Learn more <ChevronRight size={16} />
                   </Link>
                 </div>
@@ -308,71 +231,28 @@ const AIConsulting = () => {
       </section>
 
       {/* Benefits Section */}
-      <section style={{ padding: '4rem 0', background: '#fafafa' }}>
+      <section className="ai-section">
         <div className="container">
-          <h2 style={{ 
-            fontSize: '2.5rem', 
-            fontWeight: 700, 
-            textAlign: 'center',
-            marginBottom: '0.5rem',
-            color: '#1a1a1a'
-          }}>
-            Why Choose SENZIA Consulting?
-          </h2>
-          <p style={{ 
-            textAlign: 'center', 
-            color: 'var(--text-secondary)',
-            maxWidth: '600px',
-            margin: '0 auto 3rem',
-            fontSize: '1.1rem'
-          }}>
-            We help you navigate the AI landscape with confidence and expertise.
-          </p>
+          <div className="ai-section-header">
+            <h2 className="ai-section-title">Why Choose SENZIA Consulting?</h2>
+            <p className="ai-section-desc">
+              We help you navigate the AI landscape with confidence and expertise.
+            </p>
+          </div>
 
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
-            gap: '2rem'
-          }}>
+          <div className="ai-benefits-grid">
             {benefits.map((benefit, index) => {
               const Icon = benefit.icon;
               return (
-                <div key={index} style={{ 
-                  textAlign: 'center',
-                  padding: '2rem',
-                  background: 'white',
-                  borderRadius: '16px',
-                  border: '1px solid #f0f0f0'
-                }}>
-                  <div style={{ 
-                    width: '56px',
-                    height: '56px',
-                    borderRadius: '50%',
-                    background: `${benefit.color}10`,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    margin: '0 auto 1rem'
-                  }}>
+                <div key={index} className="ai-benefit-card">
+                  <div
+                    className="ai-benefit-icon"
+                    style={{ background: `${benefit.color}1f` }}
+                  >
                     <Icon size={28} color={benefit.color} />
                   </div>
-                  
-                  <h3 style={{ 
-                    fontSize: '1.1rem', 
-                    fontWeight: 700,
-                    marginBottom: '0.5rem',
-                    color: '#1a1a1a'
-                  }}>
-                    {benefit.title}
-                  </h3>
-                  
-                  <p style={{ 
-                    color: 'var(--text-secondary)',
-                    lineHeight: '1.6',
-                    fontSize: '0.95rem'
-                  }}>
-                    {benefit.description}
-                  </p>
+                  <h3 className="ai-benefit-title">{benefit.title}</h3>
+                  <p className="ai-benefit-desc">{benefit.description}</p>
                 </div>
               );
             })}
@@ -381,107 +261,34 @@ const AIConsulting = () => {
       </section>
 
       {/* Training Programs Section */}
-      <section style={{ padding: '4rem 0', background: 'white' }}>
+      <section className="ai-section">
         <div className="container">
-          <h2 style={{ 
-            fontSize: '2.5rem', 
-            fontWeight: 700, 
-            textAlign: 'center',
-            marginBottom: '0.5rem',
-            color: '#1a1a1a'
-          }}>
-            Training Programs
-          </h2>
-          <p style={{ 
-            textAlign: 'center', 
-            color: 'var(--text-secondary)',
-            maxWidth: '600px',
-            margin: '0 auto 3rem',
-            fontSize: '1.1rem'
-          }}>
-            Structured learning programs for every level of AI maturity.
-          </p>
+          <div className="ai-section-header">
+            <h2 className="ai-section-title">Training Programs</h2>
+            <p className="ai-section-desc">
+              Structured learning programs for every level of AI maturity.
+            </p>
+          </div>
 
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
-            gap: '2rem'
-          }}>
+          <div className="ai-programs-grid">
             {programs.map((program, index) => (
-              <div key={index} style={{ 
-                padding: '2rem',
-                background: '#fafafa',
-                borderRadius: '16px',
-                border: '1px solid #f0f0f0',
-                transition: 'all 0.3s ease'
-              }}>
-                <div style={{ 
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  marginBottom: '0.5rem'
-                }}>
-                  <h3 style={{ 
-                    fontSize: '1.2rem', 
-                    fontWeight: 700,
-                    color: '#1a1a1a'
-                  }}>
-                    {program.title}
-                  </h3>
-                  <span style={{ 
-                    background: '#7c3aed',
-                    color: 'white',
-                    padding: '0.15rem 0.75rem',
-                    borderRadius: '20px',
-                    fontSize: '0.8rem',
-                    fontWeight: 600
-                  }}>
-                    {program.duration}
-                  </span>
+              <div key={index} className="ai-program-card">
+                <div className="ai-program-header">
+                  <h3 className="ai-program-title">{program.title}</h3>
+                  <span className="ai-program-badge">{program.duration}</span>
                 </div>
 
-                <p style={{ 
-                  color: 'var(--text-secondary)',
-                  fontSize: '0.9rem',
-                  marginBottom: '0.5rem'
-                }}>
-                  {program.description}
+                <p className="ai-program-desc">{program.description}</p>
+
+                <p className="ai-program-audience">
+                  <Users size={13} /> {program.audience}
                 </p>
 
-                <p style={{ 
-                  color: 'var(--text-secondary)',
-                  fontSize: '0.85rem',
-                  marginBottom: '1rem',
-                  fontWeight: 500
-                }}>
-                  👤 {program.audience}
-                </p>
-
-                <div style={{ 
-                  borderTop: '1px solid #e5e7eb',
-                  paddingTop: '1rem'
-                }}>
-                  <p style={{ 
-                    fontWeight: 600,
-                    fontSize: '0.9rem',
-                    color: '#1a1a1a',
-                    marginBottom: '0.5rem'
-                  }}>
-                    What you'll learn:
-                  </p>
-                  <ul style={{ 
-                    listStyle: 'none',
-                    padding: 0
-                  }}>
+                <div className="ai-program-modules">
+                  <p className="ai-program-modules-label">What you'll learn:</p>
+                  <ul>
                     {program.modules.map((module, idx) => (
-                      <li key={idx} style={{ 
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem',
-                        padding: '0.2rem 0',
-                        color: 'var(--text-secondary)',
-                        fontSize: '0.85rem'
-                      }}>
+                      <li key={idx}>
                         <CheckCircle size={14} color="#22c55e" />
                         {module}
                       </li>
@@ -489,14 +296,7 @@ const AIConsulting = () => {
                   </ul>
                 </div>
 
-                <Link to="/contact" style={{ 
-                  display: 'inline-block',
-                  marginTop: '1rem',
-                  color: '#7c3aed',
-                  textDecoration: 'none',
-                  fontWeight: 600,
-                  fontSize: '0.95rem'
-                }}>
+                <Link to="/contact" className="ai-program-link">
                   Enroll Now →
                 </Link>
               </div>
@@ -506,69 +306,21 @@ const AIConsulting = () => {
       </section>
 
       {/* Testimonials Section */}
-      <section style={{ padding: '4rem 0', background: '#fafafa' }}>
+      <section className="ai-section">
         <div className="container">
-          <h2 style={{ 
-            fontSize: '2.5rem', 
-            fontWeight: 700, 
-            textAlign: 'center',
-            marginBottom: '3rem',
-            color: '#1a1a1a'
-          }}>
-            What Our Clients Say
-          </h2>
+          <div className="ai-section-header">
+            <h2 className="ai-section-title">What Our Clients Say</h2>
+          </div>
 
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', 
-            gap: '2rem'
-          }}>
+          <div className="ai-testimonials-grid">
             {testimonials.map((testimonial, index) => (
-              <div key={index} style={{ 
-                padding: '2rem',
-                background: 'white',
-                borderRadius: '16px',
-                border: '1px solid #f0f0f0'
-              }}>
-                <p style={{ 
-                  fontSize: '1rem',
-                  color: '#1a1a1a',
-                  lineHeight: '1.6',
-                  marginBottom: '1.5rem',
-                  fontStyle: 'italic'
-                }}>
-                  "{testimonial.quote}"
-                </p>
-                <div style={{ 
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '1rem'
-                }}>
-                  <div style={{ 
-                    fontSize: '2.5rem',
-                    width: '48px',
-                    height: '48px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    background: '#f3f4f6',
-                    borderRadius: '50%'
-                  }}>
-                    {testimonial.image}
-                  </div>
+              <div key={index} className="ai-testimonial-card">
+                <p className="ai-testimonial-quote">"{testimonial.quote}"</p>
+                <div className="ai-testimonial-author-row">
+                  <div className="ai-testimonial-avatar">{testimonial.initials}</div>
                   <div>
-                    <p style={{ 
-                      fontWeight: 700,
-                      color: '#1a1a1a'
-                    }}>
-                      {testimonial.author}
-                    </p>
-                    <p style={{ 
-                      color: 'var(--text-secondary)',
-                      fontSize: '0.9rem'
-                    }}>
-                      {testimonial.role}
-                    </p>
+                    <p className="ai-testimonial-name">{testimonial.author}</p>
+                    <p className="ai-testimonial-role">{testimonial.role}</p>
                   </div>
                 </div>
               </div>
@@ -578,59 +330,18 @@ const AIConsulting = () => {
       </section>
 
       {/* CTA Section */}
-      <section style={{ 
-        padding: '4rem 0',
-        background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
-        textAlign: 'center'
-      }}>
+      <section className="ai-cta-section">
         <div className="container">
-          <h2 style={{ 
-            fontSize: '2.5rem', 
-            fontWeight: 700,
-            color: 'white',
-            marginBottom: '1rem'
-          }}>
-            Ready to Transform Your Business with AI?
-          </h2>
-          <p style={{ 
-            fontSize: '1.1rem',
-            color: 'rgba(255,255,255,0.9)',
-            maxWidth: '600px',
-            margin: '0 auto 2rem',
-            lineHeight: '1.6'
-          }}>
+          <h2 className="ai-cta-title">Ready to Transform Your Business with AI?</h2>
+          <p className="ai-cta-desc">
             Let's discuss how SENZIA can help you implement AI the right way.
           </p>
-          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link to="/contact">
-              <button style={{ 
-                background: 'white',
-                border: 'none',
-                padding: '1rem 2.5rem',
-                borderRadius: '8px',
-                color: '#7c3aed',
-                fontWeight: 700,
-                fontSize: '1.1rem',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease'
-              }}>
-                Contact Us →
-              </button>
+          <div className="ai-cta-buttons">
+            <Link to="/contact" className="ai-btn-primary">
+              Contact Us <ArrowRight size={18} />
             </Link>
-            <Link to="/demo">
-              <button style={{ 
-                background: 'transparent',
-                border: '2px solid white',
-                padding: '1rem 2.5rem',
-                borderRadius: '8px',
-                color: 'white',
-                fontWeight: 700,
-                fontSize: '1.1rem',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease'
-              }}>
-                Book a Demo
-              </button>
+            <Link to="/demo" className="ai-btn-outline">
+              Book a Demo
             </Link>
           </div>
         </div>
