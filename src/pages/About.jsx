@@ -1,411 +1,186 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Users, TrendingUp, Globe, ShieldCheck, Lightbulb, Leaf, Brain } from 'lucide-react';
 import Navbar from '../components/Layout/Navbar';
+import './About.css';
 
 const About = () => {
+  const stats = [
+    { icon: Users, number: '15,000+', label: 'Businesses Trust Senzia', note: 'Across multiple industries' },
+    { icon: TrendingUp, number: '50M+', label: 'Data Points Processed Daily', note: 'Real-time. Accurate. Reliable.' },
+    { icon: TrendingUp, number: '98%', label: 'Customer Satisfaction', note: 'Trusted by business leaders' },
+    { icon: Globe, number: '5+', label: 'Countries', note: 'Global presence, local impact' }
+  ];
+
   const values = [
     {
-      icon: '💡',
-      title: 'Intelligence',
-      description: 'Turning data into actionable insights for smarter decisions.'
-    },
-    {
-      icon: '⚡',
-      title: 'Automation',
-      description: 'Streamlining operations and reducing manual work.'
-    },
-    {
-      icon: '📈',
-      title: 'Growth',
-      description: 'Identifying opportunities and driving sustainable growth.'
-    },
-    {
-      icon: '🔒',
+      icon: ShieldCheck,
       title: 'Integrity',
-      description: 'Building trust through security, transparency and reliability.'
+      description: 'We build trust through transparency, security, and reliability.'
+    },
+    {
+      icon: Lightbulb,
+      title: 'Innovation',
+      description: 'We embrace AI and technology to solve real business problems.'
+    },
+    {
+      icon: Users,
+      title: 'Customer Success',
+      description: "Your success is our success. We're with you every step."
+    },
+    {
+      icon: Leaf,
+      title: 'Sustainability',
+      description: 'We help businesses grow today while building a better tomorrow.'
     }
-  ];
-
-  const teamMembers = [
-    {
-      name: 'David Kimani',
-      role: 'CEO & Co-Founder',
-      description: 'Former CFO with 15+ years in financial technology and AI.',
-      image: '👨‍💼'
-    },
-    {
-      name: 'Sarah Wanjiru',
-      role: 'CTO & Co-Founder',
-      description: 'AI researcher with a passion for making technology accessible.',
-      image: '👩‍💻'
-    },
-    {
-      name: 'Michael Otieno',
-      role: 'Head of Product',
-      description: 'Product leader focused on creating exceptional user experiences.',
-      image: '👨‍💻'
-    },
-    {
-      name: 'Grace Muthoni',
-      role: 'Head of Customer Success',
-      description: 'Dedicated to ensuring every business succeeds with SENZIA.',
-      image: '👩‍💼'
-    }
-  ];
-
-  const stats = [
-    { number: '15,000+', label: 'Businesses Trust Us' },
-    { number: '98%', label: 'Customer Satisfaction' },
-    { number: '24/7', label: 'Support Available' },
-    { number: '50+', label: 'Countries Served' }
-  ];
-
-  const milestones = [
-    { year: '2022', title: 'Founded', description: 'SENZIA was founded with a vision to democratize AI for African businesses.' },
-    { year: '2023', title: 'First 1,000 Users', description: 'Reached 1,000 businesses across East Africa using our platform.' },
-    { year: '2024', title: 'Expansion', description: 'Expanded operations to 5 African countries and launched advanced features.' },
-    { year: '2025', title: '15,000+ Businesses', description: 'Now serving over 15,000 businesses across multiple industries.' }
   ];
 
   return (
-    <div>
+    <div className="about-page">
       <Navbar />
-      
-      {/* Hero Section */}
-      <section style={{ 
-        padding: '5rem 0 4rem',
-        background: 'linear-gradient(135deg, #faf5ff 0%, #ffffff 50%, #f3f4f6 100%)'
-      }}>
-        <div className="container">
-          <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
-            <h1 style={{ 
-              fontSize: '3.5rem', 
-              fontWeight: 800, 
-              marginBottom: '1.5rem',
-              lineHeight: '1.1',
-              color: '#1a1a1a'
-            }}>
-              We're on a Mission to <br />
-              <span style={{ color: 'var(--accent-purple)' }}>Empower African Businesses</span>
-            </h1>
-            
-            <p style={{ 
-              fontSize: '1.25rem', 
-              color: 'var(--text-secondary)',
-              maxWidth: '650px',
-              margin: '0 auto 2rem',
-              lineHeight: '1.6'
-            }}>
-              SENZIA combines AI, financial analytics, and expert validation to help businesses 
-              make smarter decisions, faster.
-            </p>
 
+      {/* Hero Section */}
+      <section className="about-hero">
+        <div className="container about-hero-grid">
+          <div className="about-hero-content">
+            <span className="eyebrow">About Us</span>
+            <h1 className="about-hero-title">
+              Intelligence behind <br /> better business.
+            </h1>
+            <p className="about-hero-subtitle">
+              Senzia was built with a simple mission: to help businesses turn data into clarity,
+              automate operations, and unlock sustainable growth. We combine AI, real-time data,
+              and financial expertise to give leaders the confidence to make smarter
+              decisions—every day.
+            </p>
+            <button className="about-btn-primary">
+              Our Story <span aria-hidden="true">→</span>
+            </button>
+          </div>
+
+          <div className="about-hero-visual">
+            <svg viewBox="0 0 640 360" className="skyline-svg" preserveAspectRatio="xMidYMid slice">
+              <defs>
+                <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#0d1730" />
+                  <stop offset="100%" stopColor="#060810" />
+                </linearGradient>
+                <linearGradient id="meshGrad" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="#f0b23c" />
+                  <stop offset="100%" stopColor="#818cf8" />
+                </linearGradient>
+              </defs>
+              <rect width="640" height="360" fill="url(#skyGrad)" />
+              {[
+                [40, 220, 30, 140], [80, 180, 26, 180], [115, 240, 22, 120],
+                [150, 140, 34, 220], [195, 190, 24, 170], [230, 100, 40, 260],
+                [280, 210, 26, 150], [315, 160, 30, 200], [355, 120, 36, 240],
+                [400, 200, 24, 160], [435, 170, 28, 190], [472, 140, 22, 220],
+                [505, 220, 30, 140], [545, 190, 26, 170], [580, 230, 24, 130]
+              ].map(([x, y, w, h], i) => (
+                <rect key={i} x={x} y={y} width={w} height={h} fill="#0f1626" stroke="#1c2438" strokeWidth="1" />
+              ))}
+              <path
+                d="M0,260 C120,300 220,220 320,250 C420,280 520,210 640,240"
+                fill="none"
+                stroke="url(#meshGrad)"
+                strokeWidth="1.2"
+                opacity="0.7"
+              />
+              <path
+                d="M0,290 C130,240 240,310 340,280 C440,250 540,300 640,270"
+                fill="none"
+                stroke="url(#meshGrad)"
+                strokeWidth="1"
+                opacity="0.5"
+              />
+              {[
+                [60, 268], [140, 252], [230, 262], [310, 244], [400, 268],
+                [470, 250], [540, 272], [600, 256], [200, 300], [360, 292]
+              ].map(([cx, cy], i) => (
+                <circle key={i} cx={cx} cy={cy} r={i % 3 === 0 ? 2.6 : 1.6} fill={i % 2 === 0 ? '#f0b23c' : '#818cf8'} />
+              ))}
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats bar */}
+      <section className="about-stats">
+        <div className="container about-stats-grid">
+          {stats.map((stat, index) => {
+            const Icon = stat.icon;
+            return (
+              <div className="about-stat" key={index}>
+                <div className="about-stat-icon">
+                  <Icon size={20} />
+                </div>
+                <div>
+                  <p className="about-stat-number">{stat.number}</p>
+                  <p className="about-stat-label">{stat.label}</p>
+                  <p className="about-stat-note">{stat.note}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Mission + Values */}
+      <section className="about-mission">
+        <div className="mission-glow" aria-hidden="true" />
+        <div className="container about-mission-grid">
+          <div className="mission-content">
+            <span className="eyebrow">Our Mission</span>
+            <h2 className="mission-title">
+              Empowering businesses <br /> with intelligence.
+            </h2>
+            <p className="mission-text">
+              We empower organizations with the insights and automation they need to reduce
+              risk, improve efficiency, and maximize profitability. Senzia is more than a
+              platform—it's a partner in your growth journey.
+            </p>
+          </div>
+
+          <div className="values-content">
+            <span className="eyebrow">Our Values</span>
+            <div className="values-grid">
+              {values.map((value, index) => {
+                const Icon = value.icon;
+                return (
+                  <div className="value-card" key={index}>
+                    <div className="value-icon">
+                      <Icon size={22} />
+                    </div>
+                    <h3 className="value-title">{value.title}</h3>
+                    <p className="value-description">{value.description}</p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA bar */}
+      <section className="about-cta">
+        <div className="container">
+          <div className="cta-bar">
+            <div className="cta-bar-left">
+              <div className="cta-bar-icon">
+                <Brain size={20} />
+              </div>
+              <div>
+                <p className="cta-bar-title">We're here to help you grow smarter.</p>
+                <p className="cta-bar-subtitle">Join thousands of businesses already transforming with Senzia.</p>
+              </div>
+            </div>
             <Link to="/demo">
-              <button className="btn-primary" style={{ fontSize: '1.1rem', padding: '0.875rem 2.5rem' }}>
-                Join 15,000+ Businesses →
+              <button className="about-btn-primary">
+                Book a Demo <span aria-hidden="true">→</span>
               </button>
             </Link>
           </div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section style={{ padding: '4rem 0', background: 'white' }}>
-        <div className="container">
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
-            gap: '2rem',
-            textAlign: 'center'
-          }}>
-            {stats.map((stat, index) => (
-              <div key={index}>
-                <h2 style={{ 
-                  fontSize: '2.5rem', 
-                  fontWeight: 800, 
-                  color: 'var(--accent-purple)',
-                  marginBottom: '0.5rem'
-                }}>
-                  {stat.number}
-                </h2>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '1rem' }}>
-                  {stat.label}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Our Story Section */}
-      <section style={{ padding: '4rem 0', background: '#fafafa' }}>
-        <div className="container">
-          <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-            <h2 style={{ 
-              fontSize: '2.5rem', 
-              fontWeight: 700, 
-              marginBottom: '1.5rem',
-              color: '#1a1a1a',
-              textAlign: 'center'
-            }}>
-              Our Story
-            </h2>
-            <p style={{ 
-              fontSize: '1.1rem', 
-              color: 'var(--text-secondary)',
-              lineHeight: '1.8',
-              marginBottom: '1.5rem'
-            }}>
-              SENZIA was born from a simple observation: African businesses have incredible potential, 
-              but they lack access to the data-driven insights that global companies use to grow. 
-              We founded SENZIA to democratize AI and business intelligence for businesses of all sizes.
-            </p>
-            <p style={{ 
-              fontSize: '1.1rem', 
-              color: 'var(--text-secondary)',
-              lineHeight: '1.8'
-            }}>
-              Today, we're proud to serve over 15,000 businesses across Africa, helping them increase 
-              profitability, detect risks, automate operations, and uncover new growth opportunities. 
-              Our team combines deep expertise in AI, finance, and business operations to deliver 
-              practical, actionable insights.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Values Section */}
-      <section style={{ padding: '4rem 0', background: 'white' }}>
-        <div className="container">
-          <h2 style={{ 
-            fontSize: '2.5rem', 
-            fontWeight: 700, 
-            textAlign: 'center',
-            marginBottom: '0.5rem',
-            color: '#1a1a1a'
-          }}>
-            Our Values
-          </h2>
-          <p style={{ 
-            textAlign: 'center', 
-            color: 'var(--text-secondary)',
-            maxWidth: '600px',
-            margin: '0 auto 3rem',
-            fontSize: '1.1rem'
-          }}>
-            These principles guide everything we do at SENZIA.
-          </p>
-
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
-            gap: '2rem'
-          }}>
-            {values.map((value, index) => (
-              <div key={index} style={{ 
-                textAlign: 'center',
-                padding: '2rem',
-                background: '#faf5ff',
-                borderRadius: '12px',
-                border: '1px solid #f3e8ff',
-                transition: 'all 0.3s ease'
-              }}>
-                <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>
-                  {value.icon}
-                </div>
-                <h3 style={{ 
-                  fontSize: '1.25rem', 
-                  fontWeight: 700,
-                  marginBottom: '0.75rem',
-                  color: '#1a1a1a'
-                }}>
-                  {value.title}
-                </h3>
-                <p style={{ 
-                  color: 'var(--text-secondary)',
-                  lineHeight: '1.6',
-                  fontSize: '0.95rem'
-                }}>
-                  {value.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Timeline Section */}
-      <section style={{ padding: '4rem 0', background: '#fafafa' }}>
-        <div className="container">
-          <h2 style={{ 
-            fontSize: '2.5rem', 
-            fontWeight: 700, 
-            textAlign: 'center',
-            marginBottom: '3rem',
-            color: '#1a1a1a'
-          }}>
-            Our Journey
-          </h2>
-
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
-            gap: '2rem'
-          }}>
-            {milestones.map((milestone, index) => (
-              <div key={index} style={{ 
-                padding: '1.5rem',
-                background: 'white',
-                borderRadius: '12px',
-                border: '1px solid #e5e7eb',
-                position: 'relative'
-              }}>
-                <div style={{ 
-                  position: 'absolute',
-                  top: '-12px',
-                  left: '20px',
-                  background: 'var(--accent-purple)',
-                  color: 'white',
-                  padding: '0.25rem 1rem',
-                  borderRadius: '20px',
-                  fontSize: '0.85rem',
-                  fontWeight: 600
-                }}>
-                  {milestone.year}
-                </div>
-                <div style={{ marginTop: '1.5rem' }}>
-                  <h4 style={{ 
-                    fontSize: '1.2rem', 
-                    fontWeight: 700,
-                    marginBottom: '0.5rem',
-                    color: '#1a1a1a'
-                  }}>
-                    {milestone.title}
-                  </h4>
-                  <p style={{ 
-                    color: 'var(--text-secondary)',
-                    lineHeight: '1.6',
-                    fontSize: '0.95rem'
-                  }}>
-                    {milestone.description}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Team Section */}
-      <section style={{ padding: '4rem 0', background: 'white' }}>
-        <div className="container">
-          <h2 style={{ 
-            fontSize: '2.5rem', 
-            fontWeight: 700, 
-            textAlign: 'center',
-            marginBottom: '0.5rem',
-            color: '#1a1a1a'
-          }}>
-            Meet Our Team
-          </h2>
-          <p style={{ 
-            textAlign: 'center', 
-            color: 'var(--text-secondary)',
-            maxWidth: '600px',
-            margin: '0 auto 3rem',
-            fontSize: '1.1rem'
-          }}>
-            Passionate experts dedicated to your success.
-          </p>
-
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
-            gap: '2rem'
-          }}>
-            {teamMembers.map((member, index) => (
-              <div key={index} style={{ 
-                textAlign: 'center',
-                padding: '2rem',
-                background: '#fafafa',
-                borderRadius: '16px',
-                border: '1px solid #f0f0f0',
-                transition: 'all 0.3s ease'
-              }}>
-                <div style={{ 
-                  fontSize: '4rem', 
-                  marginBottom: '1rem',
-                  display: 'block'
-                }}>
-                  {member.image}
-                </div>
-                <h3 style={{ 
-                  fontSize: '1.2rem', 
-                  fontWeight: 700,
-                  marginBottom: '0.25rem',
-                  color: '#1a1a1a'
-                }}>
-                  {member.name}
-                </h3>
-                <p style={{ 
-                  color: 'var(--accent-purple)',
-                  fontWeight: 600,
-                  marginBottom: '0.75rem'
-                }}>
-                  {member.role}
-                </p>
-                <p style={{ 
-                  color: 'var(--text-secondary)',
-                  lineHeight: '1.6',
-                  fontSize: '0.95rem'
-                }}>
-                  {member.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section style={{ 
-        padding: '4rem 0',
-        background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
-        textAlign: 'center'
-      }}>
-        <div className="container">
-          <h2 style={{ 
-            fontSize: '2.5rem', 
-            fontWeight: 700,
-            color: 'white',
-            marginBottom: '1rem'
-          }}>
-            Ready to Grow Your Business?
-          </h2>
-          <p style={{ 
-            fontSize: '1.1rem',
-            color: 'rgba(255,255,255,0.9)',
-            maxWidth: '600px',
-            margin: '0 auto 2rem',
-            lineHeight: '1.6'
-          }}>
-            Join 15,000+ businesses already using SENZIA to drive performance and grow.
-          </p>
-          <Link to="/demo">
-            <button style={{ 
-              background: 'white',
-              border: 'none',
-              padding: '1rem 2.5rem',
-              borderRadius: '8px',
-              color: '#7c3aed',
-              fontWeight: 700,
-              fontSize: '1.1rem',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease'
-            }}>
-              Start Free Trial →
-            </button>
-          </Link>
         </div>
       </section>
     </div>
