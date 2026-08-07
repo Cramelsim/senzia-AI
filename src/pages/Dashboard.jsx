@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -8,6 +8,7 @@ import {
   ChevronDown,
   Filter,
   Download,
+  Check,
 } from 'lucide-react';
 import AppShell from './AppShell';
 import './Dashboard.css';
@@ -58,10 +59,45 @@ const quickActions = [
   { icon: '⚙️', label: 'Manage Settings', to: '/settings' },
 ];
 
+const dateRangeOptions = [
+  'Today',
+  'Yesterday',
+  'This Week',
+  'Last Week',
+  'This Month',
+  'Last Month',
+  'This Year',
+];
+
 const maxValue = Math.max(...weekData.map((d) => d.revenue));
 
 const Dashboard = ({ user, onLogout }) => {
   const [chartRange, setChartRange] = useState('This Week');
+  const [isDateOpen, setIsDateOpen] = useState(false);
+  const [selectedRange, setSelectedRange] = useState('May 12 – May 19, 2025');
+  const dateDropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dateDropdownRef.current && !dateDropdownRef.current.contains(event.target)) {
+        setIsDateOpen(false);
+      }
+    };
+    const handleEscape = (event) => {
+      if (event.key === 'Escape') setIsDateOpen(false);
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, []);
+
+  const handleSelectRange = (label) => {
+    setSelectedRange(label);
+    setIsDateOpen(false);
+  };
 
   return (
     <AppShell
@@ -74,7 +110,35 @@ const Dashboard = ({ user, onLogout }) => {
       onLogout={onLogout}
       headerActions={
         <>
-          <button className="btn btn-ghost"><Calendar size={16} /> May 12 – May 19, 2025 <ChevronDown size={14} /></button>
+          <div className="date-dropdown" ref={dateDropdownRef}>
+            <button
+              type="button"
+              className="btn btn-ghost"
+              onClick={() => setIsDateOpen((open) => !open)}
+              aria-haspopup="true"
+              aria-expanded={isDateOpen}
+            >
+              <Calendar size={16} /> {selectedRange} <ChevronDown size={14} />
+            </button>
+
+            {isDateOpen && (
+              <div className="date-dropdown-menu" role="menu">
+                {dateRangeOptions.map((option) => (
+                  <button
+                    type="button"
+                    key={option}
+                    role="menuitem"
+                    className={`date-dropdown-item ${selectedRange === option ? 'active' : ''}`}
+                    onClick={() => handleSelectRange(option)}
+                  >
+                    {option}
+                    {selectedRange === option && <Check size={14} />}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
           <button className="btn btn-ghost"><Filter size={16} /> Filters</button>
           <button className="btn btn-primary"><Download size={16} /> Export</button>
         </>
