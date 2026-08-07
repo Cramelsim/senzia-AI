@@ -216,3 +216,50 @@
 @media (max-width: 640px) {
   .cashflow-top { flex-direction: column; align-items: flex-start; }
 }
+
+/* Add this to your existing Dashboard.css — styles for the calendar dropdown */
+
+.date-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.date-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  z-index: 50;
+  min-width: 200px;
+  background: var(--bg-elevated, #10162a);
+  border: 1px solid var(--border, #1f2740);
+  border-radius: 10px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+  padding: 0.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.date-dropdown-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  background: transparent;
+  border: none;
+  text-align: left;
+  padding: 0.55rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  color: var(--text-primary, #f5f6fa);
+  cursor: pointer;
+}
+
+.date-dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.date-dropdown-item.active {
+  color: var(--accent, #e8a94d);
+  font-weight: 600;
+}
