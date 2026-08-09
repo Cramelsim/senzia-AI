@@ -9,6 +9,7 @@ import {
   Filter,
   Download,
   Check,
+  X,
 } from 'lucide-react';
 import AppShell from './AppShell';
 import './Dashboard.css';
@@ -69,22 +70,56 @@ const dateRangeOptions = [
   'This Year',
 ];
 
+const alertTypeLabels = {
+  warning: 'Warning',
+  danger: 'Danger',
+  success: 'Success',
+  info: 'Info',
+};
+
+const insightTypeLabels = {
+  positive: 'Positive',
+  opportunity: 'Opportunity',
+  warning: 'Warning',
+};
+
+const allMetricTitles = metrics.map((m) => m.title);
+const allSourceNames = revenueSources.map((s) => s.name);
+const allAlertTypes = Object.keys(alertTypeLabels);
+const allInsightTypes = [...new Set(aiInsights.map((i) => i.type))];
+
 const maxValue = Math.max(...weekData.map((d) => d.revenue));
 
 const Dashboard = ({ user, onLogout }) => {
   const [chartRange, setChartRange] = useState('This Week');
+
+  // ---- Date dropdown ----
   const [isDateOpen, setIsDateOpen] = useState(false);
   const [selectedRange, setSelectedRange] = useState('May 12 – May 19, 2025');
   const dateDropdownRef = useRef(null);
+
+  // ---- Filters dropdown ----
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [filterMetrics, setFilterMetrics] = useState(allMetricTitles);
+  const [filterSources, setFilterSources] = useState(allSourceNames);
+  const [filterAlertTypes, setFilterAlertTypes] = useState(allAlertTypes);
+  const [filterInsightTypes, setFilterInsightTypes] = useState(allInsightTypes);
+  const filterDropdownRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dateDropdownRef.current && !dateDropdownRef.current.contains(event.target)) {
         setIsDateOpen(false);
       }
+      if (filterDropdownRef.current && !filterDropdownRef.current.contains(event.target)) {
+        setIsFilterOpen(false);
+      }
     };
     const handleEscape = (event) => {
-      if (event.key === 'Escape') setIsDateOpen(false);
+      if (event.key === 'Escape') {
+        setIsDateOpen(false);
+        setIsFilterOpen(false);
+      }
     };
     document.addEventListener('mousedown', handleClickOutside);
     document.addEventListener('keydown', handleEscape);
@@ -98,6 +133,28 @@ const Dashboard = ({ user, onLogout }) => {
     setSelectedRange(label);
     setIsDateOpen(false);
   };
+
+  const toggleInList = (list, setList, value) => {
+    setList(list.includes(value) ? list.filter((v) => v !== value) : [...list, value]);
+  };
+
+  const resetFilters = () => {
+    setFilterMetrics(allMetricTitles);
+    setFilterSources(allSourceNames);
+    setFilterAlertTypes(allAlertTypes);
+    setFilterInsightTypes(allInsightTypes);
+  };
+
+  const totalFilterOptions =
+    allMetricTitles.length + allSourceNames.length + allAlertTypes.length + allInsightTypes.length;
+  const selectedFilterOptions =
+    filterMetrics.length + filterSources.length + filterAlertTypes.length + filterInsightTypes.length;
+  const activeFilterCount = totalFilterOptions - selectedFilterOptions;
+
+  const visibleMetrics = metrics.filter((m) => filterMetrics.includes(m.title));
+  const visibleSources = revenueSources.filter((s) => filterSources.includes(s.name));
+  const visibleAlerts = alerts.filter((a) => filterAlertTypes.includes(a.type));
+  const visibleInsights = aiInsights.filter((i) => filterInsightTypes.includes(i.type));
 
   return (
     <AppShell
@@ -139,14 +196,130 @@ const Dashboard = ({ user, onLogout }) => {
             )}
           </div>
 
-          <button className="btn btn-ghost"><Filter size={16} /> Filters</button>
+          <div className="filter-dropdown" ref={filterDropdownRef}>
+            <button
+              type="button"
+              className="btn btn-ghost"
+              onClick={() => setIsFilterOpen((open) => !open)}
+              aria-haspopup="true"
+              aria-expanded={isFilterOpen}
+            >
+              <Filter size={16} /> Filters
+              {activeFilterCount > 0 && <span className="filter-count-badge">{activeFilterCount}</span>}
+            </button>
+
+            {isFilterOpen && (
+              <div className="filter-dropdown-menu" role="menu">
+                <div className="filter-dropdown-header">
+                  <span>Filters</span>
+                  <button type="button" className="filter-reset-btn" onClick={resetFilters}>
+                    Reset
+                  </button>
+                </div>
+
+                <div className="filter-section">
+                  <p className="filter-section-label">Metrics</p>
+                  {allMetricTitles.map((title) => (
+                    <label className="filter-checkbox-row" key={title}>
+                      <span
+                        className={`filter-checkbox ${filterMetrics.includes(title) ? 'checked' : ''}`}
+                        onClick={() => toggleInList(filterMetrics, setFilterMetrics, title)}
+                      >
+                        {filterMetrics.includes(title) && <Check size={12} />}
+                      </span>
+                      {title}
+                    </label>
+                  ))}
+                </div>
+
+                <div className="filter-section">
+                  <p className="filter-section-label">Revenue Sources</p>
+                  {allSourceNames.map((name) => (
+                    <label className="filter-checkbox-row" key={name}>
+                      <span
+                        className={`filter-checkbox ${filterSources.includes(name) ? 'checked' : ''}`}
+                        onClick={() => toggleInList(filterSources, setFilterSources, name)}
+                      >
+                        {filterSources.includes(name) && <Check size={12} />}
+                      </span>
+                      {name}
+                    </label>
+                  ))}
+                </div>
+
+                <div className="filter-section">
+                  <p className="filter-section-label">Alert Types</p>
+                  {allAlertTypes.map((type) => (
+                    <label className="filter-checkbox-row" key={type}>
+                      <span
+                        className={`filter-checkbox ${filterAlertTypes.includes(type) ? 'checked' : ''}`}
+                        onClick={() => toggleInList(filterAlertTypes, setFilterAlertTypes, type)}
+                      >
+                        {filterAlertTypes.includes(type) && <Check size={12} />}
+                      </span>
+                      {alertTypeLabels[type]}
+                    </label>
+                  ))}
+                </div>
+
+                <div className="filter-section">
+                  <p className="filter-section-label">AI Insight Types</p>
+                  {allInsightTypes.map((type) => (
+                    <label className="filter-checkbox-row" key={type}>
+                      <span
+                        className={`filter-checkbox ${filterInsightTypes.includes(type) ? 'checked' : ''}`}
+                        onClick={() => toggleInList(filterInsightTypes, setFilterInsightTypes, type)}
+                      >
+                        {filterInsightTypes.includes(type) && <Check size={12} />}
+                      </span>
+                      {insightTypeLabels[type]}
+                    </label>
+                  ))}
+                </div>
+
+                <button type="button" className="filter-apply-btn" onClick={() => setIsFilterOpen(false)}>
+                  Done
+                </button>
+              </div>
+            )}
+          </div>
+
           <button className="btn btn-primary"><Download size={16} /> Export</button>
         </>
       }
     >
+      {/* ---- Active filter chips ---- */}
+      {activeFilterCount > 0 && (
+        <div className="active-filters-row">
+          {filterMetrics.length < allMetricTitles.length && (
+            <span className="active-filter-chip">
+              {filterMetrics.length} of {allMetricTitles.length} metrics
+            </span>
+          )}
+          {filterSources.length < allSourceNames.length && (
+            <span className="active-filter-chip">
+              {filterSources.length} of {allSourceNames.length} sources
+            </span>
+          )}
+          {filterAlertTypes.length < allAlertTypes.length && (
+            <span className="active-filter-chip">
+              {filterAlertTypes.length} of {allAlertTypes.length} alert types
+            </span>
+          )}
+          {filterInsightTypes.length < allInsightTypes.length && (
+            <span className="active-filter-chip">
+              {filterInsightTypes.length} of {allInsightTypes.length} insight types
+            </span>
+          )}
+          <button type="button" className="active-filters-clear" onClick={resetFilters}>
+            <X size={13} /> Clear all
+          </button>
+        </div>
+      )}
+
       {/* ---- Metrics grid ---- */}
       <div className="metrics-grid">
-        {metrics.map(({ title, value, change, trend, vs }) => (
+        {visibleMetrics.map(({ title, value, change, trend, vs }) => (
           <div className="metric-card" key={title}>
             <div className="metric-card-top">
               <p>{title}</p>
@@ -207,7 +380,10 @@ const Dashboard = ({ user, onLogout }) => {
           {/* ---- Revenue sources ---- */}
           <div className="panel">
             <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: '0 0 1rem' }}>Top Revenue Sources</h3>
-            {revenueSources.map((source) => (
+            {visibleSources.length === 0 && (
+              <p className="filter-empty-state">No revenue sources match your filters.</p>
+            )}
+            {visibleSources.map((source) => (
               <div className="source-row" key={source.name}>
                 <div className="source-row-top">
                   <span>{source.name}</span>
@@ -228,7 +404,10 @@ const Dashboard = ({ user, onLogout }) => {
               <h4 style={{ margin: 0 }}>AI Insights</h4>
               <Link to="/insights" className="link-accent">View All →</Link>
             </div>
-            {aiInsights.map((insight) => (
+            {visibleInsights.length === 0 && (
+              <p className="filter-empty-state">No insights match your filters.</p>
+            )}
+            {visibleInsights.map((insight) => (
               <div className={`ai-note ${insight.type}`} key={insight.title}>
                 <p>{insight.title}</p>
                 <p>{insight.description}</p>
@@ -241,7 +420,10 @@ const Dashboard = ({ user, onLogout }) => {
               <h4 style={{ margin: 0 }}>Recent Alerts</h4>
               <Link to="/alerts" className="link-accent">View All →</Link>
             </div>
-            {alerts.map((alert) => (
+            {visibleAlerts.length === 0 && (
+              <p className="filter-empty-state">No alerts match your filters.</p>
+            )}
+            {visibleAlerts.map((alert) => (
               <div className="alert-row" key={alert.title}>
                 <div className="alert-icon">{alert.icon}</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
