@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { Brain, Settings, TrendingUp, ShieldCheck, ArrowRight } from 'lucide-react';
 import './Home.css';
 
+
 const Home = () => {
   const features = [
     { icon: Brain, title: 'Intelligence', desc: 'Turning data into actionable insights for smarter decisions.' },
