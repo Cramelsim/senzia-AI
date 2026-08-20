@@ -117,6 +117,8 @@
 
 .pricing-page .pricing-hero {
   padding: 3.5rem 0 4rem;
+  background: radial-gradient(70% 60% at 82% 0%, rgba(240, 178, 60, 0.07), transparent 60%),
+              radial-gradient(50% 50% at 10% 10%, rgba(129, 140, 248, 0.06), transparent 60%);
 }
 
 .pricing-page .pricing-heading {
@@ -211,11 +213,13 @@
 .pricing-page .plan-tag {
   position: absolute;
   top: -13px;
-  right: 20px;
+  left: 50%;
+  transform: translateX(-50%);
   padding: 0.3rem 1rem;
   border-radius: 20px;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .pricing-page .popular-tag {
@@ -226,6 +230,19 @@
 .pricing-page .enterprise-tag {
   background: var(--violet);
   color: #14181f;
+}
+
+/* New: per-plan icon box, matches the reference screenshot's card headers */
+.pricing-page .plan-icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 1px solid;
+  background: rgba(255,255,255,0.03);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
 }
 
 .pricing-page .plan-name {
@@ -324,6 +341,47 @@
   gap: 0.25rem;
   font-size: 0.9rem;
   padding: 0;
+}
+
+/* ---- Trust strip + footer note (new, additive) ---- */
+.pricing-page .pricing-trust-strip {
+  margin-top: 2.5rem;
+  padding: 1.3rem 1.6rem;
+  background: var(--surface-solid);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1.4rem;
+}
+
+.pricing-page .trust-item { display: flex; align-items: center; gap: 0.65rem; }
+.pricing-page .trust-item-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(129, 140, 248, 0.12);
+  color: var(--indigo);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.pricing-page .trust-item p:first-child { font-size: 0.83rem; font-weight: 700; color: var(--text-primary); margin: 0; }
+.pricing-page .trust-item p:last-child { font-size: 0.75rem; color: var(--text-muted); margin: 0; }
+
+.pricing-page .pricing-footer-note {
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 1.5rem 0 0;
+}
+.pricing-page .pricing-footer-note a {
+  color: var(--gold);
+  text-decoration: none;
+  font-weight: 600;
 }
 
 /* ------------------------------- Billing center ---------------------------- */
@@ -531,5 +589,8 @@
   }
   .pricing-page .pricing-title {
     font-size: 2rem;
+  }
+  .pricing-page .pricing-trust-strip {
+    justify-content: flex-start;
   }
 }
