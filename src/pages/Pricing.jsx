@@ -1,8 +1,28 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Check, ChevronDown, ChevronUp } from 'lucide-react';
+import {
+  Check, ChevronDown, ChevronUp,
+  Rocket, TrendingUp, Building2, Award, ShieldCheck,
+  Clock, Globe, ArrowRight,
+} from 'lucide-react';
 import Navbar from '../components/Layout/Navbar';
 import './Pricing.css';
+
+const planIcon = {
+  starter: { icon: Rocket, color: 'var(--gold)' },
+  growth: { icon: TrendingUp, color: 'var(--indigo)' },
+  business: { icon: Building2, color: 'var(--violet)' },
+  professional: { icon: Award, color: 'var(--green)' },
+  enterprise: { icon: ShieldCheck, color: 'var(--violet)' },
+};
+
+const trustItems = [
+  { icon: ShieldCheck, title: 'Enterprise-grade security.', sub: 'Your data is always protected.' },
+  { icon: Clock, title: '99.9%', sub: 'Uptime SLA' },
+  { icon: ShieldCheck, title: 'Bank-level', sub: 'Security' },
+  { icon: Award, title: 'ISO 27001', sub: 'Certified' },
+  { icon: Globe, title: 'GDPR', sub: 'Compliant' },
+];
 
 const Pricing = () => {
   const [billingCycle, setBillingCycle] = useState('monthly');
@@ -204,6 +224,7 @@ const Pricing = () => {
               const price = getPrice(plan);
               const period = getPeriod(plan);
               const isExpanded = expandedPlan === plan.id;
+              const { icon: PlanIcon, color: iconColor } = planIcon[plan.id];
 
               return (
                 <div
@@ -212,6 +233,10 @@ const Pricing = () => {
                 >
                   {plan.popular && <span className="plan-tag popular-tag">Most Popular</span>}
                   {plan.isEnterprise && <span className="plan-tag enterprise-tag">Enterprise</span>}
+
+                  <div className="plan-icon-box" style={{ color: iconColor, borderColor: iconColor }}>
+                    <PlanIcon size={20} />
+                  </div>
 
                   <h3 className="plan-name">{plan.name}</h3>
                   <p className="plan-description">{plan.description}</p>
@@ -260,6 +285,22 @@ const Pricing = () => {
               );
             })}
           </div>
+
+          {/* Trust strip — new, additive */}
+          <div className="pricing-trust-strip">
+            {trustItems.map(({ icon: Icon, title, sub }) => (
+              <div className="trust-item" key={title + sub}>
+                <div className="trust-item-icon"><Icon size={16} /></div>
+                <div>
+                  <p>{title}</p>
+                  <p>{sub}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="pricing-footer-note">
+            Not sure which plan is right for you? <Link to="/contact">Talk to an Expert <ArrowRight size={14} style={{ display: 'inline', verticalAlign: '-2px' }} /></Link>
+          </p>
         </div>
       </section>
 

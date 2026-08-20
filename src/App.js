@@ -109,7 +109,7 @@ function App() {
           } 
         />
         
-        {/* Protected Routes - Dashboard and others */}
+        {/* Protected Routes - ALL pass user prop now */}
         <Route 
           path="/dashboard" 
           element={
@@ -125,7 +125,7 @@ function App() {
           path="/data-sources" 
           element={
             isAuthenticated && onboardingComplete ? 
-              <DataSources /> : 
+              <DataSources user={user} /> :   // ← Added user prop
               <Navigate to="/demo" replace />
           } 
         />
@@ -134,7 +134,7 @@ function App() {
           path="/reports" 
           element={
             isAuthenticated && onboardingComplete ? 
-              <Reports /> : 
+              <Reports user={user} /> :   // ← Added user prop
               <Navigate to="/demo" replace />
           } 
         />
@@ -143,7 +143,7 @@ function App() {
           path="/ai-assistant" 
           element={
             isAuthenticated && onboardingComplete ? 
-              <AIAssistant /> : 
+              <AIAssistant user={user} /> :   // ← Added user prop
               <Navigate to="/demo" replace />
           } 
         />
@@ -152,25 +152,25 @@ function App() {
           path="/insights" 
           element={
             isAuthenticated && onboardingComplete ? 
-              <Insights /> : 
+              <Insights user={user} /> :   // ← Added user prop
               <Navigate to="/demo" replace />
           } 
         />
 
         <Route 
-  path="/integrations" 
-  element={
-    isAuthenticated && onboardingComplete ? 
-      <Integrations /> : 
-      <Navigate to="/demo" replace />
-  } 
-/>
+          path="/integrations" 
+          element={
+            isAuthenticated && onboardingComplete ? 
+              <Integrations user={user} /> :   // ← Added user prop
+              <Navigate to="/demo" replace />
+          } 
+        />
         
         <Route 
           path="/settings" 
           element={
             isAuthenticated && onboardingComplete ? 
-              <Settings /> : 
+              <Settings user={user} /> :   // ← Added user prop
               <Navigate to="/demo" replace />
           } 
         />
@@ -179,15 +179,16 @@ function App() {
           path="/billing" 
           element={
             isAuthenticated && onboardingComplete ? 
-              <Billing /> : 
+              <Billing user={user} /> :   // ← Added user prop
               <Navigate to="/demo" replace />
           } 
         />
+
         <Route 
           path="/forecasting" 
           element={
             isAuthenticated && onboardingComplete ? 
-              <Forecasting /> : 
+              <Forecasting user={user} /> :   // ← Added user prop
               <Navigate to="/demo" replace />
           } 
         />
@@ -196,19 +197,19 @@ function App() {
           path="/users" 
           element={
             isAuthenticated && onboardingComplete ? 
-              <Users /> : 
+              <Users user={user} /> :   // ← Added user prop
               <Navigate to="/demo" replace />
           } 
         />
 
         <Route 
-  path="/alerts" 
-  element={
-    isAuthenticated && onboardingComplete ? 
-      <Alerts /> : 
-      <Navigate to="/demo" replace />
-  } 
-/>
+          path="/alerts" 
+          element={
+            isAuthenticated && onboardingComplete ? 
+              <Alerts user={user} /> :   // ← Added user prop
+              <Navigate to="/demo" replace />
+          } 
+        />
         
         {/* Catch all - redirect to home */}
         <Route path="*" element={<Navigate to="/" replace />} />
