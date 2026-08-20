@@ -79,8 +79,22 @@ const statusPill = (status) => {
   }
 };
 
-const Billing = () => {
+const Billing = ({ user }) => {  
+  const navigate = useNavigate();
   const [page] = useState(1);
+
+  const handleUpgrade = () => {
+    navigate('/pricing');
+  };
+
+  const getInitials = () => {
+    if (!user?.name) return 'JM';
+    return user.name
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase();
+  };
 
   return (
     <AppShell
@@ -88,13 +102,17 @@ const Billing = () => {
       pageIcon={CreditCard}
       title="Billing Center"
       subtitle="Manage your subscription, invoices, payments and billing preferences."
+      user={user}  // ← Pass user to AppShell
       headerActions={
         <>
           <button className="btn btn-ghost"><FileText size={16} /> View All Invoices</button>
-          <button className="btn btn-primary"><Plus size={16} /> Upgrade Plan</button>
+          <button className="btn btn-primary" onClick={handleUpgrade}>
+            <Plus size={16} /> Upgrade Plan
+          </button>
         </>
       }
     >
+  
       {/* ---- Current plan banner ---- */}
       <div className="panel plan-banner">
         <div className="plan-banner-top">
