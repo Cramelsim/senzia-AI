@@ -173,7 +173,12 @@ const Pricing = () => {
               {currentPlan.price}
               <span className="current-plan-period">{currentPlan.period}</span>
             </p>
-            <button className="btn-outline">Manage Plan</button>
+            <button
+              className="btn-outline"
+              onClick={() => document.getElementById('billing-center')?.scrollIntoView({ behavior: 'smooth' })}
+            >
+              Manage Plan
+            </button>
           </div>
         </div>
       </section>
@@ -294,7 +299,7 @@ const Pricing = () => {
       </section>
 
       {/* Billing Center Section */}
-      <section className="billing-center">
+      <section className="billing-center" id="billing-center">
         <div className="container">
           <h2 className="section-title left">Billing Center</h2>
 
