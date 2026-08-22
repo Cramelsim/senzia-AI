@@ -232,7 +232,14 @@
   color: #14181f;
 }
 
-/* New: per-plan icon box, matches the reference screenshot's card headers */
+/* New: per-plan icon box + head row, matches the reference screenshot's card headers */
+.pricing-page .plan-card-head-row {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 1.3rem;
+}
+
 .pricing-page .plan-icon-box {
   width: 44px;
   height: 44px;
@@ -242,7 +249,38 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 1rem;
+  flex-shrink: 0;
+}
+
+.pricing-page .plan-sub {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0.1rem 0 0;
+}
+
+.pricing-page .plan-bestfor {
+  border-top: 1px solid var(--border-soft);
+  padding-top: 1rem;
+  margin-top: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.pricing-page .plan-features-label.muted { color: var(--text-muted); }
+
+.pricing-page .plan-bestfor-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.pricing-page .plan-cta-note {
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin: 0.6rem 0 0;
 }
 
 .pricing-page .plan-name {
