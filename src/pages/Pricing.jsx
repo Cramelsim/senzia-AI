@@ -1,18 +1,17 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Check, ChevronDown, ChevronUp,
-  Rocket, TrendingUp, Building2, Award, ShieldCheck,
-  Clock, Globe, ArrowRight,
+  Check, ArrowRight,
+  Rocket, Building2, ShieldCheck,
+  Utensils, Store, Pill, Fuel, Users, ShoppingCart, MapPin, Landmark,
+  Clock, Globe, Award,
 } from 'lucide-react';
 import Navbar from '../components/Layout/Navbar';
 import './Pricing.css';
 
-const planIcon = {
+const planMeta = {
   starter: { icon: Rocket, color: 'var(--gold)' },
-  growth: { icon: TrendingUp, color: 'var(--indigo)' },
-  business: { icon: Building2, color: 'var(--violet)' },
-  professional: { icon: Award, color: 'var(--green)' },
+  professional: { icon: Building2, color: 'var(--indigo)' },
   enterprise: { icon: ShieldCheck, color: 'var(--violet)' },
 };
 
@@ -26,107 +25,92 @@ const trustItems = [
 
 const Pricing = () => {
   const [billingCycle, setBillingCycle] = useState('monthly');
-  const [expandedPlan, setExpandedPlan] = useState(null);
 
   const plans = [
     {
       id: 'starter',
       name: 'Starter',
-      description: 'Perfect for small businesses getting started with AI.',
-      monthlyPrice: 4999,
-      yearlyPrice: 49990,
-      savings: '16%',
+      sub: 'For single-branch businesses',
+      description: 'Everything you need to get started with smarter business intelligence.',
+      monthlyPrice: 15000,
+      yearlyPrice: 144000,
+      savings: '20%',
+      listLabel: 'Includes:',
       features: [
-        'Up to 5,000 transactions/month',
-        'Basic fraud detection',
-        'AI dashboard (basic)',
-        'WhatsApp reports (daily)',
-        'Email support',
-        '1 data source connection',
-        'Basic analytics'
+        'Financial Intelligence',
+        'Forecasting Intelligence',
+        'AI Business Assistant',
+        'Daily Email Reports',
+        'Manual Data Upload',
+        'Basic Integrations',
+        'Up to 5 Users'
+      ],
+      bestFor: [
+        { icon: Utensils, label: 'Small restaurants' },
+        { icon: Store, label: 'Retail shops' },
+        { icon: Pill, label: 'Pharmacies' },
+        { icon: Fuel, label: 'Small petrol stations' },
       ],
       buttonText: 'Start Free Trial',
-      popular: false
-    },
-    {
-      id: 'growth',
-      name: 'Growth',
-      description: 'Designed for growing businesses scaling their operations.',
-      monthlyPrice: 9999,
-      yearlyPrice: 99990,
-      savings: '16%',
-      features: [
-        'Up to 25,000 transactions/month',
-        'Advanced fraud detection',
-        'AI dashboard (advanced)',
-        'WhatsApp reports (real-time)',
-        'Priority email support',
-        '5 data source connections',
-        'Advanced analytics',
-        'Basic forecasting'
-      ],
-      buttonText: 'Start Free Trial',
-      popular: true
-    },
-    {
-      id: 'business',
-      name: 'Business',
-      description: 'For established businesses requiring advanced AI capabilities.',
-      monthlyPrice: 19999,
-      yearlyPrice: 199990,
-      savings: '16%',
-      features: [
-        'Up to 100,000 transactions/month',
-        'Custom AI models',
-        'Custom report scheduling',
-        'Dedicated account manager',
-        'Phone & WhatsApp support',
-        'Unlimited data sources',
-        'Advanced forecasting',
-        'API access'
-      ],
-      buttonText: 'Start Free Trial',
+      ctaNote: 'No credit card required',
       popular: false
     },
     {
       id: 'professional',
       name: 'Professional',
-      description: 'Complete AI solution for data-driven enterprises.',
-      monthlyPrice: 24999,
-      yearlyPrice: 249990,
-      savings: '16%',
+      sub: 'For growing businesses',
+      description: 'Advanced tools and insights to help you optimize operations and grow faster.',
+      monthlyPrice: 35000,
+      yearlyPrice: 336000,
+      savings: '20%',
+      listLabel: 'Everything in Starter, plus:',
       features: [
-        'Unlimited transactions',
-        'Custom AI models',
-        'Real-time analytics',
-        'Dedicated support team',
-        '24/7 phone support',
-        'Unlimited data sources',
-        'Advanced forecasting',
-        'API access',
-        'Custom integrations',
-        'On-premise deployment'
+        'Fraud & Risk Intelligence',
+        'Business Opportunity Engine',
+        'POS Integrations',
+        'M-Pesa Integrations',
+        'Inventory Intelligence',
+        'Advanced Forecasting',
+        'Branch Comparison',
+        'Up to 20 Users'
+      ],
+      bestFor: [
+        { icon: Utensils, label: 'Medium-sized restaurants' },
+        { icon: Users, label: 'Clubs' },
+        { icon: ShoppingCart, label: 'Supermarkets' },
+        { icon: MapPin, label: 'Multiple outlets' },
       ],
       buttonText: 'Start Free Trial',
-      popular: false
+      ctaNote: 'No credit card required',
+      popular: true
     },
     {
       id: 'enterprise',
       name: 'Enterprise',
-      description: 'Custom solutions for large organizations with unique needs.',
+      sub: 'For multi-branch organizations',
+      description: 'Tailored solutions with unlimited scale, security, and expert support.',
       monthlyPrice: null,
       yearlyPrice: null,
+      listLabel: 'Everything in Professional, plus:',
       features: [
-        'Unlimited everything',
-        'Custom AI solutions',
-        'Full API access',
-        'On-premise deployment',
-        'SLA & compliance support',
-        'Dedicated support team',
-        'Custom integrations',
-        'White-label options'
+        'Unlimited Branches',
+        'Custom Integrations',
+        'Bank Integrations',
+        'Executive Dashboard',
+        'Dedicated Success Manager',
+        'AI + Human Expert Reviews',
+        'Custom Reports',
+        'API Access',
+        'Unlimited Users'
+      ],
+      bestFor: [
+        { icon: Building2, label: 'Hotel chains' },
+        { icon: Fuel, label: 'Petrol station chains' },
+        { icon: ShoppingCart, label: 'Supermarket chains' },
+        { icon: Landmark, label: 'Large enterprises' },
       ],
       buttonText: 'Contact Sales',
+      ctaNote: 'Personalized demo & pricing',
       popular: false,
       isEnterprise: true
     }
@@ -215,7 +199,7 @@ const Pricing = () => {
               onClick={() => setBillingCycle('yearly')}
             >
               Yearly
-              <span className="save-badge">Save 16%</span>
+              <span className="save-badge">Save 20%</span>
             </button>
           </div>
 
@@ -223,8 +207,7 @@ const Pricing = () => {
             {plans.map((plan) => {
               const price = getPrice(plan);
               const period = getPeriod(plan);
-              const isExpanded = expandedPlan === plan.id;
-              const { icon: PlanIcon, color: iconColor } = planIcon[plan.id];
+              const { icon: PlanIcon, color: iconColor } = planMeta[plan.id];
 
               return (
                 <div
@@ -234,16 +217,19 @@ const Pricing = () => {
                   {plan.popular && <span className="plan-tag popular-tag">Most Popular</span>}
                   {plan.isEnterprise && <span className="plan-tag enterprise-tag">Enterprise</span>}
 
-                  <div className="plan-icon-box" style={{ color: iconColor, borderColor: iconColor }}>
-                    <PlanIcon size={20} />
+                  <div className="plan-card-head-row">
+                    <div className="plan-icon-box" style={{ color: iconColor, borderColor: iconColor }}>
+                      <PlanIcon size={20} />
+                    </div>
+                    <div>
+                      <h3 className="plan-name">{plan.name}</h3>
+                      <p className="plan-sub">{plan.sub}</p>
+                    </div>
                   </div>
-
-                  <h3 className="plan-name">{plan.name}</h3>
-                  <p className="plan-description">{plan.description}</p>
 
                   <div className="plan-price-block">
                     {plan.isEnterprise ? (
-                      <p className="plan-price">Custom</p>
+                      <p className="plan-price">Custom Pricing</p>
                     ) : (
                       <>
                         <p className="plan-price">
@@ -257,30 +243,33 @@ const Pricing = () => {
                     )}
                   </div>
 
-                  <Link to={plan.isEnterprise ? '/contact' : '/demo'}>
-                    <button className={`plan-btn${plan.popular ? ' filled' : ''}`}>
-                      {plan.buttonText}
-                    </button>
-                  </Link>
+                  <p className="plan-description">{plan.description}</p>
 
                   <div className="plan-features">
-                    <p className="plan-features-label">Features included:</p>
-                    {plan.features.slice(0, isExpanded ? plan.features.length : 5).map((feature, index) => (
+                    <p className="plan-features-label">{plan.listLabel}</p>
+                    {plan.features.map((feature, index) => (
                       <div className="plan-feature" key={index}>
                         <Check size={16} className="feature-check" />
                         <span>{feature}</span>
                       </div>
                     ))}
-                    {plan.features.length > 5 && (
-                      <button
-                        className="show-more-btn"
-                        onClick={() => setExpandedPlan(isExpanded ? null : plan.id)}
-                      >
-                        {isExpanded ? 'Show less' : `Show ${plan.features.length - 5} more features`}
-                        {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                      </button>
-                    )}
                   </div>
+
+                  <div className="plan-bestfor">
+                    <p className="plan-features-label muted">Best for:</p>
+                    {plan.bestFor.map(({ icon: BIcon, label }) => (
+                      <div className="plan-bestfor-item" key={label}>
+                        <BIcon size={14} /> {label}
+                      </div>
+                    ))}
+                  </div>
+
+                  <Link to={plan.isEnterprise ? '/contact' : '/demo'}>
+                    <button className={`plan-btn${plan.popular ? ' filled' : ''}`}>
+                      {plan.buttonText} <ArrowRight size={16} />
+                    </button>
+                  </Link>
+                  <p className="plan-cta-note">{plan.ctaNote}</p>
                 </div>
               );
             })}
