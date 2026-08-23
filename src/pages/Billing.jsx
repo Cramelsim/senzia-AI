@@ -167,22 +167,12 @@ const statusPill = (status) => {
   }
 };
 
-const Billing = ({ user }) => {
+const Billing = ({ user, onLogout }) => {
   const navigate = useNavigate();
   const [page] = useState(1);
 
   const handleUpgrade = () => {
     navigate('/pricing');
-  };
-
-  const getInitials = () => {
-    if (!user?.name) return 'JM';
-
-    return user.name
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase();
   };
 
   return (
@@ -191,7 +181,9 @@ const Billing = ({ user }) => {
       pageIcon={CreditCard}
       title="Billing Center"
       subtitle="Manage your subscription, invoices, payments and billing preferences."
-      user={user}
+      userName={user?.name || 'John M.'}
+      businessName={user?.businessName || 'Senzia Limited'}
+      onLogout={onLogout}
       headerActions={
         <>
           <button className="btn btn-ghost">
@@ -206,25 +198,6 @@ const Billing = ({ user }) => {
             <Plus size={16} />
             Upgrade Plan
           </button>
-
-          {/* User avatar */}
-          <div
-            style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '50%',
-              background:
-                'linear-gradient(135deg, #7c3aed, #6d28d9)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'white',
-              fontWeight: 600,
-              fontSize: '0.8rem',
-            }}
-          >
-            {getInitials()}
-          </div>
         </>
       }
     >
