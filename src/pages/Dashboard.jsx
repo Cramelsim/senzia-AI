@@ -156,6 +156,16 @@ const Dashboard = ({ user, onLogout }) => {
   const visibleAlerts = alerts.filter((a) => filterAlertTypes.includes(a.type));
   const visibleInsights = aiInsights.filter((i) => filterInsightTypes.includes(i.type));
 
+  // ---- Dynamic avatar initials (replaces the hardcoded 'JM') ----
+  const getInitials = () => {
+    if (!user?.name) return 'JM';
+    return user.name
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase();
+  };
+
   return (
     <AppShell
       active="Dashboard"
@@ -285,6 +295,24 @@ const Dashboard = ({ user, onLogout }) => {
           </div>
 
           <button className="btn btn-primary"><Download size={16} /> Export</button>
+
+          {/* User avatar — dynamic initials instead of hardcoded 'JM' */}
+          <div
+            style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
+              background: 'linear-gradient(135deg, #7c3aed, #6d28d9)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontWeight: 600,
+              fontSize: '0.8rem',
+            }}
+          >
+            {getInitials()}
+          </div>
         </>
       }
     >
