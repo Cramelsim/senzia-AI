@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Settings as SettingsIcon,
@@ -17,8 +17,18 @@ import {
   HelpCircle,
   Gauge,
   LogOut,
+  AlertTriangle,
+  CheckCircle,
+  TrendingUp as TrendingUpIcon,
 } from 'lucide-react';
 import './tokens.css';
+
+const notifications = [
+  { id: 1, icon: AlertTriangle, tone: 'warning', title: 'Low Stock Alert', description: '5 products are running low on inventory.', time: '2 hours ago', unread: true },
+  { id: 2, icon: TrendingUpIcon, tone: 'success', title: 'Revenue up 18.6%', description: 'This week is trending higher than last week.', time: '6 hours ago', unread: true },
+  { id: 3, icon: CheckCircle, tone: 'info', title: 'Data sync completed', description: 'All data sources synchronized successfully.', time: '8 hours ago', unread: true },
+  { id: 4, icon: AlertTriangle, tone: 'danger', title: 'Unusual expense detected', description: 'Electricity bill is 25% higher than usual.', time: 'Yesterday', unread: false },
+];
 
 const NAV_MAIN = [
   { label: 'Dashboard', icon: LayoutDashboard, to: '/dashboard' },
@@ -68,6 +78,27 @@ const AppShell = ({
     .map((n) => n[0])
     .join('')
     .toUpperCase();
+
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const notifRef = useRef(null);
+  const unreadCount = notifications.filter((n) => n.unread).length;
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (notifRef.current && !notifRef.current.contains(event.target)) {
+        setIsNotifOpen(false);
+      }
+    };
+    const handleEscape = (event) => {
+      if (event.key === 'Escape') setIsNotifOpen(false);
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, []);
 
   return (
     <div className="senzia-app">
@@ -130,10 +161,46 @@ const AppShell = ({
             <span className="kbd">⌘K</span>
           </div>
           <div className="topbar-right">
-            <button className="icon-btn" aria-label="Notifications">
-              <Bell size={19} />
-              <span className="badge-dot">3</span>
-            </button>
+            <div className="notif-dropdown" ref={notifRef}>
+              <button
+                className="icon-btn"
+                aria-label="Notifications"
+                aria-haspopup="true"
+                aria-expanded={isNotifOpen}
+                onClick={() => setIsNotifOpen((open) => !open)}
+              >
+                <Bell size={19} />
+                {unreadCount > 0 && <span className="badge-dot">{unreadCount}</span>}
+              </button>
+
+              {isNotifOpen && (
+                <div className="notif-dropdown-menu" role="menu">
+                  <div className="notif-dropdown-header">
+                    <span>Notifications</span>
+                    {unreadCount > 0 && <span className="notif-unread-label">{unreadCount} new</span>}
+                  </div>
+                  <div className="notif-list">
+                    {notifications.map((n) => {
+                      const Icon = n.icon;
+                      return (
+                        <div className={`notif-row${n.unread ? ' unread' : ''}`} key={n.id}>
+                          <div className={`notif-row-icon tone-${n.tone}`}><Icon size={15} /></div>
+                          <div className="notif-row-body">
+                            <p>{n.title}</p>
+                            <p>{n.description}</p>
+                            <span>{n.time}</span>
+                          </div>
+                          {n.unread && <span className="notif-unread-dot" />}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <Link to="/alerts" className="notif-view-all" onClick={() => setIsNotifOpen(false)}>
+                    View All Alerts
+                  </Link>
+                </div>
+              )}
+            </div>
             <button className="icon-btn" aria-label="Help">
               <HelpCircle size={19} />
             </button>
