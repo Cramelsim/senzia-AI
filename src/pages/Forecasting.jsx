@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   TrendingUp,
   TrendingDown,
@@ -10,6 +11,9 @@ import {
   HelpCircle,
 } from 'lucide-react';
 import AppShell from './AppShell';
+import Modal from '../Modal';
+import { useToast } from '../Toast';
+import { downloadFile, toCsv } from '../download';
 import './Forecasting.css';
 
 const TABS = [
@@ -21,11 +25,30 @@ const TABS = [
 ];
 
 const forecastMetrics = [
-  { title: 'Revenue Forecast', value: 'KES 2,850,000', change: '+16.3%', confidence: '94%', period: 'Next Month', icon: DollarSign, color: 'var(--accent)', bg: 'var(--accent-soft)', trend: 'up' },
-  { title: 'Profit Forecast', value: 'KES 742,500', change: '+18.7%', confidence: '91%', period: 'Next Month', icon: TrendingUp, color: 'var(--success)', bg: 'var(--success-soft)', trend: 'up' },
-  { title: 'Expense Forecast', value: 'KES 612,000', change: '-4.2%', confidence: '89%', period: 'Next Month', icon: TrendingDown, color: 'var(--danger)', bg: 'var(--danger-soft)', trend: 'down' },
-  { title: 'Cash Flow Forecast', value: 'KES 1,245,000', change: '+12.8%', confidence: '93%', period: 'Next Month', icon: Activity, color: 'var(--info)', bg: 'rgba(79,139,240,0.12)', trend: 'up' },
+  { key: 'revenue', title: 'Revenue Forecast', amount: 2850000, change: 16.3, confidence: 94, icon: DollarSign, color: 'var(--accent)', bg: 'var(--accent-soft)', trend: 'up' },
+  { key: 'profit', title: 'Profit Forecast', amount: 742500, change: 18.7, confidence: 91, icon: TrendingUp, color: 'var(--success)', bg: 'var(--success-soft)', trend: 'up' },
+  { key: 'expense', title: 'Expense Forecast', amount: 612000, change: -4.2, confidence: 89, icon: TrendingDown, color: 'var(--danger)', bg: 'var(--danger-soft)', trend: 'down' },
+  { key: 'cashflow', title: 'Cash Flow Forecast', amount: 1245000, change: 12.8, confidence: 93, icon: Activity, color: 'var(--info)', bg: 'rgba(79,139,240,0.12)', trend: 'up' },
 ];
+
+// Figures above are for the next month; longer horizons scale the amount and are forecast with less certainty.
+const PERIODS = {
+  month: { label: 'Next Month', scale: 1, confidencePenalty: 0 },
+  quarter: { label: 'Next Quarter', scale: 3, confidencePenalty: 3 },
+  year: { label: 'Next Year', scale: 12, confidencePenalty: 8 },
+};
+
+// Which sections each tab shows. Metric keys limit the metric cards; the rest are on/off.
+const TAB_SECTIONS = {
+  overview: { metrics: null, chart: true, inventory: true, demand: true, insights: true },
+  revenue: { metrics: ['revenue', 'profit'], chart: true, inventory: false, demand: true, insights: true },
+  expense: { metrics: ['expense'], chart: false, inventory: false, demand: false, insights: true },
+  cashflow: { metrics: ['cashflow'], chart: true, inventory: false, demand: false, insights: true },
+  inventory: { metrics: [], chart: false, inventory: true, demand: true, insights: true },
+};
+
+const formatKes = (amount) => `KES ${Math.round(amount).toLocaleString('en-US')}`;
+const formatChange = (change) => `${change > 0 ? '+' : ''}${change.toFixed(1)}%`;
 
 const monthlyForecast = [
   { month: 'Jan', actual: 1800000, forecast: 1850000 },
@@ -129,8 +152,57 @@ const ForecastChart = () => {
 };
 
 const Forecasting = () => {
+  const navigate = useNavigate();
+  const toast = useToast();
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedPeriod, setSelectedPeriod] = useState('month');
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [refreshedAt, setRefreshedAt] = useState(null);
+  const [showSummary, setShowSummary] = useState(false);
+  const refreshTimer = useRef(null);
+
+  useEffect(() => () => clearTimeout(refreshTimer.current), []);
+
+  const period = PERIODS[selectedPeriod];
+  const sections = TAB_SECTIONS[activeTab];
+  const metrics = forecastMetrics
+    .filter((m) => !sections.metrics || sections.metrics.includes(m.key))
+    .map((m) => ({
+      ...m,
+      value: formatKes(m.amount * period.scale),
+      confidenceLabel: `${m.confidence - period.confidencePenalty}%`,
+    }));
+
+  const handleRefresh = () => {
+    if (isRefreshing) return;
+    setIsRefreshing(true);
+    refreshTimer.current = setTimeout(() => {
+      setIsRefreshing(false);
+      setRefreshedAt(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+      toast('Forecast refreshed with the latest data.');
+    }, 1000);
+  };
+
+  const handleExport = () => {
+    const metricRows = forecastMetrics.map((m) => ({
+      section: 'Metric', name: m.title, period: period.label,
+      current: '', forecast: m.amount * period.scale, change: formatChange(m.change),
+      confidence: `${m.confidence - period.confidencePenalty}%`,
+    }));
+    const monthRows = monthlyForecast.map((d) => ({
+      section: 'Revenue by month', name: d.month, period: '', current: d.actual ?? '', forecast: d.forecast, change: '', confidence: '',
+    }));
+    const inventoryRows = inventoryForecast.map((i) => ({
+      section: 'Inventory', name: i.product, period: '', current: i.current, forecast: i.forecast, change: i.change, confidence: '',
+    }));
+    const csv = toCsv([...metricRows, ...monthRows, ...inventoryRows], [
+      { key: 'section', label: 'Section' }, { key: 'name', label: 'Name' }, { key: 'period', label: 'Period' },
+      { key: 'current', label: 'Current / Actual' }, { key: 'forecast', label: 'Forecast' },
+      { key: 'change', label: 'Change' }, { key: 'confidence', label: 'Confidence' },
+    ]);
+    downloadFile('senzia-forecast.csv', csv, 'text/csv');
+    toast('Forecast exported.');
+  };
 
   return (
     <AppShell
@@ -143,8 +215,10 @@ const Forecasting = () => {
       onTabChange={setActiveTab}
       headerActions={
         <>
-          <button className="btn btn-ghost"><RefreshCw size={16} /> Refresh Forecast</button>
-          <button className="btn btn-violet"><Download size={16} /> Export Forecast</button>
+          <button className="btn btn-ghost" onClick={handleRefresh} disabled={isRefreshing}>
+            <RefreshCw size={16} className={isRefreshing ? 'spin' : undefined} /> {isRefreshing ? 'Refreshing...' : 'Refresh Forecast'}
+          </button>
+          <button className="btn btn-violet" onClick={handleExport}><Download size={16} /> Export Forecast</button>
         </>
       }
     >
@@ -162,11 +236,13 @@ const Forecasting = () => {
                 {p}
               </button>
             ))}
+            {refreshedAt && <span style={{ marginLeft: 'auto', fontSize: '0.78rem', color: 'var(--text-tertiary)' }}>Updated {refreshedAt}</span>}
           </div>
 
           {/* ---- Forecast metric cards ---- */}
+          {metrics.length > 0 && (
           <div className="forecast-metric-grid">
-            {forecastMetrics.map(({ title, value, change, confidence, period, icon: Icon, color, bg, trend }) => (
+            {metrics.map(({ title, value, change, confidenceLabel, icon: Icon, color, bg, trend }) => (
               <div className="forecast-metric-card" key={title}>
                 <div className="forecast-metric-top">
                   <div className="forecast-metric-icon" style={{ background: bg, color }}><Icon size={16} /></div>
@@ -174,15 +250,17 @@ const Forecasting = () => {
                 </div>
                 <p className="forecast-metric-value">{value}</p>
                 <div className="forecast-metric-foot">
-                  <span className="forecast-metric-change" style={{ color: trend === 'up' ? 'var(--success)' : 'var(--danger)' }}>{change}</span>
-                  <span className="confidence-chip">Confidence: {confidence}</span>
+                  <span className="forecast-metric-change" style={{ color: trend === 'up' ? 'var(--success)' : 'var(--danger)' }}>{formatChange(change)}</span>
+                  <span className="confidence-chip">Confidence: {confidenceLabel}</span>
                 </div>
-                <p className="forecast-metric-period">{period}</p>
+                <p className="forecast-metric-period">{period.label}</p>
               </div>
             ))}
           </div>
+          )}
 
           {/* ---- Revenue forecast chart ---- */}
+          {sections.chart && (
           <div className="panel">
             <div className="chart-panel-top">
               <div>
@@ -197,9 +275,12 @@ const Forecasting = () => {
             <ForecastChart />
             <p className="forecast-note">* Forecasted values</p>
           </div>
+          )}
 
           {/* ---- Inventory + Demand ---- */}
+          {(sections.inventory || sections.demand) && (
           <div className="two-col">
+            {sections.inventory && (
             <div className="panel">
               <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: '0 0 1rem' }}>Inventory Forecast</h3>
               <table className="data-table">
@@ -228,7 +309,9 @@ const Forecasting = () => {
                 </tbody>
               </table>
             </div>
+            )}
 
+            {sections.demand && (
             <div className="panel">
               <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: '0 0 1rem' }}>Demand Forecast</h3>
               {demandForecast.map((item) => (
@@ -250,9 +333,12 @@ const Forecasting = () => {
                 </div>
               ))}
             </div>
+            )}
           </div>
+          )}
 
           {/* ---- AI insights ---- */}
+          {sections.insights && (
           <div className="panel">
             <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: '0 0 1rem' }}>AI Forecast Insights</h3>
             <div className="insight-grid">
@@ -267,6 +353,7 @@ const Forecasting = () => {
               ))}
             </div>
           </div>
+          )}
 
           {/* ---- Need help ---- */}
           <div className="panel" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
@@ -278,8 +365,8 @@ const Forecasting = () => {
               </div>
             </div>
             <div style={{ display: 'flex', gap: '0.75rem' }}>
-              <button className="btn btn-whatsapp">Chat on WhatsApp</button>
-              <button className="btn btn-primary">Contact Support</button>
+              <button className="btn btn-whatsapp" onClick={() => window.open('https://wa.me/254700123456', '_blank', 'noopener,noreferrer')}>Chat on WhatsApp</button>
+              <button className="btn btn-primary" onClick={() => navigate('/contact')}>Contact Support</button>
             </div>
           </div>
         </div>
@@ -295,10 +382,29 @@ const Forecasting = () => {
               Overall outlook is positive. Revenue is expected to grow steadily next month, driven by consistent demand.
               Keep an eye on inventory levels for Product E and operational expenses.
             </p>
-            <button className="btn btn-violet btn-block">View Full Summary →</button>
+            <button className="btn btn-violet btn-block" onClick={() => setShowSummary(true)}>View Full Summary →</button>
           </div>
         </div>
       </div>
+
+      {showSummary && (
+        <Modal title="Forecast Summary" onClose={() => setShowSummary(false)} footer={<button type="button" className="btn btn-ghost" onClick={() => setShowSummary(false)}>Close</button>}>
+          <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.88rem', lineHeight: 1.5 }}>
+            Outlook for {PERIODS[selectedPeriod].label.toLowerCase()}. Figures are scaled from the monthly model, so longer horizons carry lower confidence.
+          </p>
+          {forecastMetrics.map((m) => (
+            <div className="modal-detail-row" key={m.key}>
+              <span>{m.title}</span>
+              <span>{formatKes(m.amount * period.scale)} ({formatChange(m.change)})</span>
+            </div>
+          ))}
+          {forecastInsights.map((insight) => (
+            <p key={insight.title} style={{ margin: 0, fontSize: '0.84rem' }}>
+              <strong>{insight.title}.</strong> <span style={{ color: 'var(--text-secondary)' }}>{insight.description}</span>
+            </p>
+          ))}
+        </Modal>
+      )}
     </AppShell>
   );
 };
