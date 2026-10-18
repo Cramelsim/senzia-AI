@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useRef, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Sparkles,
   AlertCircle,
@@ -16,9 +16,10 @@ import {
   Brain,
   ShoppingBag,
   ArrowUpRight,
-  ArrowDownRight,
 } from 'lucide-react';
 import AppShell from './AppShell';
+import { useToast } from '../Toast';
+import { downloadFile, toCsv } from '../download';
 import './Insights.css';
 
 const TABS = [
@@ -88,9 +89,29 @@ const trendSeries = [
   { key: 'expenses', label: 'Expenses', value: 'KES 62,350', change: '-7.8%', color: '#f0a828', data: [68000, 66000, 70000, 64000, 67000, 63000, 65000, 60000, 62350] },
 ];
 
-const xLabels = { 0: 'Apr 15', 2: 'Apr 22', 4: 'Apr 29', 6: 'May 6', 8: 'May 12' };
+const pointLabels = ['Apr 15', 'Apr 19', 'Apr 22', 'Apr 26', 'Apr 29', 'May 3', 'May 6', 'May 9', 'May 12'];
 
-const TrendChart = () => {
+// How many of the most recent data points each range shows, and the header label for it.
+const RANGES = [
+  { id: '7d', label: 'Last 7 days', points: 3, text: 'May 6 – May 12, 2025' },
+  { id: '14d', label: 'Last 14 days', points: 5, text: 'Apr 29 – May 12, 2025' },
+  { id: '28d', label: 'Last 28 days', points: 9, text: 'Apr 15 – May 12, 2025' },
+];
+
+const GRANULARITY_STEP = { Daily: 1, Weekly: 2, Monthly: 4 };
+
+// Indexes of the points to plot: the window ending at the latest point, thinned out by granularity.
+const visibleIndexes = (rangePoints, granularity) => {
+  const last = pointLabels.length - 1;
+  const first = last - rangePoints + 1;
+  const step = GRANULARITY_STEP[granularity];
+  const picked = [];
+  for (let i = last; i >= first; i -= step) picked.unshift(i);
+  if (picked.length < 2) picked.unshift(first);
+  return picked;
+};
+
+const TrendChart = ({ indexes }) => {
   const width = 680;
   const height = 260;
   const padL = 46;
@@ -100,7 +121,7 @@ const TrendChart = () => {
   const plotW = width - padL - padR;
   const plotH = height - padT - padB;
   const yMax = 300000;
-  const n = trendSeries[0].data.length;
+  const n = indexes.length;
 
   const sx = (i) => padL + (i * plotW) / (n - 1);
   const sy = (v) => padT + plotH - (v / yMax) * plotH;
@@ -118,9 +139,9 @@ const TrendChart = () => {
         </g>
       ))}
 
-      {Object.entries(xLabels).map(([i, label]) => (
-        <text key={i} x={sx(Number(i))} y={height - 6} textAnchor="middle" fontSize="10" fill="var(--text-tertiary)">
-          {label}
+      {indexes.map((dataIndex, i) => (
+        <text key={dataIndex} x={sx(i)} y={height - 6} textAnchor="middle" fontSize="10" fill="var(--text-tertiary)">
+          {pointLabels[dataIndex]}
         </text>
       ))}
 
@@ -132,10 +153,10 @@ const TrendChart = () => {
             strokeWidth="2.25"
             strokeLinejoin="round"
             strokeLinecap="round"
-            points={s.data.map((v, i) => `${sx(i)},${sy(v)}`).join(' ')}
+            points={indexes.map((d, i) => `${sx(i)},${sy(s.data[d])}`).join(' ')}
           />
-          {s.data.map((v, i) => (
-            <circle key={i} cx={sx(i)} cy={sy(v)} r="3" fill={s.color} />
+          {indexes.map((d, i) => (
+            <circle key={d} cx={sx(i)} cy={sy(s.data[d])} r="3" fill={s.color} />
           ))}
         </g>
       ))}
@@ -225,8 +246,54 @@ const impactPill = (impact) => (impact === 'High Impact' ? 'pill-danger' : 'pill
 const severityPill = (sev) => (sev === 'High' ? 'pill-danger' : 'pill-warning');
 
 const Insights = () => {
+  const navigate = useNavigate();
+  const toast = useToast();
   const [activeTab, setActiveTab] = useState('overview');
   const [granularity, setGranularity] = useState('Daily');
+  const [rangeId, setRangeId] = useState('28d');
+  const [isRangeOpen, setIsRangeOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const rangeRef = useRef(null);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    const onMouseDown = (event) => {
+      if (rangeRef.current && !rangeRef.current.contains(event.target)) setIsRangeOpen(false);
+      if (menuRef.current && !menuRef.current.contains(event.target)) setIsMenuOpen(false);
+    };
+    document.addEventListener('mousedown', onMouseDown);
+    return () => document.removeEventListener('mousedown', onMouseDown);
+  }, []);
+
+  const range = RANGES.find((r) => r.id === rangeId);
+  const indexes = visibleIndexes(range.points, granularity);
+
+  // "Smart Alerts" lives on its own page; every other tab swaps the content below.
+  const handleTabChange = (id) => {
+    if (id === 'alerts') navigate('/alerts');
+    else setActiveTab(id);
+  };
+
+  const exportTrend = () => {
+    const rows = indexes.map((d) => ({
+      date: pointLabels[d],
+      ...Object.fromEntries(trendSeries.map((series) => [series.key, series.data[d]])),
+    }));
+    downloadFile(
+      'senzia-performance-trend.csv',
+      toCsv(rows, [{ key: 'date', label: 'Date' }, ...trendSeries.map((series) => ({ key: series.key, label: series.label }))]),
+      'text/csv'
+    );
+    setIsMenuOpen(false);
+    toast('Trend data exported.');
+  };
+
+  const showCards = activeTab === 'overview';
+  const showTrend = activeTab === 'overview' || activeTab === 'trends';
+  const showTopAreas = activeTab === 'overview' || activeTab === 'trends';
+  const showOpportunities = activeTab === 'overview' || activeTab === 'opportunities';
+  const showAnomalies = activeTab === 'anomalies';
+  const showBenchmarks = activeTab === 'benchmarks';
 
   return (
     <AppShell
@@ -236,17 +303,37 @@ const Insights = () => {
       subtitle="Discover what's happening in your business. Powered by AI."
       tabs={TABS}
       activeTab={activeTab}
-      onTabChange={setActiveTab}
+      onTabChange={handleTabChange}
       headerActions={
-        <>
-          <button className="btn btn-ghost"><Calendar size={16} /> May 6 – May 12, 2025</button>
-        </>
+        <div ref={rangeRef} style={{ position: 'relative' }}>
+          <button className="btn btn-ghost" aria-haspopup="true" aria-expanded={isRangeOpen} onClick={() => setIsRangeOpen((open) => !open)}>
+            <Calendar size={16} /> {range.text}
+          </button>
+          {isRangeOpen && (
+            <div className="notif-dropdown-menu" role="menu" style={{ width: 200, top: 'calc(100% + 0.4rem)' }}>
+              {RANGES.map((r) => (
+                <button
+                  key={r.id}
+                  type="button"
+                  role="menuitemradio"
+                  aria-checked={r.id === rangeId}
+                  className="search-result-row"
+                  style={r.id === rangeId ? { color: 'var(--accent)', fontWeight: 600 } : undefined}
+                  onClick={() => { setRangeId(r.id); setIsRangeOpen(false); }}
+                >
+                  {r.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       }
     >
       <div className="insights-layout">
         <div className="content-stack">
 
           {/* ---- Critical insight cards ---- */}
+          {showCards && (
           <div className="insight-cards-row">
             {insightCards.map(({ tone, tag, title, desc, action, link, icon: Icon, spark }) => (
               <div className={`insight-card tone-${tone}`} key={title}>
@@ -269,8 +356,10 @@ const Insights = () => {
               </div>
             ))}
           </div>
+          )}
 
           {/* ---- Business performance trend ---- */}
+          {showTrend && (
           <div className="panel">
             <div className="trend-panel-top">
               <div>
@@ -283,7 +372,17 @@ const Insights = () => {
                     <button key={g} className={granularity === g ? 'active' : ''} onClick={() => setGranularity(g)}>{g}</button>
                   ))}
                 </div>
-                <button className="icon-btn" aria-label="More options"><MoreHorizontal size={18} /></button>
+                <div ref={menuRef} style={{ position: 'relative' }}>
+                  <button className="icon-btn" aria-label="More options" aria-haspopup="true" aria-expanded={isMenuOpen} onClick={() => setIsMenuOpen((open) => !open)}>
+                    <MoreHorizontal size={18} />
+                  </button>
+                  {isMenuOpen && (
+                    <div className="notif-dropdown-menu" role="menu" style={{ width: 200, top: 'calc(100% + 0.4rem)' }}>
+                      <button type="button" role="menuitem" className="search-result-row" onClick={exportTrend}>Export data (CSV)</button>
+                      <button type="button" role="menuitem" className="search-result-row" onClick={() => { setIsMenuOpen(false); navigate('/reports'); }}>Open Reports</button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -305,20 +404,25 @@ const Insights = () => {
                 ))}
               </div>
               <div className="trend-chart-wrap">
-                <TrendChart />
+                <TrendChart indexes={indexes} />
               </div>
             </div>
           </div>
+          )}
 
           {/* ---- Top performing areas + Opportunity spotlight ---- */}
-          <div className="two-col">
+          {(showTopAreas || showOpportunities) && (
+          <div className="two-col" style={!showTopAreas || !showOpportunities ? { gridTemplateColumns: '1fr' } : undefined}>
+            {showTopAreas && (
             <div className="panel">
               <div className="panel-head">
                 <div>
                   <h3>Top Performing Areas</h3>
                   <p>Areas contributing most to your growth</p>
                 </div>
-                <Link to="/reports" className="link-accent">View All</Link>
+                {activeTab === 'overview' && (
+                  <button type="button" className="link-accent" onClick={() => setActiveTab('trends')}>View All</button>
+                )}
               </div>
               <div className="donut-legend-wrap">
                 <Donut />
@@ -335,14 +439,18 @@ const Insights = () => {
                 </div>
               </div>
             </div>
+            )}
 
+            {showOpportunities && (
             <div className="panel">
               <div className="panel-head">
                 <div>
                   <h3>Opportunity Spotlight</h3>
                   <p>High impact opportunities for your business</p>
                 </div>
-                <Link to="/reports" className="link-accent">View All</Link>
+                {activeTab === 'overview' && (
+                  <button type="button" className="link-accent" onClick={() => setActiveTab('opportunities')}>View All</button>
+                )}
               </div>
               {opportunities.map(({ title, sub, amount, impact, icon: Icon }) => (
                 <div className="opportunity-row" key={title}>
@@ -361,7 +469,66 @@ const Insights = () => {
                 </div>
               ))}
             </div>
+            )}
           </div>
+          )}
+
+          {showAnomalies && (
+            <div className="panel">
+              <div className="panel-head">
+                <div>
+                  <h3>Anomalies</h3>
+                  <p>Unusual changes Senzia AI has flagged in your data</p>
+                </div>
+              </div>
+              {anomalies.map(({ title, desc, date, severity, color, bg, icon: Icon }) => (
+                <div className="anomaly-row" key={title}>
+                  <div className="anomaly-left">
+                    <div className="anomaly-icon" style={{ background: bg }}>
+                      <Icon size={15} color={color} />
+                    </div>
+                    <div>
+                      <p>{title}</p>
+                      <p>{desc}</p>
+                    </div>
+                  </div>
+                  <div className="anomaly-right">
+                    <span className={`pill ${severityPill(severity)}`}>{severity}</span>
+                    <p className="anomaly-date">{date}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {showBenchmarks && (
+            <div className="panel">
+              <div className="panel-head">
+                <div>
+                  <h3>Period-over-period Benchmarks</h3>
+                  <p>How each key metric compares with the previous period</p>
+                </div>
+              </div>
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>Metric</th>
+                    <th className="num">Current</th>
+                    <th className="num">Change</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {keyMetrics.map(({ label, value, change, up }) => (
+                    <tr key={label}>
+                      <td style={{ fontWeight: 500 }}>{label}</td>
+                      <td className="num">{value}</td>
+                      <td className="num" style={{ color: up ? 'var(--success)' : 'var(--danger)', fontWeight: 600 }}>{up ? '↑' : '↓'} {change.replace(/[+-]/, '')}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
 
         {/* ============ RIGHT RAIL ============ */}
@@ -413,7 +580,9 @@ const Insights = () => {
           <div className="rail-card">
             <div className="panel-head" style={{ marginBottom: '0.6rem' }}>
               <h4 style={{ margin: 0 }}>Recent Anomalies</h4>
-              <Link to="/reports" className="link-accent">View All</Link>
+              {!showAnomalies && (
+                <button type="button" className="link-accent" onClick={() => setActiveTab('anomalies')}>View All</button>
+              )}
             </div>
             {anomalies.map(({ title, desc, date, severity, color, bg, icon: Icon }) => (
               <div className="anomaly-row" key={title}>
