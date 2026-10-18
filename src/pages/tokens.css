@@ -75,12 +75,8 @@
 .brand-mark {
   width: 32px;
   height: 32px;
-  border-radius: 8px;
-  background: var(--accent);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #17130a;
+  object-fit: contain;
+  flex-shrink: 0;
 }
 
 .brand-name {

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
+import logoMark from '../assets/logo-mark.png';
 import {
   Settings as SettingsIcon,
   LayoutDashboard,
@@ -16,7 +17,6 @@ import {
   ChevronDown,
   Search,
   HelpCircle,
-  Gauge,
   LogOut,
   AlertTriangle,
   CheckCircle,
@@ -152,7 +152,7 @@ const AppShell = ({
       {/* ============ SIDEBAR ============ */}
       <aside className="sidebar">
         <Link to="/" className="brand">
-          <div className="brand-mark"><Gauge size={17} /></div>
+          <img className="brand-mark" src={logoMark} alt="" width="32" height="32" />
           <span className="brand-name">SENZIA</span>
         </Link>
 
