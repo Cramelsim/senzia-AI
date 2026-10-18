@@ -20,6 +20,7 @@ import Alerts from './pages/Alerts';
 import Billing from './pages/Billing';
 import Forecasting from './pages/Forecasting';
 import Users from './pages/Users';
+import { AuthContext } from './AuthContext';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -82,6 +83,7 @@ function App() {
 
 
   return (
+    <AuthContext.Provider value={{ user, onLogout: handleLogout }}>
     <Router>
       <Routes>
         {/* Public Routes */}
@@ -212,6 +214,7 @@ function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
+    </AuthContext.Provider>
   );
 }
 

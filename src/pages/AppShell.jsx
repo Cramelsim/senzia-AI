@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../AuthContext';
 import {
   Settings as SettingsIcon,
   LayoutDashboard,
@@ -23,7 +24,7 @@ import {
 } from 'lucide-react';
 import './tokens.css';
 
-const notifications = [
+const INITIAL_NOTIFICATIONS = [
   { id: 1, icon: AlertTriangle, tone: 'warning', title: 'Low Stock Alert', description: '5 products are running low on inventory.', time: '2 hours ago', unread: true },
   { id: 2, icon: TrendingUpIcon, tone: 'success', title: 'Revenue up 18.6%', description: 'This week is trending higher than last week.', time: '6 hours ago', unread: true },
   { id: 3, icon: CheckCircle, tone: 'info', title: 'Data sync completed', description: 'All data sources synchronized successfully.', time: '8 hours ago', unread: true },
@@ -47,6 +48,8 @@ const NAV_MANAGEMENT = [
   { label: 'Billing', icon: CreditCard, to: '/billing' },
 ];
 
+const ALL_NAV = [...NAV_MAIN, ...NAV_MANAGEMENT];
+
 /**
  * Shared page shell: sidebar + topbar + page header (+ optional tabs).
  *
@@ -68,35 +71,79 @@ const AppShell = ({
   tabs,
   activeTab,
   onTabChange,
-  userName = 'John M.',
-  businessName = 'Senzia Limited',
-  onLogout,
+  userName: userNameProp,
+  businessName: businessNameProp,
+  onLogout: onLogoutProp,
   children,
 }) => {
+  const navigate = useNavigate();
+  const { user, onLogout: contextLogout } = useAuth();
+  const userName = userNameProp || user?.name || 'John M.';
+  const businessName = businessNameProp || user?.businessName || 'Senzia Limited';
+  const onLogout = onLogoutProp || contextLogout;
   const initials = userName
-    .split(' ')
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
     .map((n) => n[0])
     .join('')
     .toUpperCase();
 
+  const [notifications, setNotifications] = useState(INITIAL_NOTIFICATIONS);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const notifRef = useRef(null);
   const unreadCount = notifications.filter((n) => n.unread).length;
+
+  const [query, setQuery] = useState('');
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const searchRef = useRef(null);
+  const searchInputRef = useRef(null);
+  const searchResults = query.trim()
+    ? ALL_NAV.filter((item) => item.label.toLowerCase().includes(query.trim().toLowerCase()))
+    : [];
+
+  const markRead = (id) =>
+    setNotifications((list) => list.map((n) => (n.id === id ? { ...n, unread: false } : n)));
+  const markAllRead = () =>
+    setNotifications((list) => list.map((n) => ({ ...n, unread: false })));
+
+  const goToResult = (to) => {
+    setQuery('');
+    setIsSearchOpen(false);
+    navigate(to);
+  };
+
+  const handleSearchKeyDown = (event) => {
+    if (event.key === 'Enter' && searchResults.length > 0) {
+      goToResult(searchResults[0].to);
+    } else if (event.key === 'Escape') {
+      setQuery('');
+      setIsSearchOpen(false);
+      event.target.blur();
+    }
+  };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (notifRef.current && !notifRef.current.contains(event.target)) {
         setIsNotifOpen(false);
       }
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setIsSearchOpen(false);
+      }
     };
-    const handleEscape = (event) => {
+    const handleKeyDown = (event) => {
       if (event.key === 'Escape') setIsNotifOpen(false);
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        searchInputRef.current?.focus();
+      }
     };
     document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('keydown', handleEscape);
+    document.addEventListener('keydown', handleKeyDown);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', handleEscape);
+      document.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
 
@@ -115,7 +162,7 @@ const AppShell = ({
             <span className="pill pill-success">Active</span>
           </div>
           <p className="plan-renews">Renews on June 12, 2025</p>
-          <button className="btn btn-ghost btn-sm btn-block">Manage Plan</button>
+          <button className="btn btn-ghost btn-sm btn-block" onClick={() => navigate('/billing')}>Manage Plan</button>
         </div>
 
         <nav className="nav-section">
@@ -147,7 +194,7 @@ const AppShell = ({
                 <p>Our support team is here to help you 24/7.</p>
               </div>
             </div>
-            <button className="btn btn-outline-accent btn-sm btn-block">Contact Support</button>
+            <button className="btn btn-outline-accent btn-sm btn-block" onClick={() => navigate('/contact')}>Contact Support</button>
           </div>
         </div>
       </aside>
@@ -155,10 +202,34 @@ const AppShell = ({
       {/* ============ MAIN COLUMN ============ */}
       <div className="main-col">
         <header className="topbar">
-          <div className="search-bar">
-            <Search size={16} />
-            <input placeholder="Search settings, preferences, security..." />
-            <span className="kbd">⌘K</span>
+          <div className="search-wrap" ref={searchRef}>
+            <div className="search-bar">
+              <Search size={16} />
+              <input
+                ref={searchInputRef}
+                value={query}
+                placeholder="Search pages..."
+                aria-label="Search pages"
+                onChange={(e) => { setQuery(e.target.value); setIsSearchOpen(true); }}
+                onFocus={() => setIsSearchOpen(true)}
+                onKeyDown={handleSearchKeyDown}
+              />
+              <span className="kbd">⌘K</span>
+            </div>
+            {isSearchOpen && query.trim() && (
+              <div className="search-results" role="listbox">
+                {searchResults.length === 0 ? (
+                  <p className="search-empty">No pages match “{query.trim()}”</p>
+                ) : (
+                  searchResults.map(({ label, icon: Icon, to }) => (
+                    <button key={to} type="button" className="search-result-row" onClick={() => goToResult(to)}>
+                      <Icon size={15} />
+                      {label}
+                    </button>
+                  ))
+                )}
+              </div>
+            )}
           </div>
           <div className="topbar-right">
             <div className="notif-dropdown" ref={notifRef}>
@@ -177,13 +248,24 @@ const AppShell = ({
                 <div className="notif-dropdown-menu" role="menu">
                   <div className="notif-dropdown-header">
                     <span>Notifications</span>
-                    {unreadCount > 0 && <span className="notif-unread-label">{unreadCount} new</span>}
+                    {unreadCount > 0 && (
+                      <button type="button" className="notif-mark-all" onClick={markAllRead}>
+                        Mark all read
+                      </button>
+                    )}
                   </div>
                   <div className="notif-list">
                     {notifications.map((n) => {
                       const Icon = n.icon;
                       return (
-                        <div className={`notif-row${n.unread ? ' unread' : ''}`} key={n.id}>
+                        <div
+                          className={`notif-row${n.unread ? ' unread' : ''}`}
+                          key={n.id}
+                          role="menuitem"
+                          tabIndex={0}
+                          onClick={() => markRead(n.id)}
+                          onKeyDown={(e) => { if (e.key === 'Enter') markRead(n.id); }}
+                        >
                           <div className={`notif-row-icon tone-${n.tone}`}><Icon size={15} /></div>
                           <div className="notif-row-body">
                             <p>{n.title}</p>
@@ -201,7 +283,7 @@ const AppShell = ({
                 </div>
               )}
             </div>
-            <button className="icon-btn" aria-label="Help">
+            <button className="icon-btn" aria-label="Help" onClick={() => navigate('/resources')}>
               <HelpCircle size={19} />
             </button>
             <div className="user-chip">
