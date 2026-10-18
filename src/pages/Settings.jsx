@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Settings as SettingsIcon,
   Database,
@@ -23,7 +23,15 @@ import {
   HelpCircle,
 } from 'lucide-react';
 import AppShell from './AppShell';
+import { useAuth } from '../AuthContext';
+import { useToast } from '../Toast';
+import { loadSettings, saveSettings, applyAppearance, DEFAULT_SETTINGS, SETTINGS_KEY } from '../appearance';
 import './Settings.css';
+
+const ACTIVITY_KEY = 'senzia_settings_activity';
+const ACTIVITY_PREVIEW = 4;
+const SETTING_KEYS = Object.keys(DEFAULT_SETTINGS);
+const CONTACT_WHATSAPP = 'https://wa.me/254700123456';
 
 const TABS = [
   { id: 'general', label: 'General' },
@@ -34,36 +42,42 @@ const TABS = [
   { id: 'system', label: 'System' },
 ];
 
-const OVERVIEW_CARDS = [
+const yesNo = (value) => (value ? 'On' : 'Off');
+
+// `tab` switches the settings tab, `to` navigates to another page, `profile` scrolls to the profile form.
+const buildOverviewCards = (f) => [
   {
     icon: Building2,
     title: 'Company Profile',
     desc: 'Update your company information, logo and contact details.',
     rows: [
-      { label: 'Company', value: 'Senzia Limited' },
-      { label: 'Business ID', value: 'SEN-2024-001' },
+      { label: 'Company', value: f.companyName },
+      { label: 'Business ID', value: f.businessId },
     ],
     cta: 'Edit Profile',
+    target: { profile: true },
   },
   {
     icon: SlidersHorizontal,
     title: 'Preferences',
     desc: 'Customize your experience and set your default preferences.',
     rows: [
-      { label: 'Language', value: 'English (US)' },
-      { label: 'Currency', value: 'KES - Kenyan Shilling' },
+      { label: 'Language', value: f.language },
+      { label: 'Currency', value: f.currency },
     ],
     cta: 'Configure Preferences',
+    target: { tab: 'data' },
   },
   {
     icon: Database,
     title: 'Data Settings',
     desc: 'Manage data import, retention and synchronization settings.',
     rows: [
-      { label: 'Data Retention', value: '13 Months' },
+      { label: 'Data Retention', value: f.dataRetention },
       { label: 'Auto Sync', value: 'On' },
     ],
     cta: 'Manage Data Settings',
+    target: { tab: 'data' },
   },
   {
     icon: UserCog,
@@ -74,77 +88,133 @@ const OVERVIEW_CARDS = [
       { label: 'Pending Invites', value: '3' },
     ],
     cta: 'Manage Users',
+    target: { to: '/users' },
   },
   {
     icon: Shield,
     title: 'Security',
     desc: 'Manage password, 2FA and security preferences.',
     rows: [
-      { label: 'Two-Factor Auth', value: 'Enabled' },
+      { label: 'Two-Factor Auth', value: f.twoFactorAuth ? 'Enabled' : 'Disabled' },
       { label: 'Login Sessions', value: 'Active (3)' },
     ],
     cta: 'Security Settings',
+    target: { tab: 'security' },
   },
   {
     icon: Bell,
     title: 'Notifications',
     desc: 'Configure how you receive alerts and notifications.',
     rows: [
-      { label: 'Email Notifications', value: 'On' },
-      { label: 'SMS Notifications', value: 'Off' },
+      { label: 'Email Notifications', value: yesNo(f.emailNotifications) },
+      { label: 'SMS Notifications', value: yesNo(f.smsNotifications) },
     ],
     cta: 'Notification Settings',
+    target: { tab: 'notifications' },
   },
   {
     icon: Palette,
     title: 'Appearance',
     desc: 'Customize the look and feel of the Senzia platform.',
     rows: [
-      { label: 'Theme', value: 'Dark' },
-      { label: 'Compact Mode', value: 'Off' },
+      { label: 'Theme', value: f.theme === 'system' ? 'System' : f.theme.charAt(0).toUpperCase() + f.theme.slice(1) },
+      { label: 'Compact Mode', value: yesNo(f.compactMode) },
     ],
     cta: 'Customize Appearance',
+    target: { tab: 'appearance' },
   },
   {
     icon: Monitor,
     title: 'System Settings',
     desc: 'Configure system behavior and default values.',
     rows: [
-      { label: 'Default Dashboard', value: 'Executive' },
-      { label: 'Items per page', value: '10' },
+      { label: 'Default Dashboard', value: f.defaultDashboard },
+      { label: 'Items per page', value: f.itemsPerPage },
     ],
     cta: 'System Configuration',
+    target: { tab: 'system' },
   },
 ];
 
+const DEFAULT_ACTIVITY = [
+  { user: 'John M.', initials: 'JM', action: 'Updated company profile', module: 'General', details: 'Changed company logo and contact information', time: 'Today, 09:15 AM' },
+  { user: 'Alice N.', initials: 'AN', action: 'Enabled two-factor authentication', module: 'Security', details: 'Two-factor authentication enabled', time: 'Today, 08:45 AM' },
+  { user: 'Brian O.', initials: 'BO', action: 'Added new user', module: 'Users', details: 'Invited user: Cynthia Wanjiku', time: 'Yesterday, 04:30 PM' },
+  { user: 'Jane K.', initials: 'JK', action: 'Changed data retention policy', module: 'Data Settings', details: 'Retention period updated to 13 months', time: 'Yesterday, 02:10 PM' },
+];
+
+const loadActivity = () => {
+  try {
+    const saved = JSON.parse(localStorage.getItem(ACTIVITY_KEY));
+    return Array.isArray(saved) ? [...saved, ...DEFAULT_ACTIVITY] : DEFAULT_ACTIVITY;
+  } catch {
+    return DEFAULT_ACTIVITY;
+  }
+};
+
+// Only entries created in this session/browser are persisted; the seeded ones always follow them.
+const persistActivity = (entries) => {
+  const own = entries.filter((e) => !DEFAULT_ACTIVITY.includes(e));
+  localStorage.setItem(ACTIVITY_KEY, JSON.stringify(own.slice(0, 50)));
+};
+
+const SETTING_LABELS = {
+  companyName: 'Company name', businessId: 'Business ID', email: 'Email', phone: 'Phone', address: 'Address',
+  language: 'Language', timezone: 'Timezone', currency: 'Currency', dataRetention: 'Data retention',
+  defaultDashboard: 'Default dashboard', itemsPerPage: 'Items per page', dateFormat: 'Date format',
+  theme: 'Theme', primaryColor: 'Primary color', compactMode: 'Compact mode', twoFactorAuth: 'Two-factor auth',
+  emailNotifications: 'Email notifications', inAppNotifications: 'In-app notifications', smsNotifications: 'SMS notifications',
+};
+
+const moduleFor = (key) => {
+  if (['language', 'timezone', 'currency', 'dataRetention'].includes(key)) return 'Data Settings';
+  if (['theme', 'primaryColor', 'compactMode'].includes(key)) return 'Appearance';
+  if (key === 'twoFactorAuth') return 'Security';
+  if (key.endsWith('Notifications')) return 'Notifications';
+  if (['defaultDashboard', 'itemsPerPage', 'dateFormat'].includes(key)) return 'System';
+  return 'General';
+};
+
+const formatNow = () => {
+  const d = new Date();
+  return `Today, ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+};
+
 const Settings = () => {
+  const navigate = useNavigate();
+  const toast = useToast();
+  const { user, onLogout } = useAuth();
+  const profileRef = useRef(null);
+
   const [activeTab, setActiveTab] = useState('general');
   const [showPassword, setShowPassword] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState({
-    companyName: 'Senzia Limited',
-    businessId: 'SEN-2024-001',
-    email: 'info@senzia.com',
-    phone: '+254 700 123 456',
-    address: 'WestPark Towers, 7th Floor, Waiyaki Way, Nairobi, Kenya',
-    language: 'English (US)',
-    timezone: 'EAT (UTC+3) Nairobi',
-    currency: 'KES - Kenyan Shilling',
-    theme: 'dark',
-    primaryColor: '#f0a828',
-    compactMode: false,
-    twoFactorAuth: true,
+  const [passwordError, setPasswordError] = useState('');
+  const [saved, setSaved] = useState(loadSettings);
+  const [formData, setFormData] = useState(() => ({
+    ...loadSettings(),
     currentPassword: '',
     newPassword: '',
     confirmPassword: '',
-  });
+  }));
+  const [activityLog, setActivityLog] = useState(loadActivity);
+  const [showAllActivity, setShowAllActivity] = useState(false);
 
-  const [activityLog] = useState([
-    { user: 'John M.', initials: 'JM', action: 'Updated company profile', module: 'General', details: 'Changed company logo and contact information', time: 'Today, 09:15 AM' },
-    { user: 'Alice N.', initials: 'AN', action: 'Enabled two-factor authentication', module: 'Security', details: 'Two-factor authentication enabled', time: 'Today, 08:45 AM' },
-    { user: 'Brian O.', initials: 'BO', action: 'Added new user', module: 'Users', details: 'Invited user: Cynthia Wanjiku', time: 'Yesterday, 04:30 PM' },
-    { user: 'Jane K.', initials: 'JK', action: 'Changed data retention policy', module: 'Data Settings', details: 'Retention period updated to 13 months', time: 'Yesterday, 02:10 PM' },
-  ]);
+  const changedKeys = SETTING_KEYS.filter((key) => formData[key] !== saved[key]);
+  const isEditing = changedKeys.length > 0;
+  const overviewCards = buildOverviewCards(saved);
+  const visibleActivity = showAllActivity ? activityLog : activityLog.slice(0, ACTIVITY_PREVIEW);
+
+  const actorName = user?.name || 'John M.';
+  const actorInitials = actorName.split(/\s+/).filter(Boolean).slice(0, 2).map((n) => n[0]).join('').toUpperCase();
+
+  const logActivity = (action, module, details) => {
+    const entry = { user: actorName, initials: actorInitials, action, module, details, time: formatNow() };
+    setActivityLog((entries) => {
+      const next = [entry, ...entries];
+      persistActivity(next);
+      return next;
+    });
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -152,14 +222,96 @@ const Settings = () => {
   };
 
   const handleSave = () => {
-    setIsEditing(false);
-    console.log('Settings saved:', formData);
+    if (!formData.companyName.trim()) {
+      toast('Company name is required.', 'error');
+      return;
+    }
+    if (!/^\S+@\S+\.\S+$/.test(formData.email.trim())) {
+      toast('Enter a valid email address.', 'error');
+      return;
+    }
+
+    const next = {};
+    SETTING_KEYS.forEach((key) => {
+      next[key] = typeof formData[key] === 'string' ? formData[key].trim() : formData[key];
+    });
+
+    saveSettings(next);
+    applyAppearance(next);
+    setSaved(next);
+    setFormData((prev) => ({ ...prev, ...next }));
+    logActivity(
+      'Updated settings',
+      moduleFor(changedKeys[0]),
+      changedKeys.map((key) => SETTING_LABELS[key]).join(', ')
+    );
+    toast('Settings saved.');
+  };
+
+  const handleCancel = () => {
+    setFormData((prev) => ({ ...prev, ...saved }));
   };
 
   const handlePasswordChange = (e) => {
     e.preventDefault();
-    console.log('Password updated');
+    const { currentPassword, newPassword, confirmPassword } = formData;
+
+    let error = '';
+    if (!currentPassword) error = 'Enter your current password.';
+    else if (newPassword.length < 8) error = 'New password must be at least 8 characters.';
+    else if (newPassword === currentPassword) error = 'New password must be different from the current one.';
+    else if (newPassword !== confirmPassword) error = 'New password and confirmation do not match.';
+
+    setPasswordError(error);
+    if (error) return;
+
+    // Demo accounts have no server-side password, so there is nothing to verify the current one against.
     setFormData((prev) => ({ ...prev, currentPassword: '', newPassword: '', confirmPassword: '' }));
+    logActivity('Changed password', 'Security', 'Account password updated');
+    toast('Password updated.');
+  };
+
+  const handleCardTarget = ({ tab, to, profile }) => {
+    if (to) {
+      navigate(to);
+    } else if (tab) {
+      setActiveTab(tab);
+    } else if (profile) {
+      setActiveTab('general');
+      profileRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      profileRef.current?.querySelector('input:not([disabled])')?.focus({ preventScroll: true });
+    }
+  };
+
+  const openSecurityCenter = () => {
+    setActiveTab('security');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleExportData = () => {
+    const payload = { exportedAt: new Date().toISOString(), user, settings: saved };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'senzia-account-data.json';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    toast('Account data exported.');
+  };
+
+  const handleDeactivate = () => {
+    if (!window.confirm('Deactivate your account? You will be signed out.')) return;
+    if (onLogout) onLogout();
+  };
+
+  const handleDeleteAccount = () => {
+    if (!window.confirm('Permanently delete your account and all saved settings? This cannot be undone.')) return;
+    localStorage.removeItem(SETTINGS_KEY);
+    localStorage.removeItem(ACTIVITY_KEY);
+    if (onLogout) onLogout();
   };
 
   return (
@@ -179,7 +331,7 @@ const Settings = () => {
           {activeTab === 'general' && (
             <>
               <div className="card-grid">
-                {OVERVIEW_CARDS.map(({ icon: Icon, title, desc, rows, cta }) => (
+                {overviewCards.map(({ icon: Icon, title, desc, rows, cta, target }) => (
                   <div className="settings-card" key={title} tabIndex={0}>
                     <div className="settings-card-top">
                       <div className="settings-card-icon"><Icon size={18} /></div>
@@ -197,9 +349,40 @@ const Settings = () => {
                         </div>
                       ))}
                     </div>
-                    <button className="btn btn-outline-accent btn-sm card-footer-btn">{cta}</button>
+                    <button type="button" className="btn btn-outline-accent btn-sm card-footer-btn" onClick={() => handleCardTarget(target)}>{cta}</button>
                   </div>
                 ))}
+              </div>
+
+              <div className="panel" ref={profileRef}>
+                <div className="panel-head">
+                  <div>
+                    <h3>Company Profile</h3>
+                    <p>Update your company information and contact details.</p>
+                  </div>
+                </div>
+                <div className="field-grid">
+                  <div className="field">
+                    <label htmlFor="companyName">Company Name</label>
+                    <input id="companyName" name="companyName" value={formData.companyName} onChange={handleChange} />
+                  </div>
+                  <div className="field">
+                    <label htmlFor="businessId">Business ID</label>
+                    <input id="businessId" name="businessId" value={formData.businessId} disabled />
+                  </div>
+                  <div className="field">
+                    <label htmlFor="email">Email</label>
+                    <input id="email" type="email" name="email" value={formData.email} onChange={handleChange} />
+                  </div>
+                  <div className="field">
+                    <label htmlFor="phone">Phone</label>
+                    <input id="phone" type="tel" name="phone" value={formData.phone} onChange={handleChange} />
+                  </div>
+                  <div className="field" style={{ gridColumn: '1 / -1' }}>
+                    <label htmlFor="address">Address</label>
+                    <input id="address" name="address" value={formData.address} onChange={handleChange} />
+                  </div>
+                </div>
               </div>
 
               <div className="panel">
@@ -208,9 +391,11 @@ const Settings = () => {
                     <h3>Activity Log</h3>
                     <p>Recent changes made to your system settings.</p>
                   </div>
-                  <Link to="/settings/activity" className="link-accent">
-                    View All Activity <ChevronRight size={14} />
-                  </Link>
+                  {activityLog.length > ACTIVITY_PREVIEW && (
+                    <button type="button" className="link-accent" onClick={() => setShowAllActivity((v) => !v)}>
+                      {showAllActivity ? 'Show Less' : 'View All Activity'} <ChevronRight size={14} />
+                    </button>
+                  )}
                 </div>
                 <table className="data-table">
                   <thead>
@@ -223,8 +408,8 @@ const Settings = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {activityLog.map((log) => (
-                      <tr key={`${log.user}-${log.time}`}>
+                    {visibleActivity.map((log, i) => (
+                      <tr key={`${log.user}-${log.time}-${log.action}-${i}`}>
                         <td>
                           <div className="activity-user">
                             <div className="avatar sm">{log.initials}</div>
@@ -279,6 +464,9 @@ const Settings = () => {
                       <input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} placeholder="Confirm new password" />
                     </div>
                   </div>
+                  {passwordError && (
+                    <p role="alert" style={{ color: 'var(--danger)', fontSize: '0.82rem', margin: '0.85rem 0 0' }}>{passwordError}</p>
+                  )}
                   <button type="submit" className="btn btn-primary" style={{ marginTop: '1.1rem' }}>
                     <Key size={15} /> Update Password
                   </button>
@@ -303,7 +491,9 @@ const Settings = () => {
                 <h3>Security Status</h3>
                 <div className="status-chip-grid">
                   <div className="status-chip good"><Check size={15} /> Strong Password</div>
-                  <div className="status-chip good"><Check size={15} /> 2FA Enabled</div>
+                  {saved.twoFactorAuth
+                    ? <div className="status-chip good"><Check size={15} /> 2FA Enabled</div>
+                    : <div className="status-chip warn"><Shield size={15} /> 2FA Disabled</div>}
                   <div className="status-chip warn"><Clock size={15} /> Last Login: Today, 08:32 AM</div>
                 </div>
               </div>
@@ -319,9 +509,9 @@ const Settings = () => {
               </div>
               <div className="field-block" style={{ display: 'grid', gap: '0.75rem' }}>
                 {[
-                  { key: 'emailNotifications', label: 'Email Notifications', sub: 'Get updates sent to info@senzia.com', on: true },
-                  { key: 'inAppNotifications', label: 'In-App Notifications', sub: 'Show alerts inside the Senzia dashboard', on: true },
-                  { key: 'smsNotifications', label: 'SMS Notifications', sub: 'Text alerts to +254 700 123 456', on: false },
+                  { key: 'emailNotifications', label: 'Email Notifications', sub: `Get updates sent to ${saved.email}` },
+                  { key: 'inAppNotifications', label: 'In-App Notifications', sub: 'Show alerts inside the Senzia dashboard' },
+                  { key: 'smsNotifications', label: 'SMS Notifications', sub: `Text alerts to ${saved.phone}` },
                 ].map((item) => (
                   <div className="toggle-row" key={item.key}>
                     <div>
@@ -329,7 +519,7 @@ const Settings = () => {
                       <p>{item.sub}</p>
                     </div>
                     <label className="switch">
-                      <input type="checkbox" defaultChecked={item.on} />
+                      <input type="checkbox" name={item.key} checked={formData[item.key]} onChange={handleChange} />
                       <span className="switch-track"><span className="switch-thumb" /></span>
                     </label>
                   </div>
@@ -362,6 +552,7 @@ const Settings = () => {
                     {['#f0a828', '#4f8bf0', '#34c98e', '#ef5a5a', '#a855f7', '#ec4899'].map((color) => (
                       <button
                         key={color}
+                        type="button"
                         className={`color-swatch${formData.primaryColor === color ? ' selected' : ''}`}
                         style={{ background: color }}
                         onClick={() => setFormData((p) => ({ ...p, primaryColor: color }))}
@@ -413,7 +604,7 @@ const Settings = () => {
                   </div>
                   <div className="field">
                     <label>Data Retention</label>
-                    <select name="dataRetention" defaultValue="13 Months">
+                    <select name="dataRetention" value={formData.dataRetention} onChange={handleChange}>
                       <option>6 Months</option>
                       <option>13 Months</option>
                       <option>24 Months</option>
@@ -426,9 +617,9 @@ const Settings = () => {
                 <h4>Danger Zone</h4>
                 <p>These actions are irreversible. Please proceed with caution.</p>
                 <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-                  <button className="btn btn-outline-danger"><Download size={15} /> Export All Data</button>
-                  <button className="btn btn-outline-danger"><UserX size={15} /> Deactivate Account</button>
-                  <button className="btn btn-outline-danger"><Trash2 size={15} /> Delete Account</button>
+                  <button type="button" className="btn btn-outline-danger" onClick={handleExportData}><Download size={15} /> Export All Data</button>
+                  <button type="button" className="btn btn-outline-danger" onClick={handleDeactivate}><UserX size={15} /> Deactivate Account</button>
+                  <button type="button" className="btn btn-outline-danger" onClick={handleDeleteAccount}><Trash2 size={15} /> Delete Account</button>
                 </div>
               </div>
             </div>
@@ -445,7 +636,7 @@ const Settings = () => {
                 <div className="field-grid">
                   <div className="field">
                     <label>Default Dashboard</label>
-                    <select defaultValue="Executive">
+                    <select name="defaultDashboard" value={formData.defaultDashboard} onChange={handleChange}>
                       <option>Executive</option>
                       <option>Operational</option>
                       <option>Financial</option>
@@ -453,7 +644,7 @@ const Settings = () => {
                   </div>
                   <div className="field">
                     <label>Items per page</label>
-                    <select defaultValue="10">
+                    <select name="itemsPerPage" value={formData.itemsPerPage} onChange={handleChange}>
                       <option>10</option>
                       <option>25</option>
                       <option>50</option>
@@ -461,7 +652,7 @@ const Settings = () => {
                   </div>
                   <div className="field">
                     <label>Date Format</label>
-                    <select defaultValue="MMM D, YYYY">
+                    <select name="dateFormat" value={formData.dateFormat} onChange={handleChange}>
                       <option>MMM D, YYYY</option>
                       <option>DD/MM/YYYY</option>
                       <option>YYYY-MM-DD</option>
@@ -479,7 +670,7 @@ const Settings = () => {
             <h4>Account Overview</h4>
             <div className="rail-row">
               <span className="rail-row-label">Plan</span>
-              <span className="rail-row-value">Professional <span className="pill pill-success" style={{ marginLeft: '0.4rem' }}>Active</span></span>
+              <span className="rail-row-value">{user?.plan || 'Professional'} <span className="pill pill-success" style={{ marginLeft: '0.4rem' }}>Active</span></span>
             </div>
             <div className="rail-row">
               <span className="rail-row-label">Member Since</span>
@@ -489,7 +680,7 @@ const Settings = () => {
               <span className="rail-row-label">Next Billing Date</span>
               <span className="rail-row-value">June 12, 2025</span>
             </div>
-            <button className="btn btn-outline-accent btn-sm btn-block" style={{ marginTop: '0.85rem' }}>Manage Subscription</button>
+            <button type="button" className="btn btn-outline-accent btn-sm btn-block" style={{ marginTop: '0.85rem' }} onClick={() => navigate('/billing')}>Manage Subscription</button>
           </div>
 
           <div className="rail-card">
@@ -506,7 +697,7 @@ const Settings = () => {
                 <p>of 50 GB</p>
               </div>
             </div>
-            <button className="btn btn-outline-accent btn-sm btn-block">Manage Storage</button>
+            <button type="button" className="btn btn-outline-accent btn-sm btn-block" onClick={() => navigate('/data-sources')}>Manage Storage</button>
           </div>
 
           <div className="rail-card">
@@ -516,7 +707,7 @@ const Settings = () => {
             </div>
             <div className="security-item">
               <span className="security-item-label"><Check size={14} color="var(--success)" /> Two-Factor Authentication</span>
-              <span style={{ color: 'var(--success)', fontWeight: 600 }}>Enabled</span>
+              <span style={{ color: saved.twoFactorAuth ? 'var(--success)' : 'var(--warning)', fontWeight: 600 }}>{saved.twoFactorAuth ? 'Enabled' : 'Disabled'}</span>
             </div>
             <div className="security-item">
               <span className="security-item-label"><Check size={14} color="var(--success)" /> Strong Password</span>
@@ -530,16 +721,16 @@ const Settings = () => {
               <span className="security-item-label"><Check size={14} color="var(--success)" /> Last Login</span>
               <span>Today, 08:32 AM</span>
             </div>
-            <button className="btn btn-outline-accent btn-sm btn-block" style={{ marginTop: '0.6rem' }}>View Security Center</button>
+            <button type="button" className="btn btn-outline-accent btn-sm btn-block" style={{ marginTop: '0.6rem' }} onClick={openSecurityCenter}>View Security Center</button>
           </div>
 
           <div className="rail-card danger-card">
             <h4>Danger Zone</h4>
             <p>These actions are irreversible. Please proceed with caution.</p>
             <div className="danger-actions">
-              <button className="btn btn-outline-danger btn-sm btn-block"><Download size={14} /> Export All Data</button>
-              <button className="btn btn-outline-danger btn-sm btn-block"><UserX size={14} /> Deactivate Account</button>
-              <button className="btn btn-outline-danger btn-sm btn-block"><Trash2 size={14} /> Delete Account</button>
+              <button type="button" className="btn btn-outline-danger btn-sm btn-block" onClick={handleExportData}><Download size={14} /> Export All Data</button>
+              <button type="button" className="btn btn-outline-danger btn-sm btn-block" onClick={handleDeactivate}><UserX size={14} /> Deactivate Account</button>
+              <button type="button" className="btn btn-outline-danger btn-sm btn-block" onClick={handleDeleteAccount}><Trash2 size={14} /> Delete Account</button>
             </div>
           </div>
         </div>
@@ -557,15 +748,15 @@ const Settings = () => {
           </div>
         </div>
         <div style={{ display: 'flex', gap: '0.75rem' }}>
-          <button className="btn btn-whatsapp"><MessageCircle size={16} /> Chat on WhatsApp</button>
-          <button className="btn btn-primary">Contact Support</button>
+          <button type="button" className="btn btn-whatsapp" onClick={() => window.open(CONTACT_WHATSAPP, '_blank', 'noopener,noreferrer')}><MessageCircle size={16} /> Chat on WhatsApp</button>
+          <button type="button" className="btn btn-primary" onClick={() => navigate('/contact')}>Contact Support</button>
         </div>
       </div>
 
       {isEditing && (
         <div style={{ position: 'fixed', bottom: '1.5rem', right: '1.5rem', display: 'flex', gap: '0.75rem' }}>
-          <button className="btn btn-ghost" onClick={() => setIsEditing(false)}>Cancel</button>
-          <button className="btn btn-primary" onClick={handleSave}>Save Changes</button>
+          <button type="button" className="btn btn-ghost" onClick={handleCancel}>Cancel</button>
+          <button type="button" className="btn btn-primary" onClick={handleSave}>Save Changes</button>
         </div>
       )}
     </AppShell>
