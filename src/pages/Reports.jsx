@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   FileText,
@@ -15,10 +15,12 @@ import {
   MessageCircle,
   AlertCircle,
   CheckCircle,
-  MoreVertical,
   FileDown,
 } from 'lucide-react';
 import AppShell from './AppShell';
+import Modal from '../Modal';
+import { useToast } from '../Toast';
+import { downloadFile, toCsv, slugify, copyText } from '../download';
 import './Reports.css';
 
 const reportTypes = [
@@ -43,7 +45,21 @@ const recentReports = [
   { name: 'Sales & Revenue Analysis', generated: 'Generated May 11, 2025', pages: 15 },
   { name: 'Cash Flow & Expenses Report', generated: 'Generated May 10, 2025', pages: 20 },
   { name: 'Opportunity Analysis Report', generated: 'Generated May 9, 2025', pages: 16 },
+  { name: 'Fraud & Risk Review - Q1', generated: 'Generated May 2, 2025', pages: 22 },
+  { name: 'Inventory Forecast - April', generated: 'Generated Apr 30, 2025', pages: 14 },
+  { name: 'Weekly Revenue Snapshot', generated: 'Generated Apr 28, 2025', pages: 6 },
 ];
+
+const RECENT_PREVIEW = 5;
+const FREQUENCIES = ['Daily', 'Weekly', 'Monthly'];
+const DELIVERIES = ['Email', 'PDF', 'WhatsApp'];
+const PERIODS = ['Today', 'Last 7 days', 'Last 30 days', 'This quarter'];
+
+const formatStamp = () =>
+  `Today ${new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`;
+
+const reportBody = (title, items, generated) =>
+  [title, '='.repeat(title.length), `${generated}`, '', 'Includes:', ...items.map((i) => `  - ${i}`), ''].join('\n');
 
 const overviewStats = [
   { label: 'Reports Generated', sub: 'This Month', value: '127', trend: '+18% vs last month', icon: FileText, color: 'var(--success)', bg: 'var(--success-soft)' },
@@ -63,6 +79,89 @@ const statusPill = { active: 'pill-success', pending: 'pill-warning', inactive: 
 const statusLabel = { active: 'Active', pending: 'Pending', inactive: 'Inactive' };
 
 const Reports = () => {
+  const toast = useToast();
+  const [types, setTypes] = useState(reportTypes);
+  const [recent, setRecent] = useState(recentReports);
+  const [scheduled, setScheduled] = useState(scheduledReports);
+  const [showAllRecent, setShowAllRecent] = useState(false);
+  const [modal, setModal] = useState(null); // { kind: 'generate' | 'schedule' | 'view', report? }
+  const [generateForm, setGenerateForm] = useState({ typeId: reportTypes[0].id, period: PERIODS[1] });
+  const [scheduleForm, setScheduleForm] = useState({ typeId: reportTypes[0].id, frequency: 'Weekly', delivery: 'Email', recipients: '1' });
+
+  const visibleRecent = showAllRecent ? recent : recent.slice(0, RECENT_PREVIEW);
+  const closeModal = () => setModal(null);
+
+  const handleGenerate = (e) => {
+    e.preventDefault();
+    const type = types.find((t) => t.id === generateForm.typeId);
+    const stamp = formatStamp();
+    setTypes((list) => list.map((t) => (t.id === type.id ? { ...t, lastGenerated: stamp } : t)));
+    setRecent((list) => [
+      { name: `${type.title} - ${generateForm.period}`, generated: `Generated ${stamp}`, pages: 8 + Math.floor(Math.random() * 14), typeId: type.id },
+      ...list,
+    ]);
+    closeModal();
+    toast(`${type.title} generated.`);
+  };
+
+  const handleSchedule = (e) => {
+    e.preventDefault();
+    const type = types.find((t) => t.id === scheduleForm.typeId);
+    const recipients = Number.parseInt(scheduleForm.recipients, 10);
+    if (!Number.isInteger(recipients) || recipients < 1) {
+      toast('Enter at least one recipient.', 'error');
+      return;
+    }
+    const nextRun = { Daily: 'Tomorrow, 8:00 AM', Weekly: 'Next week, 8:00 AM', Monthly: 'Next month, 8:00 AM' }[scheduleForm.frequency];
+    setScheduled((list) => [
+      ...list,
+      { id: Date.now(), name: type.title.replace(' Report', '') + ' Report', frequency: scheduleForm.frequency, delivery: scheduleForm.delivery, nextRun, recipients: String(recipients), status: 'active' },
+    ]);
+    closeModal();
+    toast(`${type.title} scheduled ${scheduleForm.frequency.toLowerCase()}.`);
+  };
+
+  const toggleSchedule = (id) => {
+    const target = scheduled.find((r) => r.id === id);
+    if (!target) return;
+    const status = target.status === 'active' ? 'inactive' : 'active';
+    setScheduled((list) => list.map((r) => (r.id === id ? { ...r, status } : r)));
+    toast(`${target.name} ${status === 'active' ? 'resumed' : 'paused'}.`, 'info');
+  };
+
+  const downloadType = (type) => {
+    downloadFile(`${slugify(type.title)}.txt`, reportBody(type.title, type.items, `Last generated: ${type.lastGenerated}`));
+    toast('Report downloaded.');
+  };
+
+  const downloadRecent = (report) => {
+    downloadFile(`${slugify(report.name)}.txt`, reportBody(report.name, [`${report.pages} pages`], report.generated));
+    toast('Report downloaded.');
+  };
+
+  const shareRecent = async (report) => {
+    const copied = await copyText(`${window.location.origin}/reports#${slugify(report.name)}`);
+    toast(copied ? 'Report link copied to clipboard.' : 'Could not copy the link.', copied ? 'success' : 'error');
+  };
+
+  const exportExcel = () => {
+    const csv = toCsv(scheduled, [
+      { key: 'name', label: 'Report' },
+      { key: 'frequency', label: 'Frequency' },
+      { key: 'delivery', label: 'Delivery' },
+      { key: 'nextRun', label: 'Next Run' },
+      { key: 'recipients', label: 'Recipients' },
+      { key: 'status', label: 'Status' },
+    ]);
+    downloadFile('senzia-reports.csv', csv, 'text/csv');
+    toast('Exported as CSV (opens in Excel).');
+  };
+
+  const exportPdf = () => {
+    toast('Choose "Save as PDF" in the print dialog.', 'info');
+    setTimeout(() => window.print(), 300);
+  };
+
   return (
     <AppShell
       active="Reports"
@@ -71,10 +170,10 @@ const Reports = () => {
       subtitle="Generate, schedule, download and share business intelligence reports across your organization."
       headerActions={
         <>
-          <button className="btn btn-violet"><Plus size={16} /> Generate Report</button>
-          <button className="btn btn-ghost"><Clock size={16} /> Schedule Report</button>
-          <button className="btn btn-ghost"><FileDown size={16} /> Export PDF</button>
-          <button className="btn btn-ghost"><FileDown size={16} /> Export Excel</button>
+          <button className="btn btn-violet" onClick={() => setModal({ kind: 'generate' })}><Plus size={16} /> Generate Report</button>
+          <button className="btn btn-ghost" onClick={() => setModal({ kind: 'schedule' })}><Clock size={16} /> Schedule Report</button>
+          <button className="btn btn-ghost" onClick={exportPdf}><FileDown size={16} /> Export PDF</button>
+          <button className="btn btn-ghost" onClick={exportExcel}><FileDown size={16} /> Export Excel</button>
         </>
       }
     >
@@ -83,7 +182,7 @@ const Reports = () => {
 
           {/* ---- Report type cards ---- */}
           <div className="report-type-grid">
-            {reportTypes.map(({ id, title, items, lastGenerated, icon: Icon, color, bg, potentialImpact }) => (
+            {types.map((type) => { const { id, title, items, lastGenerated, icon: Icon, color, bg, potentialImpact } = type; return (
               <div className="report-type-card" key={id}>
                 <div className="report-type-icon" style={{ background: bg, color }}><Icon size={19} /></div>
                 <h4>{title}</h4>
@@ -96,9 +195,9 @@ const Reports = () => {
                 </div>
                 <div className="report-generated"><Clock size={12} /> Last Generated: {lastGenerated}</div>
                 {potentialImpact && <span className="report-impact">Potential Impact: {potentialImpact}</span>}
-                <button className="btn btn-outline-accent btn-sm btn-block">View Report →</button>
+                <button className="btn btn-outline-accent btn-sm btn-block" onClick={() => setModal({ kind: 'view', report: type })}>View Report →</button>
               </div>
-            ))}
+            ); })}
           </div>
 
           {/* ---- Scheduled + Recent ---- */}
@@ -106,7 +205,7 @@ const Reports = () => {
             <div className="panel">
               <div className="panel-head">
                 <h3>Scheduled Reports</h3>
-                <button className="btn btn-ghost btn-sm"><Plus size={14} /> Schedule</button>
+                <button className="btn btn-ghost btn-sm" onClick={() => setModal({ kind: 'schedule' })}><Plus size={14} /> Schedule</button>
               </div>
               <table className="data-table">
                 <thead>
@@ -119,7 +218,7 @@ const Reports = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {scheduledReports.map((r) => (
+                  {scheduled.map((r) => (
                     <tr key={r.id}>
                       <td style={{ fontWeight: 500 }}>{r.name}</td>
                       <td style={{ color: 'var(--text-secondary)' }}>{r.frequency}</td>
@@ -129,32 +228,46 @@ const Reports = () => {
                         </span>
                       </td>
                       <td style={{ color: 'var(--text-tertiary)', whiteSpace: 'nowrap' }}>{r.nextRun}</td>
-                      <td className="center"><span className={`pill ${statusPill[r.status]}`}>{statusLabel[r.status]}</span></td>
+                      <td className="center">
+                        <button
+                          type="button"
+                          className={`pill ${statusPill[r.status]}`}
+                          style={{ border: 'none', cursor: 'pointer', font: 'inherit', fontSize: '0.68rem', fontWeight: 700 }}
+                          title={r.status === 'active' ? 'Click to pause' : 'Click to resume'}
+                          onClick={() => toggleSchedule(r.id)}
+                        >
+                          {statusLabel[r.status]}
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
               <div className="table-footer">
-                <span>Showing 1 to {scheduledReports.length} of {scheduledReports.length} results</span>
+                <span>Showing 1 to {scheduled.length} of {scheduled.length} results</span>
               </div>
             </div>
 
             <div className="panel">
               <div className="panel-head">
                 <h3>Recent Reports</h3>
-                <Link to="/reports/all" className="link-accent">View All</Link>
+                {recent.length > RECENT_PREVIEW && (
+                  <button type="button" className="link-accent" onClick={() => setShowAllRecent((v) => !v)}>
+                    {showAllRecent ? 'Show Less' : 'View All'}
+                  </button>
+                )}
               </div>
-              {recentReports.map((r) => (
-                <div className="recent-report-row" key={r.name}>
+              {visibleRecent.map((r) => (
+                <div className="recent-report-row" key={`${r.name}-${r.generated}`}>
                   <div className="recent-report-icon"><FileText size={16} /></div>
                   <div style={{ minWidth: 0 }}>
                     <p>{r.name}</p>
                     <p>{r.generated} · Pages: {r.pages}</p>
                   </div>
                   <div className="recent-report-actions">
-                    <button className="icon-btn" aria-label="View"><Eye size={14} /></button>
-                    <button className="icon-btn" aria-label="Share"><Share2 size={14} /></button>
-                    <button className="icon-btn" aria-label="More"><MoreVertical size={14} /></button>
+                    <button className="icon-btn" aria-label={`View ${r.name}`} onClick={() => setModal({ kind: 'view', report: { title: r.name, items: [`${r.pages} pages`], lastGenerated: r.generated.replace('Generated ', ''), recent: r } })}><Eye size={14} /></button>
+                    <button className="icon-btn" aria-label={`Share ${r.name}`} onClick={() => shareRecent(r)}><Share2 size={14} /></button>
+                    <button className="icon-btn" aria-label={`Download ${r.name}`} onClick={() => downloadRecent(r)}><Download size={14} /></button>
                   </div>
                 </div>
               ))}
@@ -199,6 +312,99 @@ const Reports = () => {
           </div>
         </div>
       </div>
+
+      {modal?.kind === 'generate' && (
+        <Modal
+          title="Generate Report"
+          onClose={closeModal}
+          footer={
+            <>
+              <button type="button" className="btn btn-ghost" onClick={closeModal}>Cancel</button>
+              <button type="submit" form="generate-report-form" className="btn btn-violet">Generate</button>
+            </>
+          }
+        >
+          <form id="generate-report-form" onSubmit={handleGenerate} style={{ display: 'grid', gap: '0.9rem' }}>
+            <div className="modal-field">
+              <label htmlFor="gen-type">Report type</label>
+              <select id="gen-type" value={generateForm.typeId} onChange={(e) => setGenerateForm({ ...generateForm, typeId: e.target.value })}>
+                {types.map((t) => <option key={t.id} value={t.id}>{t.title}</option>)}
+              </select>
+            </div>
+            <div className="modal-field">
+              <label htmlFor="gen-period">Period</label>
+              <select id="gen-period" value={generateForm.period} onChange={(e) => setGenerateForm({ ...generateForm, period: e.target.value })}>
+                {PERIODS.map((p) => <option key={p}>{p}</option>)}
+              </select>
+            </div>
+          </form>
+        </Modal>
+      )}
+
+      {modal?.kind === 'schedule' && (
+        <Modal
+          title="Schedule Report"
+          onClose={closeModal}
+          footer={
+            <>
+              <button type="button" className="btn btn-ghost" onClick={closeModal}>Cancel</button>
+              <button type="submit" form="schedule-report-form" className="btn btn-violet">Schedule</button>
+            </>
+          }
+        >
+          <form id="schedule-report-form" onSubmit={handleSchedule} style={{ display: 'grid', gap: '0.9rem' }}>
+            <div className="modal-field">
+              <label htmlFor="sch-type">Report type</label>
+              <select id="sch-type" value={scheduleForm.typeId} onChange={(e) => setScheduleForm({ ...scheduleForm, typeId: e.target.value })}>
+                {types.map((t) => <option key={t.id} value={t.id}>{t.title}</option>)}
+              </select>
+            </div>
+            <div className="modal-field">
+              <label htmlFor="sch-frequency">Frequency</label>
+              <select id="sch-frequency" value={scheduleForm.frequency} onChange={(e) => setScheduleForm({ ...scheduleForm, frequency: e.target.value })}>
+                {FREQUENCIES.map((f) => <option key={f}>{f}</option>)}
+              </select>
+            </div>
+            <div className="modal-field">
+              <label htmlFor="sch-delivery">Delivery</label>
+              <select id="sch-delivery" value={scheduleForm.delivery} onChange={(e) => setScheduleForm({ ...scheduleForm, delivery: e.target.value })}>
+                {DELIVERIES.map((d) => <option key={d}>{d}</option>)}
+              </select>
+            </div>
+            <div className="modal-field">
+              <label htmlFor="sch-recipients">Recipients</label>
+              <input id="sch-recipients" type="number" min="1" value={scheduleForm.recipients} onChange={(e) => setScheduleForm({ ...scheduleForm, recipients: e.target.value })} />
+            </div>
+          </form>
+        </Modal>
+      )}
+
+      {modal?.kind === 'view' && (
+        <Modal
+          title={modal.report.title}
+          onClose={closeModal}
+          footer={
+            <>
+              <button type="button" className="btn btn-ghost" onClick={closeModal}>Close</button>
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={() => (modal.report.recent ? downloadRecent(modal.report.recent) : downloadType(modal.report))}
+              >
+                <Download size={15} /> Download
+              </button>
+            </>
+          }
+        >
+          <div className="modal-detail-row"><span>Last generated</span><span>{modal.report.lastGenerated}</span></div>
+          <div>
+            <p style={{ margin: '0 0 0.5rem', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{modal.report.recent ? 'Details' : 'Includes'}</p>
+            {modal.report.items.map((item) => (
+              <div className="report-checklist-item" key={item}><CheckCircle size={13} color="var(--success)" /> {item}</div>
+            ))}
+          </div>
+        </Modal>
+      )}
     </AppShell>
   );
 };
