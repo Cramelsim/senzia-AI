@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Bell,
   AlertCircle,
@@ -15,6 +15,8 @@ import {
   Eye,
 } from 'lucide-react';
 import AppShell from './AppShell';
+import Modal from '../Modal';
+import { useToast } from '../Toast';
 import './Alerts.css';
 
 const TABS = [
@@ -40,7 +42,14 @@ const recentAlerts = [
   { id: 3, title: 'Large Transaction Alert', module: 'Transactions Module', type: 'warning', time: '08:45 AM', status: 'new', description: 'Transaction exceeds KES 500,000 threshold' },
   { id: 4, title: 'Unusual Activity Detected', module: 'User Activity', type: 'critical', time: '08:10 AM', status: 'investigating', description: 'Abnormal login pattern detected from new location' },
   { id: 5, title: 'Inventory Discrepancy', module: 'Inventory Module', type: 'warning', time: '07:30 AM', status: 'resolved', description: 'Stock variance detected in Branch 2' },
+  { id: 6, title: 'Data Sync Completed', module: 'Data Sources', type: 'info', time: '07:05 AM', status: 'new', description: 'All connected data sources synchronized successfully' },
+  { id: 7, title: 'Weekly Report Ready', module: 'Reports Module', type: 'info', time: '06:45 AM', status: 'acknowledged', description: 'Your weekly business summary is ready to view' },
 ];
+
+const PAGE_SIZE = 5;
+const SETTINGS_KEY = 'senzia_alert_settings';
+const RULE_MODULES = ['Expenses Module', 'Inventory Module', 'Transactions Module', 'User Activity', 'Data Sources'];
+const RULE_COLORS = { critical: '#ef5a5a', warning: '#f0a828', info: '#4f8bf0' };
 
 const topAlertRules = [
   { name: 'High Expense Detected', description: 'Expenses exceeded threshold', count: 5, color: '#ef5a5a' },
@@ -56,12 +65,21 @@ const aiInsights = [
   { title: 'Fraud Pattern', description: '3 large transactions follow a similar pattern in past 24 hours.', icon: Shield, color: '#8b5cf6' },
 ];
 
-const alertSettings = [
-  { name: 'Email Notifications', enabled: true },
-  { name: 'WhatsApp Alerts', enabled: true },
-  { name: 'SMS Alerts', enabled: false },
-  { name: 'Push Notifications', enabled: true },
-];
+const DEFAULT_ALERT_SETTINGS = {
+  'Email Notifications': true,
+  'WhatsApp Alerts': true,
+  'SMS Alerts': false,
+  'Push Notifications': true,
+};
+
+const loadAlertSettings = () => {
+  try {
+    const saved = JSON.parse(localStorage.getItem(SETTINGS_KEY));
+    return { ...DEFAULT_ALERT_SETTINGS, ...(saved && typeof saved === 'object' ? saved : {}) };
+  } catch {
+    return { ...DEFAULT_ALERT_SETTINGS };
+  }
+};
 
 const trendDays = ['May 6', 'May 7', 'May 8', 'May 9', 'May 10', 'May 11', 'May 12'];
 const trendSeries = [
@@ -120,17 +138,67 @@ const TrendChart = () => {
 };
 
 const Alerts = () => {
+  const navigate = useNavigate();
+  const toast = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('overview');
+  const [alerts, setAlerts] = useState(recentAlerts);
+  const [rules, setRules] = useState(topAlertRules);
+  const [alertSettings, setAlertSettings] = useState(loadAlertSettings);
+  const [page, setPage] = useState(1);
+  const [selectedId, setSelectedId] = useState(null);
+  const [showRuleModal, setShowRuleModal] = useState(false);
+  const [ruleForm, setRuleForm] = useState({ name: '', module: RULE_MODULES[0], type: 'warning', description: '' });
 
-  const filteredAlerts = recentAlerts.filter((alert) => {
+  useEffect(() => {
+    try {
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(alertSettings));
+    } catch {
+      // storage unavailable (private mode / quota) - toggles still work for this session
+    }
+  }, [alertSettings]);
+
+  // Back to the first page whenever the visible list changes.
+  useEffect(() => { setPage(1); }, [searchTerm, activeTab]);
+
+  const selectedAlert = alerts.find((a) => a.id === selectedId) || null;
+
+  const updateStatus = (id, status) => {
+    setAlerts((list) => list.map((a) => (a.id === id ? { ...a, status } : a)));
+    toast(status === 'resolved' ? 'Alert marked as resolved.' : 'Alert acknowledged.');
+    setSelectedId(null);
+  };
+
+  const toggleSetting = (name) => setAlertSettings((s) => ({ ...s, [name]: !s[name] }));
+
+  const handleCreateRule = (e) => {
+    e.preventDefault();
+    const name = ruleForm.name.trim();
+    if (!name) {
+      toast('Give the alert rule a name.', 'error');
+      return;
+    }
+    if (rules.some((r) => r.name.toLowerCase() === name.toLowerCase())) {
+      toast('A rule with that name already exists.', 'error');
+      return;
+    }
+    setRules((list) => [
+      ...list,
+      { name, description: ruleForm.description.trim() || ruleForm.module, count: 0, color: RULE_COLORS[ruleForm.type] },
+    ]);
+    setShowRuleModal(false);
+    setRuleForm({ name: '', module: RULE_MODULES[0], type: 'warning', description: '' });
+    toast(`Alert rule "${name}" created.`);
+  };
+
+  const filteredAlerts = alerts.filter((alert) => {
     const matchesSearch =
       alert.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       alert.module.toLowerCase().includes(searchTerm.toLowerCase()) ||
       alert.description.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesTab =
-      activeTab === 'overview' || activeTab === 'all' || activeTab === 'settings'
+      activeTab === 'overview' || activeTab === 'all'
         ? true
         : activeTab === 'resolved'
         ? alert.status === 'resolved'
@@ -138,6 +206,12 @@ const Alerts = () => {
 
     return matchesSearch && matchesTab;
   });
+
+  const pageCount = Math.max(1, Math.ceil(filteredAlerts.length / PAGE_SIZE));
+  const currentPage = Math.min(page, pageCount);
+  const pageStart = (currentPage - 1) * PAGE_SIZE;
+  const pageAlerts = filteredAlerts.slice(pageStart, pageStart + PAGE_SIZE);
+  const showSettingsTab = activeTab === 'settings';
 
   return (
     <AppShell
@@ -150,9 +224,9 @@ const Alerts = () => {
       onTabChange={setActiveTab}
       headerActions={
         <>
-          <button className="icon-btn" aria-label="Refresh"><RefreshCw size={16} /></button>
-          <Link to="/alerts/settings"><button className="btn btn-ghost"><SettingsIcon size={16} /> Alert Settings</button></Link>
-          <button className="btn btn-violet"><Plus size={16} /> Create Alert Rule</button>
+          <button className="icon-btn" aria-label="Refresh" onClick={() => toast('Alerts are up to date.', 'info')}><RefreshCw size={16} /></button>
+          <button className="btn btn-ghost" onClick={() => setActiveTab('settings')}><SettingsIcon size={16} /> Alert Settings</button>
+          <button className="btn btn-violet" onClick={() => setShowRuleModal(true)}><Plus size={16} /> Create Alert Rule</button>
         </>
       }
     >
@@ -189,6 +263,7 @@ const Alerts = () => {
           </div>
 
           {/* ---- Search + table ---- */}
+          {!showSettingsTab && (
           <div className="panel">
             <div className="panel-head">
               <h3>Recent Alerts</h3>
@@ -212,7 +287,7 @@ const Alerts = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredAlerts.map((alert) => {
+                {pageAlerts.map((alert) => {
                   const Icon = typeIcon[alert.type];
                   return (
                     <tr key={alert.id}>
@@ -231,7 +306,7 @@ const Alerts = () => {
                       <td><span className={`pill ${statusPill[alert.status]}`}>{statusLabel[alert.status]}</span></td>
                       <td style={{ color: 'var(--text-tertiary)', whiteSpace: 'nowrap' }}>{alert.time}</td>
                       <td className="center">
-                        <button className="icon-btn" aria-label="View"><Eye size={15} /></button>
+                        <button className="icon-btn" aria-label={`View ${alert.title}`} onClick={() => setSelectedId(alert.id)}><Eye size={15} /></button>
                       </td>
                     </tr>
                   );
@@ -242,20 +317,27 @@ const Alerts = () => {
               </tbody>
             </table>
             <div className="table-footer">
-              <span>Showing 1 to {filteredAlerts.length} of {recentAlerts.length} alerts</span>
+              <span>
+                {filteredAlerts.length === 0
+                  ? 'Showing 0 alerts'
+                  : `Showing ${pageStart + 1} to ${pageStart + pageAlerts.length} of ${filteredAlerts.length} alerts`}
+              </span>
               <div className="pager">
-                <button disabled>Previous</button>
-                <button className="active">1</button>
-                <button disabled>Next</button>
+                <button disabled={currentPage === 1} onClick={() => setPage(currentPage - 1)}>Previous</button>
+                {Array.from({ length: pageCount }, (_, i) => i + 1).map((n) => (
+                  <button key={n} className={n === currentPage ? 'active' : ''} onClick={() => setPage(n)}>{n}</button>
+                ))}
+                <button disabled={currentPage === pageCount} onClick={() => setPage(currentPage + 1)}>Next</button>
               </div>
             </div>
           </div>
+          )}
 
           {/* ---- Top rules + AI insights ---- */}
           <div className="two-col">
             <div className="panel">
               <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: '0 0 0.5rem' }}>Top Triggered Alert Rules</h3>
-              {topAlertRules.map((rule) => (
+              {rules.map((rule) => (
                 <div className="rule-row" key={rule.name}>
                   <span style={{ width: 8, height: 8, borderRadius: '50%', background: rule.color, flexShrink: 0 }} />
                   <div>
@@ -289,15 +371,21 @@ const Alerts = () => {
           <div className="panel">
             <div className="panel-head">
               <h3>Alert Settings</h3>
-              <Link to="/alerts/settings" className="link-accent">Configure →</Link>
+              {!showSettingsTab && (
+                <button type="button" className="link-accent" onClick={() => setActiveTab('settings')}>Configure →</button>
+              )}
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.85rem' }}>
-              {alertSettings.map((setting) => (
-                <div className="toggle-row" key={setting.name}>
-                  <p style={{ fontSize: '0.87rem' }}>{setting.name}</p>
-                  <span style={{ fontSize: '0.78rem', fontWeight: 600, color: setting.enabled ? 'var(--success)' : 'var(--danger)' }}>
-                    {setting.enabled ? 'Enabled' : 'Disabled'}
-                  </span>
+              {Object.entries(alertSettings).map(([name, enabled]) => (
+                <div className="toggle-row" key={name}>
+                  <div>
+                    <p style={{ fontSize: '0.87rem' }}>{name}</p>
+                    <p style={{ color: enabled ? 'var(--success)' : 'var(--danger)', fontWeight: 600 }}>{enabled ? 'Enabled' : 'Disabled'}</p>
+                  </div>
+                  <label className="switch">
+                    <input type="checkbox" checked={enabled} onChange={() => toggleSetting(name)} aria-label={name} />
+                    <span className="switch-track"><span className="switch-thumb" /></span>
+                  </label>
                 </div>
               ))}
             </div>
@@ -315,8 +403,8 @@ const Alerts = () => {
               </div>
             </div>
             <div style={{ display: 'flex', gap: '0.75rem' }}>
-              <button className="btn btn-whatsapp">Chat on WhatsApp</button>
-              <button className="btn btn-primary">Contact Support</button>
+              <button className="btn btn-whatsapp" onClick={() => window.open('https://wa.me/254700123456', '_blank', 'noopener,noreferrer')}>Chat on WhatsApp</button>
+              <button className="btn btn-primary" onClick={() => navigate('/contact')}>Contact Support</button>
             </div>
           </div>
         </div>
@@ -353,10 +441,72 @@ const Alerts = () => {
                 <div className="summary-legend-row"><div className="summary-legend-left"><span className="summary-legend-dot" style={{ background: '#4f8bf0' }} /> Info</div><span>32 (56%)</span></div>
               </div>
             </div>
-            <button className="btn btn-violet btn-block" style={{ marginTop: '1rem' }}>View Full Report →</button>
+            <button className="btn btn-violet btn-block" style={{ marginTop: '1rem' }} onClick={() => navigate('/reports')}>View Full Report →</button>
           </div>
         </div>
       </div>
+
+      {selectedAlert && (
+        <Modal
+          title={selectedAlert.title}
+          onClose={() => setSelectedId(null)}
+          footer={
+            <>
+              <button className="btn btn-ghost" onClick={() => setSelectedId(null)}>Close</button>
+              {selectedAlert.status === 'new' && (
+                <button className="btn btn-outline-accent" onClick={() => updateStatus(selectedAlert.id, 'acknowledged')}>Acknowledge</button>
+              )}
+              {selectedAlert.status !== 'resolved' && (
+                <button className="btn btn-primary" onClick={() => updateStatus(selectedAlert.id, 'resolved')}>Mark Resolved</button>
+              )}
+            </>
+          }
+        >
+          <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.88rem' }}>{selectedAlert.description}</p>
+          <div className="modal-detail-row"><span>Module</span><span>{selectedAlert.module}</span></div>
+          <div className="modal-detail-row"><span>Severity</span><span style={{ textTransform: 'capitalize' }}>{selectedAlert.type}</span></div>
+          <div className="modal-detail-row"><span>Status</span><span className={`pill ${statusPill[selectedAlert.status]}`}>{statusLabel[selectedAlert.status]}</span></div>
+          <div className="modal-detail-row"><span>Time</span><span>{selectedAlert.time}</span></div>
+        </Modal>
+      )}
+
+      {showRuleModal && (
+        <Modal
+          title="Create Alert Rule"
+          onClose={() => setShowRuleModal(false)}
+          footer={
+            <>
+              <button type="button" className="btn btn-ghost" onClick={() => setShowRuleModal(false)}>Cancel</button>
+              <button type="submit" form="create-rule-form" className="btn btn-violet">Create Rule</button>
+            </>
+          }
+        >
+          <form id="create-rule-form" onSubmit={handleCreateRule} style={{ display: 'grid', gap: '0.9rem' }}>
+            <div className="modal-field">
+              <label htmlFor="rule-name">Rule name</label>
+              <input id="rule-name" autoFocus value={ruleForm.name} onChange={(e) => setRuleForm({ ...ruleForm, name: e.target.value })} placeholder="e.g. Refund spike detected" />
+            </div>
+            <div className="modal-field">
+              <label htmlFor="rule-module">Module</label>
+              <select id="rule-module" value={ruleForm.module} onChange={(e) => setRuleForm({ ...ruleForm, module: e.target.value })}>
+                {RULE_MODULES.map((m) => <option key={m}>{m}</option>)}
+              </select>
+            </div>
+            <div className="modal-field">
+              <label htmlFor="rule-type">Severity</label>
+              <select id="rule-type" value={ruleForm.type} onChange={(e) => setRuleForm({ ...ruleForm, type: e.target.value })}>
+                <option value="critical">Critical</option>
+                <option value="warning">Warning</option>
+                <option value="info">Info</option>
+              </select>
+            </div>
+            <div className="modal-field">
+              <label htmlFor="rule-description">Description</label>
+              <textarea id="rule-description" rows={3} value={ruleForm.description} onChange={(e) => setRuleForm({ ...ruleForm, description: e.target.value })} placeholder="When should this rule fire?" />
+            </div>
+          </form>
+        </Modal>
+      )}
     </AppShell>
   );
 };
