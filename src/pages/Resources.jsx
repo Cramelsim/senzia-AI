@@ -14,79 +14,19 @@ import {
   Clock
 } from 'lucide-react';
 import Navbar from '../components/Layout/Navbar';
+import { featuredResources, blogPosts } from '../data/siteContent';
 import './Resources.css';
+
+// Rotates a list by one step so the arrow buttons cycle through the cards.
+const rotate = (list, direction) =>
+  direction > 0 ? [...list.slice(1), list[0]] : [list[list.length - 1], ...list.slice(0, -1)];
 
 const Resources = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [featured, setFeatured] = useState(featuredResources);
+  const [posts, setPosts] = useState(blogPosts);
 
-  const featuredResources = [
-    {
-      id: 1,
-      type: 'GUIDE',
-      title: 'The Business Intelligence Playbook for 2024',
-      description: 'A step-by-step guide to building a data-driven organization and maximizing ROI.',
-      link: '/resources/playbook',
-      accent: '#4f8cff',
-      image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80'
-    },
-    {
-      id: 2,
-      type: 'CASE STUDY',
-      title: 'How a Restaurant Group Increased Profit by 28%',
-      description: 'See how real-time insights and automation transformed operations and boosted margins.',
-      link: '/resources/case-study',
-      accent: '#22c55e',
-      image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&q=80'
-    },
-    {
-      id: 3,
-      type: 'WHITEPAPER',
-      title: 'The Future of AI in Business Intelligence',
-      description: 'Key trends, predictions, and strategies shaping the future of data-driven businesses.',
-      link: '/resources/whitepaper',
-      accent: '#a855f7',
-      image: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=600&q=80'
-    }
-  ];
 
-  const blogPosts = [
-    {
-      id: 1,
-      title: '5 Metrics Every Business Owner Should Track',
-      date: 'May 20, 2024',
-      category: 'Analytics',
-      excerpt: 'Learn the key metrics that drive business success and how to track them effectively.',
-      link: '/blog/metrics',
-      image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&q=80'
-    },
-    {
-      id: 2,
-      title: 'How Real-Time Data Drives Better Decisions',
-      date: 'May 15, 2024',
-      category: 'Data',
-      excerpt: 'Discover how real-time data can transform your decision-making process.',
-      link: '/blog/real-time-data',
-      image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&q=80'
-    },
-    {
-      id: 3,
-      title: 'Automating Operations: Where to Start',
-      date: 'May 8, 2024',
-      category: 'Automation',
-      excerpt: 'A practical guide to getting started with business process automation.',
-      link: '/blog/automation',
-      image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&q=80'
-    },
-    {
-      id: 4,
-      title: 'The ROI of Business Intelligence Platforms',
-      date: 'May 1, 2024',
-      category: 'ROI',
-      excerpt: 'Calculate the return on investment for implementing business intelligence.',
-      link: '/blog/roi',
-      image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&q=80'
-    }
-  ];
 
   const resourceCategories = [
     { icon: Grid, label: 'All Resources', sub: 'View all' },
@@ -98,7 +38,7 @@ const Resources = () => {
     { icon: Calendar, label: 'Whitepapers', sub: 'Research & reports' }
   ];
 
-  const filteredBlogs = blogPosts.filter(post =>
+  const filteredBlogs = posts.filter(post =>
     post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     post.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
     post.excerpt.toLowerCase().includes(searchTerm.toLowerCase())
@@ -180,17 +120,17 @@ const Resources = () => {
             </div>
 
             <div className="resources-nav-buttons">
-              <button className="resources-circle-btn">
+              <button className="resources-circle-btn" aria-label="Previous resource" onClick={() => setFeatured((list) => rotate(list, -1))}>
                 <ArrowLeft size={16} />
               </button>
-              <button className="resources-circle-btn">
+              <button className="resources-circle-btn" aria-label="Next resource" onClick={() => setFeatured((list) => rotate(list, 1))}>
                 <ArrowRight size={16} />
               </button>
             </div>
           </div>
 
           <div className="resources-featured-grid">
-            {featuredResources.map((resource) => (
+            {featured.map((resource) => (
               <Link key={resource.id} to={resource.link} className="resources-featured-card">
                 <div
                   className="resources-featured-image"
@@ -234,7 +174,7 @@ const Resources = () => {
               </Link>
             </div>
 
-            <button className="resources-circle-btn">
+            <button className="resources-circle-btn" aria-label="Next article" onClick={() => setPosts((list) => rotate(list, 1))}>
               <ArrowRight size={16} />
             </button>
           </div>

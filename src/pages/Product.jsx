@@ -13,59 +13,21 @@ import {
   Headphones
 } from 'lucide-react';
 import Navbar from '../components/Layout/Navbar';
+import { productModules } from '../data/siteContent';
 import './Product.css';
 
+const MODULE_ICONS = {
+  bi: BarChart3,
+  automation: Zap,
+  'ai-insights': Brain,
+  alerts: Bell,
+  integrations: Database,
+  consulting: Users,
+};
+
 const Product = () => {
-  const modules = [
-    {
-      icon: BarChart3,
-      title: 'Business Intelligence',
-      description: 'Get real-time insights into your business performance.',
-      features: ['Interactive Dashboards', 'Custom Reports', 'KPI Tracking', 'Data Visualization'],
-      link: '/product/bi',
-      color: '#60a5fa'
-    },
-    {
-      icon: Zap,
-      title: 'Automation',
-      description: 'Automate repetitive tasks and streamline your operations.',
-      features: ['Workflow Automation', 'Scheduled Reports', 'Data Sync & Integration', 'Task Automation'],
-      link: '/product/automation',
-      color: '#34d399'
-    },
-    {
-      icon: Brain,
-      title: 'AI Insights',
-      description: 'Leverage AI to uncover trends, predict outcomes, and get smarter recommendations.',
-      features: ['AI-Powered Analytics', 'Predictive Forecasting', 'Anomaly Detection', 'Smart Recommendations'],
-      link: '/product/ai-insights',
-      color: '#a78bfa'
-    },
-    {
-      icon: Bell,
-      title: 'Alerts & Notifications',
-      description: 'Stay informed with real-time alerts on what matters.',
-      features: ['Threshold Alerts', 'Email Notifications', 'WhatsApp Alerts', 'Custom Notifications'],
-      link: '/product/alerts',
-      color: '#fb923c'
-    },
-    {
-      icon: Database,
-      title: 'Data Integration',
-      description: 'Connect all your data sources in one central platform.',
-      features: ['Multiple Data Sources', 'Real-time Sync', 'Data Cleaning', 'Secure Storage'],
-      link: '/product/integrations',
-      color: '#22d3ee'
-    },
-    {
-      icon: Users,
-      title: 'AI Consulting & Training',
-      description: 'Upskill your team and implement AI the right way.',
-      features: ['AI Strategy Consulting', 'Team Training', 'Workshops', 'Ongoing Support'],
-      link: '/product/consulting',
-      color: '#f472b6'
-    }
-  ];
+  const modules = productModules.map((m) => ({ ...m, icon: MODULE_ICONS[m.slug], link: `/product/${m.slug}` }));
+
 
   const benefits = [
     {

@@ -169,7 +169,7 @@ const Contact = () => {
 
                   <label className="contact-terms-row">
                     <input type="checkbox" name="agreeToTerms" checked={formData.agreeToTerms} onChange={handleChange} required />
-                    <span>I agree to the <a href="/privacy">Privacy Policy</a> and <a href="/terms">Terms of Service</a>.</span>
+                    <span>I agree to the <Link to="/privacy" target="_blank">Privacy Policy</Link> and <Link to="/terms" target="_blank">Terms of Service</Link>.</span>
                   </label>
 
                   <div className="contact-submit-row">

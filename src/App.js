@@ -20,6 +20,9 @@ import Alerts from './pages/Alerts';
 import Billing from './pages/Billing';
 import Forecasting from './pages/Forecasting';
 import Users from './pages/Users';
+import { ProductDetail, ResourceView, BlogIndex, BlogPost } from './pages/Content';
+import ApiDocs from './pages/ApiDocs';
+import Legal from './pages/Legal';
 import { AuthContext } from './AuthContext';
 import { ToastProvider } from './Toast';
 import { loadSettings, applyAppearance } from './appearance';
@@ -101,6 +104,14 @@ function App() {
         <Route path="/ai-consulting" element={<AIConsulting />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/resources" element={<Resources />} />
+        <Route path="/resources/:slug" element={<ResourceView />} />
+        <Route path="/product/:slug" element={<ProductDetail />} />
+        <Route path="/blog" element={<BlogIndex />} />
+        <Route path="/blog/:slug" element={<BlogPost />} />
+        <Route path="/api-docs" element={<ApiDocs />} />
+        <Route path="/privacy" element={<Legal kind="privacy" />} />
+        <Route path="/terms" element={<Legal kind="terms" />} />
+        <Route path="/get-started" element={<Navigate to="/demo" replace />} />
         
         {/* Demo Route */}
         <Route path="/demo" element={<Demo onLogin={handleLogin} />} />
