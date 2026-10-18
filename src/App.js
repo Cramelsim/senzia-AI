@@ -32,34 +32,32 @@ function App() {
     const savedOnboarding = localStorage.getItem('senzia_onboarding_complete');
     
     if (savedUser) {
-      setUser(JSON.parse(savedUser));
-      setIsAuthenticated(true);
-      setOnboardingComplete(savedOnboarding === 'true');
-      console.log('✅ User authenticated:', JSON.parse(savedUser));
-    } else {
-      console.log('❌ No user found in localStorage');
+      try {
+        setUser(JSON.parse(savedUser));
+        setIsAuthenticated(true);
+        setOnboardingComplete(savedOnboarding === 'true');
+      } catch {
+        localStorage.removeItem('senzia_user');
+        localStorage.removeItem('senzia_onboarding_complete');
+      }
     }
     setLoading(false);
   }, []);
 
   const handleLogin = (userData) => {
-    console.log('🔐 handleLogin called with:', userData);
     setUser(userData);
     setIsAuthenticated(true);
     setOnboardingComplete(false);
     localStorage.setItem('senzia_user', JSON.stringify(userData));
     localStorage.setItem('senzia_onboarding_complete', 'false');
-    console.log('✅ User logged in, redirecting to onboarding');
   };
 
   const completeOnboarding = () => {
-    console.log('✅ Onboarding completed');
     setOnboardingComplete(true);
     localStorage.setItem('senzia_onboarding_complete', 'true');
   };
 
   const handleLogout = () => {
-    console.log('👋 User logged out');
     setUser(null);
     setIsAuthenticated(false);
     setOnboardingComplete(false);
@@ -82,7 +80,6 @@ function App() {
     );
   }
 
-  console.log('🔍 App state:', { isAuthenticated, onboardingComplete, user });
 
   return (
     <Router>
