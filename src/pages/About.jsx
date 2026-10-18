@@ -53,7 +53,10 @@ const About = () => {
               and financial expertise to give leaders the confidence to make smarter
               decisions—every day.
             </p>
-            <button className="about-btn-primary">
+            <button
+              className="about-btn-primary"
+              onClick={() => document.querySelector('.about-mission')?.scrollIntoView({ behavior: 'smooth' })}
+            >
               Our Story <span aria-hidden="true">→</span>
             </button>
           </div>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate, Navigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import Navbar from '../components/Layout/Navbar';
 
 const Demo = ({ onLogin }) => {

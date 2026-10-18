@@ -35,7 +35,7 @@ const Hero = () => {
             detect risks, automate operations, and uncover new growth opportunities.
           </p>
 
-          <Link to="/get-started">
+          <Link to="/demo">
             <button className="btn-primary hero-cta">
               Get Started <span aria-hidden="true">→</span>
             </button>

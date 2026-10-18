@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Check, ArrowRight,
   Rocket, Building2, ShieldCheck,
@@ -24,6 +24,7 @@ const trustItems = [
 ];
 
 const Pricing = () => {
+  const navigate = useNavigate();
   const [billingCycle, setBillingCycle] = useState('monthly');
 
   const plans = [
@@ -308,7 +309,7 @@ const Pricing = () => {
               <p className="summary-label">Current Plan</p>
               <p className="summary-value">KES 24,999 / month</p>
               <p className="summary-note">Renews on June 12, 2025</p>
-              <button className="btn-outline small">View Subscription</button>
+              <button className="btn-outline small" onClick={() => navigate('/billing')}>View Subscription</button>
             </div>
 
             <div className="summary-card">
