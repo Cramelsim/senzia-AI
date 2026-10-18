@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import {
   Database,
   Plus,
@@ -9,8 +9,11 @@ import {
   ArrowRight,
   Lightbulb,
   MoreVertical,
+  Trash2,
 } from 'lucide-react';
 import AppShell from './AppShell';
+import Modal from '../Modal';
+import { useToast } from '../Toast';
 import './DataSources.css';
 
 /* Kept from your real source — not swapped for the different fictional list shown
@@ -36,38 +39,112 @@ const availableIntegrations = [
   { name: 'WooCommerce', icon: '🛒', description: 'Sync orders, customers and products.' },
 ];
 
+const CONNECTION_TYPES = ['API', 'OAuth 2.0'];
+const ICON_BY_NAME = Object.fromEntries(availableIntegrations.map((i) => [i.name, i.icon]));
+const COLORS = ['#8b5cf6', '#22c55e', '#f59e0b', '#3b82f6', '#ec4899', '#6366f1'];
+
+const nowStamp = () => `Today, ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+
 const statusPill = { connected: 'pill-success', warning: 'pill-warning', error: 'pill-danger' };
 const statusLabel = { connected: 'Active', warning: 'Warning', error: 'Error' };
 
 const DataSources = () => {
+  const toast = useToast();
   const [searchTerm, setSearchTerm] = useState('');
+  const [sources, setSources] = useState(dataSources);
+  const [available, setAvailable] = useState(availableIntegrations);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [modal, setModal] = useState(null); // { kind: 'add', preset? } | { kind: 'manage', id }
+  const [addForm, setAddForm] = useState({ name: availableIntegrations[0].name, connection: 'API' });
+  const syncTimer = useRef(null);
 
-  const filteredSources = dataSources.filter(
+  useEffect(() => () => clearTimeout(syncTimer.current), []);
+
+  const closeModal = () => setModal(null);
+  const managed = modal?.kind === 'manage' ? sources.find((s) => s.id === modal.id) : null;
+
+  const openAdd = (preset) => {
+    const name = preset || available[0]?.name || '';
+    setAddForm({ name, connection: 'API' });
+    setModal({ kind: 'add' });
+  };
+
+  const handleAdd = (e) => {
+    e.preventDefault();
+    const integration = available.find((i) => i.name === addForm.name);
+    if (!integration) {
+      toast('Every available integration is already connected.', 'info');
+      closeModal();
+      return;
+    }
+    setSources((list) => [
+      ...list,
+      {
+        id: Date.now(), name: integration.name, type: 'Integration', connection: addForm.connection, status: 'connected',
+        lastSync: nowStamp(), records: '0', icon: ICON_BY_NAME[integration.name], color: COLORS[list.length % COLORS.length],
+      },
+    ]);
+    setAvailable((list) => list.filter((i) => i.name !== integration.name));
+    closeModal();
+    toast(`${integration.name} connected.`);
+  };
+
+  const handleRefreshAll = () => {
+    if (isSyncing) return;
+    setIsSyncing(true);
+    syncTimer.current = setTimeout(() => {
+      const stamp = nowStamp();
+      setSources((list) => list.map((src) => (src.status === 'connected' ? { ...src, lastSync: stamp } : src)));
+      setIsSyncing(false);
+      toast('All active sources are up to date.');
+    }, 1200);
+  };
+
+  // Syncing a source with a warning is how it gets "fixed": the reconnect succeeds and clears the warning.
+  const handleSyncOne = (src) => {
+    const wasWarning = src.status === 'warning';
+    setSources((list) => list.map((x) => (x.id === src.id ? { ...x, status: 'connected', lastSync: nowStamp() } : x)));
+    closeModal();
+    toast(wasWarning ? `${src.name} reconnected.` : `${src.name} synced.`);
+  };
+
+  const handleDisconnect = (src) => {
+    if (!window.confirm(`Disconnect ${src.name}? Its data will stop syncing.`)) return;
+    setSources((list) => list.filter((x) => x.id !== src.id));
+    if (ICON_BY_NAME[src.name]) {
+      const original = availableIntegrations.find((i) => i.name === src.name);
+      setAvailable((list) => [...list, original]);
+    }
+    closeModal();
+    toast(`${src.name} disconnected.`);
+  };
+
+  const filteredSources = sources.filter(
     (s) => s.name.toLowerCase().includes(searchTerm.toLowerCase()) || s.type.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   /* Stats derived live from the actual dataset, instead of the hardcoded
      "16 total / 14 active" your source had (which didn't match its own 8-item array). */
   const { total, active, warning } = useMemo(() => {
-    const active = dataSources.filter((s) => s.status === 'connected').length;
-    const warning = dataSources.filter((s) => s.status === 'warning').length;
-    return { total: dataSources.length, active, warning };
-  }, []);
+    const active = sources.filter((s) => s.status === 'connected').length;
+    const warning = sources.filter((s) => s.status === 'warning').length;
+    return { total: sources.length, active, warning };
+  }, [sources]);
 
   const typeBreakdown = useMemo(() => {
     const map = {};
-    dataSources.forEach((s) => { map[s.type] = (map[s.type] || 0) + 1; });
+    sources.forEach((s) => { map[s.type] = (map[s.type] || 0) + 1; });
     return Object.entries(map).sort((a, b) => b[1] - a[1]);
-  }, []);
+  }, [sources]);
 
   const donutSegments = [
-    { label: 'Active', count: active, pct: Math.round((active / total) * 100), color: 'var(--success)' },
-    { label: 'Warning', count: warning, pct: Math.round((warning / total) * 100), color: 'var(--warning)' },
+    { label: 'Active', count: active, pct: total ? Math.round((active / total) * 100) : 0, color: 'var(--success)' },
+    { label: 'Warning', count: warning, pct: total ? Math.round((warning / total) * 100) : 0, color: 'var(--warning)' },
   ];
 
   const stats = [
     { label: 'Total Data Sources', value: String(total), sub: 'Connected and active', icon: Database, color: 'var(--accent)', bg: 'var(--accent-soft)' },
-    { label: 'Active Sources', value: String(active), sub: `${Math.round((active / total) * 100)}% of total sources`, icon: CheckCircle, color: 'var(--success)', bg: 'var(--success-soft)' },
+    { label: 'Active Sources', value: String(active), sub: `${total ? Math.round((active / total) * 100) : 0}% of total sources`, icon: CheckCircle, color: 'var(--success)', bg: 'var(--success-soft)' },
     { label: 'Data Sync Status', value: '98.7%', sub: 'Success Rate', icon: RefreshCw, color: 'var(--info)', bg: 'rgba(79,139,240,0.12)' },
     { label: 'Time Saved', value: '125 hrs', sub: '+18% this month', icon: Clock, color: 'var(--warning)', bg: 'var(--warning-soft)' },
   ];
@@ -80,8 +157,10 @@ const DataSources = () => {
       subtitle="Manage and monitor all your connected data sources."
       headerActions={
         <>
-          <button className="btn btn-ghost"><RefreshCw size={16} /> Refresh All</button>
-          <button className="btn btn-violet"><Plus size={16} /> Add Data Source</button>
+          <button className="btn btn-ghost" onClick={handleRefreshAll} disabled={isSyncing}>
+            <RefreshCw size={16} className={isSyncing ? 'spin' : undefined} /> {isSyncing ? 'Syncing...' : 'Refresh All'}
+          </button>
+          <button className="btn btn-violet" onClick={() => openAdd()}><Plus size={16} /> Add Data Source</button>
         </>
       }
     >
@@ -146,8 +225,8 @@ const DataSources = () => {
                     <td className="center"><span className={`pill ${statusPill[s.status]}`}>{statusLabel[s.status]}</span></td>
                     <td className="center">
                       <div style={{ display: 'flex', gap: '0.3rem', justifyContent: 'center' }}>
-                        <button className="btn btn-ghost btn-sm">{s.status === 'connected' ? 'Manage' : 'Fix'}</button>
-                        <button className="icon-btn" aria-label="More"><MoreVertical size={14} /></button>
+                        <button className="btn btn-ghost btn-sm" onClick={() => setModal({ kind: 'manage', id: s.id })}>{s.status === 'connected' ? 'Manage' : 'Fix'}</button>
+                        <button className="icon-btn" aria-label={`More options for ${s.name}`} onClick={() => setModal({ kind: 'manage', id: s.id })}><MoreVertical size={14} /></button>
                       </div>
                     </td>
                   </tr>
@@ -158,7 +237,7 @@ const DataSources = () => {
               </tbody>
             </table>
             <div className="table-footer">
-              <span>Showing 1 to {filteredSources.length} of {dataSources.length} results</span>
+              <span>Showing {filteredSources.length === 0 ? 0 : 1} to {filteredSources.length} of {sources.length} results</span>
             </div>
           </div>
 
@@ -166,8 +245,19 @@ const DataSources = () => {
           <div>
             <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: '0 0 1rem' }}>Available Integrations</h3>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
-              {availableIntegrations.map((i) => (
-                <div className="available-ds-row" key={i.name}>
+              {available.length === 0 && (
+                <p style={{ color: 'var(--text-tertiary)', fontSize: '0.85rem', margin: 0 }}>Every available integration is connected.</p>
+              )}
+              {available.map((i) => (
+                <div
+                  className="available-ds-row"
+                  key={i.name}
+                  role="button"
+                  tabIndex={0}
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => openAdd(i.name)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openAdd(i.name); } }}
+                >
                   <span style={{ fontSize: '1.6rem' }}>{i.icon}</span>
                   <div style={{ flex: 1 }}>
                     <p>{i.name}</p>
@@ -238,6 +328,60 @@ const DataSources = () => {
           </div>
         </div>
       </div>
+
+      {modal?.kind === 'add' && (
+        <Modal
+          title="Add Data Source"
+          onClose={closeModal}
+          footer={
+            <>
+              <button type="button" className="btn btn-ghost" onClick={closeModal}>Cancel</button>
+              <button type="submit" form="add-source-form" className="btn btn-violet" disabled={available.length === 0}>Connect</button>
+            </>
+          }
+        >
+          <form id="add-source-form" onSubmit={handleAdd} style={{ display: 'grid', gap: '0.9rem' }}>
+            <div className="modal-field">
+              <label htmlFor="ds-name">Integration</label>
+              <select id="ds-name" value={addForm.name} onChange={(e) => setAddForm({ ...addForm, name: e.target.value })}>
+                {available.map((i) => <option key={i.name}>{i.name}</option>)}
+              </select>
+            </div>
+            <div className="modal-field">
+              <label htmlFor="ds-connection">Connection method</label>
+              <select id="ds-connection" value={addForm.connection} onChange={(e) => setAddForm({ ...addForm, connection: e.target.value })}>
+                {CONNECTION_TYPES.map((c) => <option key={c}>{c}</option>)}
+              </select>
+            </div>
+          </form>
+        </Modal>
+      )}
+
+      {managed && (
+        <Modal
+          title={managed.name}
+          onClose={closeModal}
+          footer={
+            <>
+              <button type="button" className="btn btn-outline-danger" onClick={() => handleDisconnect(managed)}><Trash2 size={15} /> Disconnect</button>
+              <button type="button" className="btn btn-primary" onClick={() => handleSyncOne(managed)}>
+                <RefreshCw size={15} /> {managed.status === 'warning' ? 'Reconnect' : 'Sync Now'}
+              </button>
+            </>
+          }
+        >
+          {managed.status === 'warning' && (
+            <p style={{ margin: 0, color: 'var(--warning)', fontSize: '0.85rem' }}>
+              The last sync did not complete. Reconnect to resume syncing.
+            </p>
+          )}
+          <div className="modal-detail-row"><span>Type</span><span>{managed.type}</span></div>
+          <div className="modal-detail-row"><span>Connection</span><span>{managed.connection}</span></div>
+          <div className="modal-detail-row"><span>Status</span><span className={`pill ${statusPill[managed.status]}`}>{statusLabel[managed.status]}</span></div>
+          <div className="modal-detail-row"><span>Last sync</span><span>{managed.lastSync}</span></div>
+          <div className="modal-detail-row"><span>Records</span><span>{managed.records}</span></div>
+        </Modal>
+      )}
     </AppShell>
   );
 };
