@@ -21,12 +21,18 @@ import Billing from './pages/Billing';
 import Forecasting from './pages/Forecasting';
 import Users from './pages/Users';
 import { AuthContext } from './AuthContext';
+import { ToastProvider } from './Toast';
+import { loadSettings, applyAppearance } from './appearance';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
   const [onboardingComplete, setOnboardingComplete] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    applyAppearance(loadSettings());
+  }, []);
 
   useEffect(() => {
     const savedUser = localStorage.getItem('senzia_user');
@@ -84,6 +90,7 @@ function App() {
 
   return (
     <AuthContext.Provider value={{ user, onLogout: handleLogout }}>
+    <ToastProvider>
     <Router>
       <Routes>
         {/* Public Routes */}
@@ -214,6 +221,7 @@ function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
+    </ToastProvider>
     </AuthContext.Provider>
   );
 }

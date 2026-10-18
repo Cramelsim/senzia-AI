@@ -645,6 +645,54 @@
 }
 .notif-view-all:hover { background: var(--surface); }
 
+/* ===================== TOASTS ===================== */
+.toast-stack {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: auto;
+  cursor: pointer;
+  min-width: 220px;
+  max-width: min(480px, 90vw);
+  padding: 0.7rem 1.1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.35);
+}
+.toast-success { border-color: var(--success); }
+.toast-error { border-color: var(--danger); }
+.toast-info { border-color: var(--info); }
+
+/* ===================== LIGHT THEME + COMPACT MODE (Settings > Appearance) ===================== */
+:root[data-theme='light'] {
+  --bg: #f5f6f8;
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  --border: #d9dce3;
+  --border-soft: #e6e8ee;
+  --text-primary: #14171d;
+  --text-secondary: #565b67;
+  --text-tertiary: #7d828f;
+}
+:root[data-theme='light'] .topbar { background: rgba(245, 246, 248, 0.85); }
+
+.compact .page-body { padding: 1rem; gap: 1rem; }
+.compact .panel { padding: 0.85rem; }
+
 /* ===================== RESPONSIVE ===================== */
 @media (max-width: 1180px) {
   .rail-stack { position: static; }
