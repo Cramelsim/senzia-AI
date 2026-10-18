@@ -12,6 +12,8 @@ import {
   X,
 } from 'lucide-react';
 import AppShell from './AppShell';
+import { useToast } from '../Toast';
+import { downloadFile, toCsv } from '../download';
 import './Dashboard.css';
 
 const metrics = [
@@ -91,6 +93,7 @@ const allInsightTypes = [...new Set(aiInsights.map((i) => i.type))];
 const maxValue = Math.max(...weekData.map((d) => d.revenue));
 
 const Dashboard = ({ user, onLogout }) => {
+  const toast = useToast();
   const [chartRange, setChartRange] = useState('This Week');
 
   // ---- Date dropdown ----
@@ -155,6 +158,27 @@ const Dashboard = ({ user, onLogout }) => {
   const visibleSources = revenueSources.filter((s) => filterSources.includes(s.name));
   const visibleAlerts = alerts.filter((a) => filterAlertTypes.includes(a.type));
   const visibleInsights = aiInsights.filter((i) => filterInsightTypes.includes(i.type));
+
+  // Exports exactly what the filters currently show, tagged with the selected date range.
+  const handleExport = () => {
+    const rows = visibleMetrics.map((m) => ({ metric: m.title, value: m.value, change: m.change, comparison: m.vs, range: selectedRange }));
+    if (rows.length === 0) {
+      toast('Nothing to export. Adjust your filters first.', 'error');
+      return;
+    }
+    downloadFile(
+      'senzia-dashboard.csv',
+      toCsv(rows, [
+        { key: 'metric', label: 'Metric' },
+        { key: 'value', label: 'Value' },
+        { key: 'change', label: 'Change' },
+        { key: 'comparison', label: 'Compared to' },
+        { key: 'range', label: 'Date range' },
+      ]),
+      'text/csv'
+    );
+    toast(`Exported ${rows.length} metrics.`);
+  };
 
   return (
     <AppShell
@@ -284,7 +308,7 @@ const Dashboard = ({ user, onLogout }) => {
             )}
           </div>
 
-          <button className="btn btn-primary"><Download size={16} /> Export</button>
+          <button className="btn btn-primary" onClick={handleExport}><Download size={16} /> Export</button>
         </>
       }
     >
